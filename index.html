@@ -615,6 +615,15 @@
 
     </main>
 
+    <!-- Rodapé com link para o GitHub -->
+    <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-6 flex justify-center">
+        <a href="https://github.com/anreren/minecraft-optimization-panel" target="_blank" rel="noopener noreferrer"
+           class="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-xl bg-gray-900 border border-gray-700 text-gray-200 font-semibold text-sm hover:border-emerald-500/60 hover:text-white hover:bg-gray-800 transition shadow-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true" class="shrink-0"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+            <span id="i18n-footer-github">Ver no GitHub</span>
+        </a>
+    </footer>
+
     <script>
         // ============================================================================
         // DICIONÁRIO DE IDIOMAS (PORTUGUÊS BR & ENGLISH US)
@@ -681,6 +690,7 @@
                 toastJvmCopied: "Argumentos JVM GraalVM copiados!",
                 toastCfgCopied: "Arquivo de configuração copiado!",
                 toastChkReset: "Checklist reiniciado!",
+                footerGithub: "Ver no GitHub",
                 toastJava21Req: "Minecraft 1.20.6+ exige Java 21! Alterado para Oracle GraalVM 21.",
                 freqStdGroup: "Frequências Padrão",
                 freqOtherGroup: "Outras Frequências"
@@ -746,6 +756,7 @@
                 toastJvmCopied: "GraalVM JVM arguments copied!",
                 toastCfgCopied: "Configuration file copied!",
                 toastChkReset: "Checklist reset!",
+                footerGithub: "View on GitHub",
                 toastJava21Req: "Minecraft 1.20.6+ requires Java 21! Switched to Oracle GraalVM 21.",
                 freqStdGroup: "Standard Frequencies",
                 freqOtherGroup: "Other Frequencies"
@@ -869,6 +880,7 @@
             }
 
             const t = i18n[lang];
+            document.getElementById('i18n-footer-github').textContent = t.footerGithub;
             document.getElementById('i18n-app-title').textContent = t.appTitle;
             document.getElementById('i18n-checklist-top').textContent = t.checklistTop;
             document.getElementById('i18n-sec1-title').textContent = t.sec1Title;
