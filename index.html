@@ -1,0 +1,1927 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador & Otimizador Universal Minecraft Modded | GraalVM Edition</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #070a12;
+            color: #f3f4f6;
+            background-image: 
+                radial-gradient(circle at 10% 8%, rgba(16, 185, 129, 0.09) 0%, transparent 35%),
+                radial-gradient(circle at 90% 12%, rgba(139, 92, 246, 0.09) 0%, transparent 35%),
+                radial-gradient(circle at 50% 90%, rgba(6, 182, 212, 0.07) 0%, transparent 45%);
+        }
+        .code-scroll::-webkit-scrollbar {
+            height: 8px;
+            width: 8px;
+        }
+        .code-scroll::-webkit-scrollbar-track {
+            background: #05070c;
+            border-radius: 6px;
+        }
+        .code-scroll::-webkit-scrollbar-thumb {
+            background: #1f2937;
+            border-radius: 6px;
+        }
+        .code-scroll::-webkit-scrollbar-thumb:hover {
+            background: #374151;
+        }
+        select option, select optgroup {
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+    </style>
+</head>
+<body class="min-h-screen antialiased selection:bg-emerald-500 selection:text-white pb-20">
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none bg-emerald-600 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 font-medium border border-emerald-400/40">
+        <i class="fa-solid fa-circle-check text-lg"></i>
+        <span id="toast-msg">Copiado para a área de transferência!</span>
+    </div>
+
+    <!-- Header -->
+    <header class="border-b border-gray-800/80 bg-gray-900/80 backdrop-blur-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-500 via-teal-500 to-purple-600 flex items-center justify-center shadow-lg shadow-emerald-500/20 border border-white/10">
+                        <i class="fa-solid fa-microchip text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <h1 id="i18n-app-title" class="text-lg sm:text-xl font-extrabold tracking-tight text-white">Simulador & Otimizador Universal Minecraft</h1>
+                            <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/40">Oracle GraalVM JIT Engine</span>
+                            <span id="header-loader-badge" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">Forge 1.20.1</span>
+                        </div>
+                        <p id="header-hw-summary" class="text-xs text-gray-400 mt-0.5">Ryzen 5 5500 (6C/12T) • RTX 3050 6GB (Desktop) • 32GB DDR4 2666MHz • SSD NVMe</p>
+                    </div>
+                </div>
+
+                <!-- Seletor de Idioma (PT-BR / EN-US) & Progresso -->
+                <div class="flex flex-wrap items-center gap-3">
+                    <div class="flex items-center bg-gray-950/90 p-1 rounded-xl border border-gray-800">
+                        <button onclick="setLanguage('pt')" id="lang-btn-pt" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 text-white transition flex items-center gap-1.5">
+                            <span>🇧🇷</span> Português (BR)
+                        </button>
+                        <button onclick="setLanguage('en')" id="lang-btn-en" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-400 hover:text-white transition flex items-center gap-1.5">
+                            <span>🇺🇸</span> English (US)
+                        </button>
+                    </div>
+                    <div class="flex items-center gap-3 bg-gray-950/90 px-3.5 py-2 rounded-xl border border-gray-800">
+                        <div class="text-right">
+                            <div id="i18n-checklist-top" class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Checklist</div>
+                            <div id="progress-text" class="text-xs font-bold text-emerald-400">0/8 (0%)</div>
+                        </div>
+                        <div class="w-20 h-2 bg-gray-800 rounded-full overflow-hidden">
+                            <div id="progress-bar" class="h-full bg-gradient-to-r from-emerald-500 to-cyan-400 w-0 transition-all duration-500"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-8">
+
+        <!-- SEÇÃO 1: CONFIGURADOR DE HARDWARE, MEMÓRIA, DISCO E VERSÃO DO JOGO -->
+        <section class="bg-gray-900/95 border border-gray-800 rounded-2xl p-5 sm:p-6 shadow-2xl space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-gray-800">
+                <div>
+                    <h2 class="text-lg sm:text-xl font-bold text-white flex items-center gap-2.5">
+                        <i class="fa-solid fa-sliders text-emerald-400"></i>
+                        <span id="i18n-sec1-title">1. Configurador Dinâmico de Hardware, Memória & Jogo</span>
+                    </h2>
+                    <p id="i18n-sec1-sub" class="text-xs sm:text-sm text-gray-400 mt-0.5">Altere qualquer peça abaixo para recalcular instantaneamente threads do ZGC, instruções AVX, compilador GraalVM e arquivos de configuração.</p>
+                </div>
+                <span class="text-xs font-mono text-cyan-400 bg-cyan-950/50 border border-cyan-500/30 px-3 py-1.5 rounded-xl self-start sm:self-auto">
+                    <i class="fa-solid fa-bolt mr-1"></i> <span id="i18n-live-telemetry">Telemetria em Tempo Real</span>
+                </span>
+            </div>
+
+            <!-- Grid de Seletores de Hardware -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                
+                <!-- 1. Processador (CPU) -->
+                <div class="bg-gray-950/80 border border-gray-800 rounded-xl p-3.5 space-y-2">
+                    <label for="select-cpu" class="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-orange-400">
+                        <span><i class="fa-solid fa-microchip mr-1.5"></i><span id="i18n-lbl-cpu">Processador (CPU)</span></span>
+                        <span id="cpu-badge-threads" class="font-mono text-[11px] bg-orange-500/15 px-2 py-0.5 rounded border border-orange-500/30">6C / 12T</span>
+                    </label>
+                    <select id="select-cpu" onchange="onHardwareChange()" class="w-full bg-gray-900 border border-gray-700/80 rounded-lg px-3 py-2 text-xs sm:text-sm text-white font-medium focus:outline-none focus:border-emerald-500">
+                        <optgroup label="AMD Ryzen Série 5000 / 4000 / 3000 (AM4)">
+                            <option value="r5_5500" selected>AMD Ryzen 5 5500 (6C/12T - Zen 3)</option>
+                            <option value="r5_5600">AMD Ryzen 5 5600 / 5600X (6C/12T - 32MB L3)</option>
+                            <option value="r5_5600g">AMD Ryzen 5 5600G / 4600G (6C/12T - APU)</option>
+                            <option value="r7_5700x">AMD Ryzen 7 5700X / 5800X (8C/16T - Zen 3)</option>
+                            <option value="r7_5700x3d">AMD Ryzen 7 5700X3D / 5800X3D (8C/16T - 96MB V-Cache)</option>
+                            <option value="r9_5900x">AMD Ryzen 9 5900X / 5950X (12C/24T+)</option>
+                            <option value="r5_3600">AMD Ryzen 5 3600 / 4500 (6C/12T - Zen 2)</option>
+                            <option value="r3_3200g">AMD Ryzen 3 3200G / 2200G (4C/4T - Zen+)</option>
+                        </optgroup>
+                        <optgroup label="AMD Ryzen Série 7000 / 9000 (AM5 - AVX-512)">
+                            <option value="r5_7600">AMD Ryzen 5 7600 / 7600X / 9600X (6C/12T - Zen 4/5)</option>
+                            <option value="r7_7800x3d">AMD Ryzen 7 7800X3D / 9800X3D (8C/16T - 3D V-Cache)</option>
+                            <option value="r9_7950x">AMD Ryzen 9 7900X / 7950X / 9950X (16C/32T)</option>
+                        </optgroup>
+                        <optgroup label="Intel Core 12th to 14th Gen (LGA1700)">
+                            <option value="i3_12100f">Intel Core i3-12100F / 13100F / 14100F (4C/8T)</option>
+                            <option value="i5_12400f">Intel Core i5-12400F / 13400F (6P+4E / 12-16T)</option>
+                            <option value="i5_13600k">Intel Core i5-13600K / 14600K (14C/20T Hybrid)</option>
+                            <option value="i7_13700k">Intel Core i7-12700K / 13700K / 14700K (16C/24T)</option>
+                            <option value="i9_14900k">Intel Core i9-13900K / 14900K / Core Ultra 9 (24C/32T)</option>
+                        </optgroup>
+                        <optgroup label="Intel Core 9th-11th Gen & Legacy / Xeon">
+                            <option value="i5_10400f">Intel Core i5-10400F / 11400F (6C/12T)</option>
+                            <option value="i5_9400f">Intel Core i5-9400F / i5-8400 (6C/6T)</option>
+                            <option value="i7_4790k">Intel Core i7-4790K / i7-3770 (4C/8T - DDR3)</option>
+                            <option value="xeon_2680v4">Intel Xeon E5-2680 v4 / 2666 v3 (12C/24T X99)</option>
+                            <option value="fx_8350">AMD FX-8350 / FX-6300 (DDR3 - AVX1)</option>
+                        </optgroup>
+                    </select>
+                    <p id="cpu-meta-desc" class="text-[11px] text-gray-400 font-mono">Zen 3 • AVX2 • 16MB L3 • ConcGC: 3 / Parallel: 8</p>
+                </div>
+
+                <!-- 2. Placa de Vídeo (GPU) -->
+                <div class="bg-gray-950/80 border border-gray-800 rounded-xl p-3.5 space-y-2">
+                    <label for="select-gpu" class="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-emerald-400">
+                        <span><i class="fa-solid fa-display mr-1.5"></i><span id="i18n-lbl-gpu">Placa de Vídeo (GPU)</span></span>
+                        <span id="gpu-badge-vram" class="font-mono text-[11px] bg-emerald-500/15 px-2 py-0.5 rounded border border-emerald-500/30">6GB VRAM</span>
+                    </label>
+                    <select id="select-gpu" onchange="onHardwareChange()" class="w-full bg-gray-900 border border-gray-700/80 rounded-lg px-3 py-2 text-xs sm:text-sm text-white font-medium focus:outline-none focus:border-emerald-500">
+                        <optgroup label="NVIDIA GeForce RTX 30 / 40 / 50 Series">
+                            <option value="rtx_3050_6_desk" selected>NVIDIA RTX 3050 6GB (Desktop - Ampere 96-bit)</option>
+                            <option value="rtx_3050_8">NVIDIA RTX 3050 8GB (Desktop - Ampere 128-bit)</option>
+                            <option value="rtx_3050_4_lap">NVIDIA RTX 3050 / 3050 Ti (4GB Laptop - Ampere)</option>
+                            <option value="rtx_3060_12">NVIDIA RTX 3060 (12GB) / RTX 3060 Ti (8GB)</option>
+                            <option value="rtx_4060">NVIDIA RTX 4060 / 4060 Ti (8GB / 16GB - Ada)</option>
+                            <option value="rtx_4070s">NVIDIA RTX 4070 Super / 4080 / RTX 5070 (12GB-16GB)</option>
+                            <option value="rtx_2060">NVIDIA RTX 2060 / 2060 Super (6GB / 8GB - Turing)</option>
+                        </optgroup>
+                        <optgroup label="NVIDIA GeForce GTX 16 / 10 Series">
+                            <option value="gtx_1660s">NVIDIA GTX 1660 Super / 1660 Ti (6GB)</option>
+                            <option value="gtx_1650">NVIDIA GTX 1650 / 1650 Super (4GB)</option>
+                            <option value="gtx_1060">NVIDIA GTX 1060 (6GB) / GTX 1070 (8GB)</option>
+                            <option value="gtx_1050ti">NVIDIA GTX 1050 Ti (4GB) / GT 1030 (2GB)</option>
+                        </optgroup>
+                        <optgroup label="AMD Radeon RX 6000 / 7000 / 500 / 400 Series">
+                            <option value="rx_6600">AMD Radeon RX 6600 / 6650 XT (8GB RDNA2)</option>
+                            <option value="rx_6750xt">AMD Radeon RX 6700 XT / 6750 XT (12GB RDNA2)</option>
+                            <option value="rx_7600">AMD Radeon RX 7600 (8GB) / RX 7700 XT / 7800 XT</option>
+                            <option value="rx_580">AMD Radeon RX 580 2048SP / RX 570 (8GB Polaris)</option>
+                            <option value="rx_470_8">AMD Radeon RX 470 / RX 480 (8GB Polaris)</option>
+                            <option value="rx_470_4">AMD Radeon RX 470 / RX 570 (4GB Polaris)</option>
+                            <option value="rx_550">AMD Radeon RX 550 (4GB) / Vega 7 / Vega 8 (iGPU)</option>
+                        </optgroup>
+                        <optgroup label="Intel Arc & Integrated Graphics">
+                            <option value="arc_a750">Intel Arc A750 / A770 / B580 (8GB - 16GB)</option>
+                            <option value="arc_a380">Intel Arc A380 / A580 (6GB - 8GB)</option>
+                            <option value="intel_igpu">Intel Iris Xe / UHD Graphics (Shared Memory)</option>
+                        </optgroup>
+                    </select>
+                    <p id="gpu-meta-desc" class="text-[11px] text-gray-400 font-mono">NVIDIA Ampere • Threaded Optimization: ON</p>
+                </div>
+
+                <!-- 3. Memória RAM (Geração DDR3-DDR5, Frequência e Capacidade) -->
+                <div class="bg-gray-950/80 border border-gray-800 rounded-xl p-3.5 space-y-2">
+                    <label class="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-blue-400">
+                        <span><i class="fa-solid fa-memory mr-1.5"></i><span id="i18n-lbl-ram">Memória RAM</span></span>
+                        <span id="ram-badge-bw" class="font-mono text-[11px] bg-blue-500/15 px-2 py-0.5 rounded border border-blue-500/30">DDR4 2666</span>
+                    </label>
+                    <div class="grid grid-cols-3 gap-1.5">
+                        <!-- Tipo DDR -->
+                        <select id="select-ddr-type" onchange="onDDRTypeChange()" aria-label="Geração DDR" class="bg-gray-900 border border-gray-700/80 rounded-lg px-2 py-2 text-xs text-white font-bold focus:outline-none focus:border-blue-500">
+                            <option value="DDR3">DDR3</option>
+                            <option value="DDR4" selected>DDR4</option>
+                            <option value="DDR5">DDR5</option>
+                        </select>
+                        <!-- Frequência -->
+                        <select id="select-ram-freq" onchange="onHardwareChange()" aria-label="Frequência da RAM" class="col-span-2 bg-gray-900 border border-gray-700/80 rounded-lg px-2 py-2 text-xs text-white font-medium focus:outline-none focus:border-blue-500">
+                            <!-- Populado via JS com todas as frequências -->
+                        </select>
+                    </div>
+                    <div class="pt-0.5">
+                        <select id="select-sys-ram" onchange="onSystemRamChange()" aria-label="Capacidade Total de RAM" class="w-full bg-gray-900 border border-gray-700/80 rounded-lg px-2.5 py-1.5 text-xs text-gray-200 font-medium focus:outline-none focus:border-blue-500">
+                            <option value="8" data-pt="8 GB de RAM Total no PC" data-en="8 GB Total System RAM">8 GB de RAM Total no PC</option>
+                            <option value="12" data-pt="12 GB de RAM Total no PC" data-en="12 GB Total System RAM">12 GB de RAM Total no PC</option>
+                            <option value="16" data-pt="16 GB de RAM Total no PC" data-en="16 GB Total System RAM">16 GB de RAM Total no PC</option>
+                            <option value="24" data-pt="24 GB de RAM Total no PC" data-en="24 GB Total System RAM">24 GB de RAM Total no PC</option>
+                            <option value="32" data-pt="32 GB de RAM Total no PC" data-en="32 GB Total System RAM" selected>32 GB de RAM Total no PC</option>
+                            <option value="48" data-pt="48 GB de RAM Total no PC" data-en="48 GB Total System RAM">48 GB de RAM Total no PC</option>
+                            <option value="64" data-pt="64 GB de RAM Total no PC" data-en="64 GB Total System RAM">64 GB de RAM Total no PC</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 4. Armazenamento (Storage) -->
+                <div class="bg-gray-950/80 border border-gray-800 rounded-xl p-3.5 space-y-2">
+                    <label for="select-storage" class="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-purple-400">
+                        <span><i class="fa-solid fa-hard-drive mr-1.5"></i><span id="i18n-lbl-storage">Armazenamento</span></span>
+                        <span id="storage-badge-io" class="font-mono text-[11px] bg-purple-500/15 px-2 py-0.5 rounded border border-purple-500/30">SpikeTol: 5.0</span>
+                    </label>
+                    <select id="select-storage" onchange="onHardwareChange()" class="w-full bg-gray-900 border border-gray-700/80 rounded-lg px-3 py-2 text-xs sm:text-sm text-white font-medium focus:outline-none focus:border-purple-500">
+                        <option value="nvme" data-pt="SSD NVMe M.2 PCIe (3500+ MB/s)" data-en="NVMe M.2 PCIe SSD (3500+ MB/s)" selected>SSD NVMe M.2 PCIe (3500+ MB/s)</option>
+                        <option value="sata" data-pt="SSD SATA III (500 MB/s)" data-en="SATA III SSD (500 MB/s)">SSD SATA III (500 MB/s)</option>
+                        <option value="hdd" data-pt="HD Mecânico (HDD 7200/5400 RPM)" data-en="Mechanical Hard Drive (HDD 7200/5400 RPM)">HD Mecânico (HDD 7200/5400 RPM)</option>
+                    </select>
+                    <p id="storage-meta-desc" class="text-[11px] text-gray-400 font-mono">I/O Ultra Rápido • Dynamic Resources: Ideal</p>
+                </div>
+            </div>
+
+            <!-- Linha 2: Versão do Minecraft, Mod Loader e Motor GraalVM -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 border-t border-gray-800/80">
+                <!-- Versão do Jogo -->
+                <div class="bg-gray-950/70 border border-gray-800 rounded-xl p-3.5 flex items-center justify-between gap-3">
+                    <div class="w-full">
+                        <label for="select-mc-version" class="text-xs font-bold uppercase tracking-wider text-emerald-400 block mb-1.5">
+                            <i class="fa-solid fa-gamepad mr-1.5"></i><span id="i18n-lbl-mcver">Versão do Minecraft</span>
+                        </label>
+                        <select id="select-mc-version" onchange="onVersionOrLoaderChange()" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs sm:text-sm text-white font-semibold focus:outline-none focus:border-emerald-500">
+                            <option value="1.20.1" data-pt="Minecraft 1.20.1 (LTS de Grandes Modpacks)" data-en="Minecraft 1.20.1 (Major Modpacks LTS)" selected>Minecraft 1.20.1 (LTS de Grandes Modpacks)</option>
+                            <option value="1.20.4" data-pt="Minecraft 1.20.2 / 1.20.4" data-en="Minecraft 1.20.2 / 1.20.4">Minecraft 1.20.2 / 1.20.4</option>
+                            <option value="1.20.6" data-pt="Minecraft 1.20.6 (Java 21 Nativo)" data-en="Minecraft 1.20.6 (Native Java 21)">Minecraft 1.20.6 (Java 21 Nativo)</option>
+                            <option value="1.21.1" data-pt="Minecraft 1.21.1 (LTS Atual de Mods)" data-en="Minecraft 1.21.1 (Current Modded LTS)">Minecraft 1.21.1 (LTS Atual de Mods)</option>
+                            <option value="1.21.4" data-pt="Minecraft 1.21.3 / 1.21.4+ (Mais Recente)" data-en="Minecraft 1.21.3 / 1.21.4+ (Latest)">Minecraft 1.21.3 / 1.21.4+ (Mais Recente)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Mod Loader -->
+                <div class="bg-gray-950/70 border border-gray-800 rounded-xl p-3.5 flex items-center justify-between gap-3">
+                    <div class="w-full">
+                        <label for="select-loader" class="text-xs font-bold uppercase tracking-wider text-cyan-400 block mb-1.5">
+                            <i class="fa-solid fa-hammer mr-1.5"></i><span id="i18n-lbl-loader">Mod Loader (Carregador)</span>
+                        </label>
+                        <select id="select-loader" onchange="onVersionOrLoaderChange()" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs sm:text-sm text-white font-semibold focus:outline-none focus:border-cyan-500">
+                            <option value="forge" data-pt="Forge (Clássico 1.20.1+)" data-en="Forge (Classic 1.20.1+)" selected>Forge (Clássico 1.20.1+)</option>
+                            <option value="neoforge" data-pt="NeoForge (Sucessor Moderno 1.20.1 / 1.21+)" data-en="NeoForge (Modern Successor 1.20.1 / 1.21+)">NeoForge (Sucessor Moderno 1.20.1 / 1.21+)</option>
+                            <option value="fabric" data-pt="Fabric (Leve & Alta Performance)" data-en="Fabric (Lightweight & High Performance)">Fabric (Leve & Alta Performance)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Motor Java / GraalVM -->
+                <div class="bg-gray-950/70 border border-purple-500/30 rounded-xl p-3.5 flex items-center justify-between gap-3">
+                    <div class="w-full">
+                        <label for="select-jvm-engine" class="text-xs font-bold uppercase tracking-wider text-purple-300 block mb-1.5">
+                            <i class="fa-solid fa-fire-flame-curved mr-1.5"></i><span id="i18n-lbl-jvm">Distribuição Java (Foco GraalVM)</span>
+                        </label>
+                        <select id="select-jvm-engine" onchange="onHardwareChange()" class="w-full bg-gray-900 border border-purple-500/50 rounded-lg px-3 py-2 text-xs sm:text-sm text-white font-semibold focus:outline-none focus:border-purple-400">
+                            <option value="graal21_zgc" data-pt="Oracle GraalVM 21/22+ (Generational ZGC + JIT Graal) ★" data-en="Oracle GraalVM 21/22+ (Generational ZGC + Graal JIT) ★" selected>Oracle GraalVM 21/22+ (Generational ZGC + JIT Graal) ★</option>
+                            <option value="graal21_g1" data-pt="Oracle GraalVM 21 (G1GC Tuned + Graal Vectorizer)" data-en="Oracle GraalVM 21 (G1GC Tuned + Graal Vectorizer)">Oracle GraalVM 21 (G1GC Tuned + Graal Vectorizer)</option>
+                            <option value="graal17_zgc" data-pt="Oracle GraalVM 17 (Para Mods 1.20.1 incompatíveis c/ Java 21)" data-en="Oracle GraalVM 17 (For 1.20.1 Mods incompatible w/ Java 21)">Oracle GraalVM 17 (Para Mods 1.20.1 incompatíveis c/ Java 21)</option>
+                            <option value="temurin21_zgc" data-pt="OpenJDK / Adoptium Temurin 21 (Generational ZGC Padrão)" data-en="OpenJDK / Adoptium Temurin 21 (Standard Generational ZGC)">OpenJDK / Adoptium Temurin 21 (Generational ZGC Padrão)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Painel de Diagnóstico Inteligente de Hardware & Gargalos -->
+            <div id="hardware-diagnostics" class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+                <!-- Preenchido dinamicamente pelo JS -->
+            </div>
+        </section>
+
+        <!-- SEÇÃO 2: CALCULADORA DE RAM, BARRA VISUAL & GERADOR DE ARGUMENTOS GRAALVM -->
+        <section class="bg-gray-900 border border-gray-800 rounded-2xl p-5 sm:p-6 shadow-xl space-y-6">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-gray-800">
+                <div>
+                    <h2 class="text-lg sm:text-xl font-bold text-white flex items-center gap-2.5">
+                        <i class="fa-solid fa-terminal text-purple-400"></i>
+                        <span id="i18n-sec2-title">2. Alocação Inteligente de RAM & Argumentos JVM (Oracle GraalVM)</span>
+                    </h2>
+                    <p id="i18n-sec2-sub" class="text-xs sm:text-sm text-gray-400 mt-0.5">O compilador JIT do <strong>Oracle GraalVM</strong> usa parte da RAM nativa para otimizar loops de mods em código de máquina. Escolha o porte do modpack abaixo:</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span id="graal-status-pill" class="text-xs font-mono px-3 py-1.5 rounded-xl bg-purple-500/15 text-purple-300 border border-purple-500/30">
+                        <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> <span id="i18n-graal-pill">GraalVM JIT Compiler Ativo</span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- 4 Perfis Rápidos de Modpack -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <button onclick="selectModpackProfile('light')" id="profile-light" class="profile-card text-left p-4 rounded-xl border border-gray-800 bg-gray-950/60 hover:border-gray-700 transition flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between">
+                            <span id="i18n-prof-light-badge" class="text-xs font-bold px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-400 border border-cyan-500/30">Leve / Vanilla+</span>
+                            <span id="card-ram-light" class="text-sm font-extrabold text-white">6 GB</span>
+                        </div>
+                        <h3 id="i18n-prof-light-title" class="text-sm font-bold text-gray-200 mt-2">Até 90 Mods</h3>
+                        <p id="i18n-prof-light-desc" class="text-xs text-gray-400 mt-1">Pacotes focados em FPS, aventura leve ou QoL.</p>
+                    </div>
+                    <div class="mt-3 pt-2 border-t border-gray-800/80 flex justify-between text-[11px] font-mono text-gray-400">
+                        <span>SoftMax: 5G</span>
+                        <span>CodeCache: 384M</span>
+                    </div>
+                </button>
+
+                <button onclick="selectModpackProfile('medium')" id="profile-medium" class="profile-card text-left p-4 rounded-xl border border-gray-800 bg-gray-950/60 hover:border-gray-700 transition flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between">
+                            <span id="i18n-prof-med-badge" class="text-xs font-bold px-2 py-0.5 rounded bg-blue-500/15 text-blue-400 border border-blue-500/30">Médio / RPG ou Tech</span>
+                            <span id="card-ram-medium" class="text-sm font-extrabold text-white">10 GB</span>
+                        </div>
+                        <h3 id="i18n-prof-med-title" class="text-sm font-bold text-gray-200 mt-2">90 a 200 Mods</h3>
+                        <p id="i18n-prof-med-desc" class="text-xs text-gray-400 mt-1">Create, Cobblemon, RPG ou Magia com Shaders leves.</p>
+                    </div>
+                    <div class="mt-3 pt-2 border-t border-gray-800/80 flex justify-between text-[11px] font-mono text-gray-400">
+                        <span>SoftMax: 8G</span>
+                        <span>CodeCache: 512M</span>
+                    </div>
+                </button>
+
+                <button onclick="selectModpackProfile('heavy')" id="profile-heavy" class="profile-card text-left p-4 rounded-xl border-2 border-emerald-500 bg-emerald-950/20 transition flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between">
+                            <span id="i18n-prof-heavy-badge" class="text-xs font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">Pesado ★ Recomendado</span>
+                            <span id="card-ram-heavy" class="text-sm font-extrabold text-emerald-400">12 GB</span>
+                        </div>
+                        <h3 id="i18n-prof-heavy-title" class="text-sm font-bold text-white mt-2">200 a 350 Mods</h3>
+                        <p id="i18n-prof-heavy-desc" class="text-xs text-gray-300 mt-1">Modpacks grandes com dimensões, física, chefes e automação.</p>
+                    </div>
+                    <div class="mt-3 pt-2 border-t border-emerald-500/30 flex justify-between text-[11px] font-mono text-emerald-300">
+                        <span>SoftMax: 10G</span>
+                        <span>CodeCache: 512M</span>
+                    </div>
+                </button>
+
+                <button onclick="selectModpackProfile('extreme')" id="profile-extreme" class="profile-card text-left p-4 rounded-xl border border-gray-800 bg-gray-950/60 hover:border-gray-700 transition flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between">
+                            <span id="i18n-prof-ext-badge" class="text-xs font-bold px-2 py-0.5 rounded bg-orange-500/15 text-orange-400 border border-orange-500/30">Extremo / Kitchen Sink</span>
+                            <span id="card-ram-extreme" class="text-sm font-extrabold text-white">14 GB</span>
+                        </div>
+                        <h3 id="i18n-prof-ext-title" class="text-sm font-bold text-gray-200 mt-2">350 a 500+ Mods</h3>
+                        <p id="i18n-prof-ext-desc" class="text-xs text-gray-400 mt-1">All The Mods 9/10, GregTech, Prominence II + Shaders.</p>
+                    </div>
+                    <div class="mt-3 pt-2 border-t border-gray-800/80 flex justify-between text-[11px] font-mono text-gray-400">
+                        <span>SoftMax: 12G</span>
+                        <span>CodeCache: 768M</span>
+                    </div>
+                </button>
+            </div>
+
+            <!-- Slider de RAM e Mapa Visual da Memória do Sistema -->
+            <div class="bg-gray-950/90 border border-gray-800 rounded-2xl p-4 sm:p-5 space-y-4">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div class="flex flex-wrap items-center gap-4">
+                        <div>
+                            <span id="i18n-ram-slider-lbl" class="text-xs text-gray-400 block">RAM Alocada para o Minecraft (-Xms = -Xmx)</span>
+                            <div class="flex items-baseline gap-2">
+                                <span id="ram-alloc-gb" class="text-2xl font-extrabold text-white">12 GB</span>
+                                <span id="ram-alloc-mb" class="text-sm font-mono text-emerald-400">(12288 MiB)</span>
+                            </div>
+                        </div>
+                        <input type="range" id="ram-slider" min="4" max="24" step="1" value="12" oninput="onRamSliderInput(this.value)" class="w-40 sm:w-56 accent-emerald-500 cursor-pointer">
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-3">
+                        <label class="flex items-center gap-2 bg-gray-900 px-3 py-2 rounded-xl border border-gray-800 cursor-pointer select-none">
+                            <input type="checkbox" id="chk-include-xmx" onchange="recalculateAll()" class="rounded accent-emerald-500">
+                            <span id="i18n-chk-xmx" class="text-xs text-gray-300 font-medium">Incluir <code class="text-emerald-400 font-mono">-Xms / -Xmx</code> na linha</span>
+                        </label>
+                        <label class="flex items-center gap-2 bg-gray-900 px-3 py-2 rounded-xl border border-gray-800 cursor-pointer select-none">
+                            <input type="checkbox" id="chk-large-pages" onchange="recalculateAll()" class="rounded accent-purple-500">
+                            <span id="i18n-chk-lp" class="text-xs text-gray-300 font-medium">Usar <code class="text-purple-400 font-mono">LargePages</code></span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Alerta caso aloque RAM demais para o PC atual -->
+                <div id="ram-warning-banner" class="hidden p-3 rounded-xl bg-red-950/50 border border-red-500/40 text-xs text-red-200 flex items-center gap-2.5">
+                    <i class="fa-solid fa-triangle-exclamation text-red-400 text-base"></i>
+                    <span id="ram-warning-text">Atenção: Você está alocando quase toda a RAM do PC!</span>
+                </div>
+
+                <!-- Barra de Divisão da RAM Total Selecionada -->
+                <div class="space-y-2">
+                    <div class="flex flex-col sm:flex-row sm:justify-between text-xs text-gray-400 gap-1">
+                        <span id="ram-bar-title" class="font-medium text-gray-300">Divisão dos seus 32 GB DDR4 2666 MHz:</span>
+                        <span id="ram-bar-free-label" class="font-mono text-emerald-400">19.0 GB livres para Windows/Linux, Driver GPU e Cache de Disco</span>
+                    </div>
+                    <div class="w-full h-4 bg-gray-900 rounded-xl overflow-hidden flex border border-gray-800 p-0.5 gap-0.5">
+                        <div id="bar-seg-soft" class="bg-emerald-500 h-full rounded-l-lg transition-all duration-300" style="width: 31%"></div>
+                        <div id="bar-seg-buf" class="bg-amber-500 h-full transition-all duration-300" style="width: 6%"></div>
+                        <div id="bar-seg-graal" class="bg-purple-500 h-full transition-all duration-300" style="width: 4%"></div>
+                        <div id="bar-seg-free" class="bg-gray-800 h-full rounded-r-lg transition-all duration-300" style="width: 59%"></div>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-[11px]">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-sm bg-emerald-500 inline-block"></span>
+                            <span class="text-gray-300"><span id="i18n-leg-soft-lbl">Alvo SoftMax</span> (<code id="leg-soft" class="font-mono text-emerald-400">10 GB</code>)</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-sm bg-amber-500 inline-block"></span>
+                            <span class="text-gray-300"><span id="i18n-leg-buf-lbl">Buffer Picos</span> (<code id="leg-buf" class="font-mono text-amber-400">2 GB</code>)</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-sm bg-purple-500 inline-block"></span>
+                            <span class="text-gray-300"><span id="i18n-leg-graal-lbl">Metaspace + Graal JIT</span> (<code id="leg-graal" class="font-mono text-purple-400">1.0 GB</code>)</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-sm bg-gray-700 inline-block"></span>
+                            <span class="text-gray-400"><span id="i18n-leg-free-lbl">Livre SO / VRAM</span> (<code id="leg-free" class="font-mono text-gray-300">19.0 GB</code>)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Caixa de Argumentos JVM Gerados -->
+            <div class="space-y-2">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <span id="jvm-command-subtitle" class="text-xs font-mono text-emerald-400 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        Defina Mínimo e Máximo em 12288 MiB no Launcher
+                    </span>
+                    <button onclick="copyText('jvm-args-box', 'jvm')" class="flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold transition shadow-lg shadow-emerald-600/20">
+                        <i class="fa-regular fa-copy"></i> <span id="i18n-btn-copy-jvm">Copiar Argumentos JVM Otimizados</span>
+                    </button>
+                </div>
+                <pre id="jvm-args-box" class="bg-gray-950 border border-gray-800 rounded-xl p-4 font-mono text-xs sm:text-sm text-emerald-300 overflow-x-auto code-scroll whitespace-pre-wrap break-all leading-relaxed select-all"></pre>
+            </div>
+
+            <!-- Explicação Dinâmica das Flags Geradas + Como Instalar o GraalVM -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 pt-2">
+                <div class="bg-gray-950/70 border border-gray-800 rounded-xl p-4 space-y-2.5">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-purple-400 flex items-center gap-2">
+                        <i class="fa-solid fa-magnifying-glass-chart"></i> <span id="i18n-exp-flags-title">Por que essas flags foram geradas para o seu PC?</span>
+                    </h3>
+                    <ul id="dynamic-flags-explanation" class="text-xs text-gray-300 space-y-2 leading-relaxed">
+                        <!-- Populado via JS -->
+                    </ul>
+                </div>
+
+                <div class="bg-gray-950/70 border border-purple-500/30 rounded-xl p-4 space-y-2.5">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-2">
+                        <i class="fa-solid fa-download"></i> <span id="i18n-graal-guide-title">Como Ativar o Oracle GraalVM no Seu Launcher</span>
+                    </h3>
+                    <ol id="i18n-graal-guide-steps" class="text-xs text-gray-300 space-y-2 list-decimal list-inside leading-relaxed">
+                        <li>Baixe o <strong>Oracle GraalVM for JDK 21</strong> (Community ou Oracle GraalVM) em <code class="text-purple-300 font-mono">graalvm.org/downloads</code> (arquivo ZIP para Windows/Linux) e extraia no seu SSD.</li>
+                        <li>No <strong>Prism Launcher / Modrinth / CurseForge</strong>, vá nas configurações de Java da instância e aponte para o <code class="text-emerald-300 font-mono">bin/javaw.exe</code> da pasta do GraalVM.</li>
+                        <li>No Prism Launcher, marque <strong>"Ignorar verificação de compatibilidade do Java"</strong> (pois a 1.20.1 pede Java 17 por padrão, mas roda muito melhor no GraalVM 21).</li>
+                        <li>O compilador JIT Graal (<code class="text-purple-300 font-mono">-XX:+UseJVMCICompiler</code>) eleva o FPS mínimo (1% lows) em até 25% em bases cheias de máquinas e entidades.</li>
+                    </ol>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO 3: CATÁLOGO DINÂMICO DE MODS (MUDA CONFORME FORGE / NEOFORGE / FABRIC & VERSÃO) -->
+        <section class="bg-gray-900 border border-gray-800 rounded-2xl p-5 sm:p-6 shadow-xl space-y-5">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-gray-800">
+                <div>
+                    <div class="flex flex-wrap items-center gap-2.5">
+                        <h2 class="text-lg sm:text-xl font-bold text-white flex items-center gap-2.5">
+                            <i class="fa-solid fa-cubes text-cyan-400"></i>
+                            <span id="i18n-sec3-title">3. Mods de Otimização Obrigatórios para</span>
+                        </h2>
+                        <span id="mods-section-badge" class="px-3 py-1 rounded-lg text-xs font-extrabold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">Forge 1.20.1</span>
+                    </div>
+                    <p id="i18n-sec3-sub" class="text-xs sm:text-sm text-gray-400 mt-1">Os nomes dos mods mudam automaticamente conforme você escolhe <strong>Forge</strong>, <strong>NeoForge</strong> ou <strong>Fabric</strong> e a versão do Minecraft no topo.</p>
+                </div>
+
+                <!-- Filtro de Categoria de Mods -->
+                <div class="flex flex-wrap gap-1.5 bg-gray-950 p-1.5 rounded-xl border border-gray-800">
+                    <button onclick="setModCategoryFilter('all')" id="mcat-all" class="mcat-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-gray-800 text-white transition">Todos</button>
+                    <button onclick="setModCategoryFilter('fps')" id="mcat-fps" class="mcat-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-emerald-400 hover:text-white transition">Render / GPU</button>
+                    <button onclick="setModCategoryFilter('ram')" id="mcat-ram" class="mcat-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-blue-400 hover:text-white transition">RAM & Boot</button>
+                    <button onclick="setModCategoryFilter('tps')" id="mcat-tps" class="mcat-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-orange-400 hover:text-white transition">CPU & Chunks</button>
+                    <button onclick="setModCategoryFilter('avoid')" id="mcat-avoid" class="mcat-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-red-400 hover:text-white transition">Evitar / Conflitos</button>
+                </div>
+            </div>
+
+            <div id="dynamic-mods-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Populado dinamicamente pelo JS conforme Loader e Versão -->
+            </div>
+        </section>
+
+        <!-- SEÇÃO 4: CENTRAL COMPLETA DE CONFIGURAÇÕES RECOMENDADAS PARA TODOS OS MODS -->
+        <section class="bg-gray-900 border border-gray-800 rounded-2xl p-5 sm:p-6 shadow-xl space-y-5">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-gray-800">
+                <div>
+                    <h2 class="text-lg sm:text-xl font-bold text-white flex items-center gap-2.5">
+                        <i class="fa-solid fa-file-code text-blue-400"></i>
+                        <span id="i18n-sec4-title">4. Configurações Recomendadas para TODOS os Mods de Otimização (Pasta <code class="text-blue-400 font-mono text-base">/config</code>)</span>
+                    </h2>
+                    <p id="i18n-sec4-sub" class="text-xs sm:text-sm text-gray-400 mt-0.5">Todos os arquivos abaixo são recalculados automaticamente para a sua <strong>CPU</strong> (threads), <strong>GPU</strong> (VRAM/driver), <strong>RAM</strong> (DDR3/4/5) e <strong>Disco</strong> (NVMe/SATA/HDD).</p>
+                </div>
+            </div>
+
+            <!-- Navegação de Abas para Todos os Mods de Otimização -->
+            <div class="flex flex-wrap gap-1.5 bg-gray-950 p-2 rounded-xl border border-gray-800">
+                <button onclick="selectConfigTab('modernfix')" id="ctab-modernfix" class="ctab-btn px-3 py-2 rounded-lg text-xs font-bold bg-blue-600 text-white transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-bolt"></i> 1. ModernFix
+                </button>
+                <button onclick="selectConfigTab('embeddium')" id="ctab-embeddium" class="ctab-btn px-3 py-2 rounded-lg text-xs font-semibold text-gray-400 hover:text-white transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-display"></i> <span id="tab-label-renderer">2. Embeddium / Sodium</span>
+                </button>
+                <button onclick="selectConfigTab('ferrite')" id="ctab-ferrite" class="ctab-btn px-3 py-2 rounded-lg text-xs font-semibold text-gray-400 hover:text-white transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-memory"></i> 3. FerriteCore
+                </button>
+                <button onclick="selectConfigTab('immediatelyfast')" id="ctab-immediatelyfast" class="ctab-btn px-3 py-2 rounded-lg text-xs font-semibold text-gray-400 hover:text-white transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-gauge-high"></i> 4. ImmediatelyFast
+                </button>
+                <button onclick="selectConfigTab('entityculling')" id="ctab-entityculling" class="ctab-btn px-3 py-2 rounded-lg text-xs font-semibold text-gray-400 hover:text-white transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-eye-slash"></i> 5. EntityCulling
+                </button>
+                <button onclick="selectConfigTab('badopt')" id="ctab-badopt" class="ctab-btn px-3 py-2 rounded-lg text-xs font-semibold text-gray-400 hover:text-white transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-feather"></i> 6. BadOptimizations
+                </button>
+                <button onclick="selectConfigTab('radium')" id="ctab-radium" class="ctab-btn px-3 py-2 rounded-lg text-xs font-semibold text-gray-400 hover:text-white transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-gears"></i> <span id="tab-label-lithium">7. Radium / Lithium</span>
+                </button>
+                <button onclick="selectConfigTab('loader')" id="ctab-loader" class="ctab-btn px-3 py-2 rounded-lg text-xs font-semibold text-gray-400 hover:text-white transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-sliders"></i> 8. Forge / NeoForge / C2ME
+                </button>
+                <button onclick="selectConfigTab('driver')" id="ctab-driver" class="ctab-btn px-3 py-2 rounded-lg text-xs font-semibold text-gray-400 hover:text-white transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-screwdriver-wrench"></i> <span id="i18n-tab-driver">9. Driver GPU & Shaders</span>
+                </button>
+            </div>
+
+            <!-- Painel de Conteúdo da Config Selecionada -->
+            <div class="bg-gray-950/90 border border-gray-800 rounded-2xl p-4 sm:p-5 space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-800">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span id="cfg-file-path" class="font-mono text-sm font-bold text-blue-400">config/modernfix-mixins.properties</span>
+                            <span id="cfg-hw-tag" class="text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">Ajustado para NVMe + 6GB VRAM</span>
+                        </div>
+                        <p id="cfg-file-desc" class="text-xs text-gray-400 mt-1">Adicione estas linhas no final do arquivo para ativar recursos dinâmicos e acelerar a renderização de itens.</p>
+                    </div>
+
+                    <!-- Controles Extras específicos do ModernFix -->
+                    <div id="modernfix-extra-toggles" class="flex flex-wrap items-center gap-3">
+                        <label class="flex items-center gap-1.5 text-xs text-gray-300 cursor-pointer select-none bg-gray-900 px-2.5 py-1.5 rounded-lg border border-gray-800">
+                            <input type="checkbox" id="chk-mf-dynres" checked onchange="renderActiveConfigTab()" class="rounded accent-blue-500">
+                            <span>dynamic_resources</span>
+                        </label>
+                        <label class="flex items-center gap-1.5 text-xs text-gray-300 cursor-pointer select-none bg-gray-900 px-2.5 py-1.5 rounded-lg border border-gray-800">
+                            <input type="checkbox" id="chk-mf-spawn" checked onchange="renderActiveConfigTab()" class="rounded accent-blue-500">
+                            <span>remove_spawn_chunks</span>
+                        </label>
+                    </div>
+
+                    <button onclick="copyText('cfg-code-output', 'cfg')" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition flex items-center gap-2 self-start sm:self-auto shrink-0">
+                        <i class="fa-regular fa-copy"></i> <span id="i18n-btn-copy-cfg">Copiar Configuração</span>
+                    </button>
+                </div>
+
+                <pre id="cfg-code-output" class="bg-gray-900/90 border border-gray-800 rounded-xl p-4 font-mono text-xs sm:text-sm text-emerald-300 overflow-x-auto code-scroll leading-relaxed select-all"></pre>
+
+                <div id="cfg-tips-box" class="p-3.5 rounded-xl bg-blue-950/20 border border-blue-500/30 text-xs text-gray-300 leading-relaxed">
+                    <!-- Explicação técnica das chaves do mod atual -->
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO 5: CHECKLIST INTERATIVO UNIVERSAL -->
+        <section class="bg-gray-900 border border-gray-800 rounded-2xl p-5 sm:p-6 shadow-xl">
+            <div class="flex items-center justify-between pb-4 border-b border-gray-800">
+                <div>
+                    <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-list-check text-emerald-400"></i>
+                        <span id="i18n-sec5-title">5. Checklist Rápido de Aplicação (Qualquer Modpack)</span>
+                    </h2>
+                    <p id="i18n-sec5-sub" class="text-xs text-gray-400 mt-0.5">Marque cada etapa concluída na sua instância.</p>
+                </div>
+                <button onclick="resetChecklist()" id="i18n-btn-reset-chk" class="text-xs text-gray-400 hover:text-red-400 transition">Resetar marcações</button>
+            </div>
+            <div id="checklist-container" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                <!-- Preenchido via JS -->
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // ============================================================================
+        // DICIONÁRIO DE IDIOMAS (PORTUGUÊS BR & ENGLISH US)
+        // ============================================================================
+        const i18n = {
+            pt: {
+                appTitle: "Simulador & Otimizador Universal Minecraft",
+                checklistTop: "Checklist",
+                sec1Title: "1. Configurador Dinâmico de Hardware, Memória & Jogo",
+                sec1Sub: "Altere qualquer peça abaixo para recalcular instantaneamente threads do ZGC, instruções AVX, compilador GraalVM e arquivos de configuração.",
+                liveTelemetry: "Telemetria em Tempo Real",
+                lblCpu: "Processador (CPU)",
+                lblGpu: "Placa de Vídeo (GPU)",
+                lblRam: "Memória RAM",
+                lblStorage: "Armazenamento",
+                lblMcVer: "Versão do Minecraft",
+                lblLoader: "Mod Loader (Carregador)",
+                lblJvm: "Distribuição Java (Foco GraalVM)",
+                sec2Title: "2. Alocação Inteligente de RAM & Argumentos JVM (Oracle GraalVM)",
+                sec2Sub: "O compilador JIT do <strong>Oracle GraalVM</strong> usa parte da RAM nativa para otimizar loops de mods em código de máquina. Escolha o porte do modpack abaixo:",
+                graalPill: "GraalVM JIT Compiler Ativo",
+                profLightBadge: "Leve / Vanilla+",
+                profLightTitle: "Até 90 Mods",
+                profLightDesc: "Pacotes focados em FPS, aventura leve ou QoL.",
+                profMedBadge: "Médio / RPG ou Tech",
+                profMedTitle: "90 a 200 Mods",
+                profMedDesc: "Create, Cobblemon, RPG ou Magia com Shaders leves.",
+                profHeavyBadge: "Pesado ★ Recomendado",
+                profHeavyTitle: "200 a 350 Mods",
+                profHeavyDesc: "Modpacks grandes com dimensões, física, chefes e automação.",
+                profExtBadge: "Extremo / Kitchen Sink",
+                profExtTitle: "350 a 500+ Mods",
+                profExtDesc: "All The Mods 9/10, GregTech, Prominence II + Shaders.",
+                ramSliderLbl: "RAM Alocada para o Minecraft (-Xms = -Xmx)",
+                chkXmx: 'Incluir <code class="text-emerald-400 font-mono">-Xms / -Xmx</code> na linha',
+                chkLp: 'Usar <code class="text-purple-400 font-mono">LargePages</code>',
+                legSoftLbl: "Alvo SoftMax",
+                legBufLbl: "Buffer Picos",
+                legGraalLbl: "Metaspace + Graal JIT",
+                legFreeLbl: "Livre SO / VRAM",
+                btnCopyJvm: "Copiar Argumentos JVM Otimizados",
+                expFlagsTitle: "Por que essas flags foram geradas para o seu PC?",
+                graalGuideTitle: "Como Ativar o Oracle GraalVM no Seu Launcher",
+                graalGuideSteps: `
+                    <li>Baixe o <strong>Oracle GraalVM for JDK 21</strong> (Community ou Oracle GraalVM) em <code class="text-purple-300 font-mono">graalvm.org/downloads</code> (arquivo ZIP para Windows/Linux) e extraia no seu SSD.</li>
+                    <li>No <strong>Prism Launcher / Modrinth / CurseForge</strong>, vá nas configurações de Java da instância e aponte para o <code class="text-emerald-300 font-mono">bin/javaw.exe</code> da pasta do GraalVM.</li>
+                    <li>No Prism Launcher, marque <strong>"Ignorar verificação de compatibilidade do Java"</strong> (pois a 1.20.1 pede Java 17 por padrão, mas roda muito melhor no GraalVM 21).</li>
+                    <li>O compilador JIT Graal (<code class="text-purple-300 font-mono">-XX:+UseJVMCICompiler</code>) eleva o FPS mínimo (1% lows) em até 25% em bases cheias de máquinas e entidades.</li>
+                `,
+                sec3Title: "3. Mods de Otimização Obrigatórios para",
+                sec3Sub: "Os nomes dos mods mudam automaticamente conforme você escolhe <strong>Forge</strong>, <strong>NeoForge</strong> ou <strong>Fabric</strong> e a versão do Minecraft no topo.",
+                mcatAll: "Todos",
+                mcatFps: "Render / GPU",
+                mcatRam: "RAM & Boot",
+                mcatTps: "CPU & Chunks",
+                mcatAvoid: "Evitar / Conflitos",
+                sec4Title: '4. Configurações Recomendadas para TODOS os Mods de Otimização (Pasta <code class="text-blue-400 font-mono text-base">/config</code>)',
+                sec4Sub: "Todos os arquivos abaixo são recalculados automaticamente para a sua <strong>CPU</strong> (threads), <strong>GPU</strong> (VRAM/driver), <strong>RAM</strong> (DDR3/4/5) e <strong>Disco</strong> (NVMe/SATA/HDD).",
+                tabDriver: "9. Driver GPU & Shaders",
+                btnCopyCfg: "Copiar Configuração",
+                sec5Title: "5. Checklist Rápido de Aplicação (Qualquer Modpack)",
+                sec5Sub: "Marque cada etapa concluída na sua instância.",
+                btnResetChk: "Resetar marcações",
+                toastJvmCopied: "Argumentos JVM GraalVM copiados!",
+                toastCfgCopied: "Arquivo de configuração copiado!",
+                toastChkReset: "Checklist reiniciado!",
+                toastJava21Req: "Minecraft 1.20.6+ exige Java 21! Alterado para Oracle GraalVM 21.",
+                freqStdGroup: "Frequências Padrão",
+                freqOtherGroup: "Outras Frequências"
+            },
+            en: {
+                appTitle: "Universal Minecraft Modded Optimizer & Simulator",
+                checklistTop: "Checklist",
+                sec1Title: "1. Dynamic Hardware, Memory & Game Configurator",
+                sec1Sub: "Change any component below to instantaneously recalculate ZGC threads, AVX instructions, GraalVM JIT compiler flags, and mod config files.",
+                liveTelemetry: "Real-Time Telemetry",
+                lblCpu: "Processor (CPU)",
+                lblGpu: "Graphics Card (GPU)",
+                lblRam: "System RAM",
+                lblStorage: "Storage Drive",
+                lblMcVer: "Minecraft Version",
+                lblLoader: "Mod Loader",
+                lblJvm: "Java Distribution (GraalVM Focus)",
+                sec2Title: "2. Smart RAM Allocation & JVM Arguments (Oracle GraalVM)",
+                sec2Sub: "The <strong>Oracle GraalVM</strong> JIT compiler uses native memory to compile heavy mod loops into fast machine code. Choose your modpack size below:",
+                graalPill: "GraalVM JIT Compiler Active",
+                profLightBadge: "Light / Vanilla+",
+                profLightTitle: "Up to 90 Mods",
+                profLightDesc: "FPS-focused packs, light adventure, or QoL.",
+                profMedBadge: "Medium / RPG or Tech",
+                profMedTitle: "90 to 200 Mods",
+                profMedDesc: "Create, Cobblemon, RPG, or Magic with light Shaders.",
+                profHeavyBadge: "Heavy ★ Recommended",
+                profHeavyTitle: "200 to 350 Mods",
+                profHeavyDesc: "Large modpacks with new dimensions, physics, bosses, and automation.",
+                profExtBadge: "Extreme / Kitchen Sink",
+                profExtTitle: "350 to 500+ Mods",
+                profExtDesc: "All The Mods 9/10, GregTech, Prominence II + Shaders.",
+                ramSliderLbl: "RAM Allocated to Minecraft (-Xms = -Xmx)",
+                chkXmx: 'Include <code class="text-emerald-400 font-mono">-Xms / -Xmx</code> in args',
+                chkLp: 'Use <code class="text-purple-400 font-mono">LargePages</code>',
+                legSoftLbl: "SoftMax Target",
+                legBufLbl: "Spike Buffer",
+                legGraalLbl: "Metaspace + Graal JIT",
+                legFreeLbl: "Free OS / VRAM",
+                btnCopyJvm: "Copy Optimized JVM Arguments",
+                expFlagsTitle: "Why were these specific flags generated for your PC?",
+                graalGuideTitle: "How to Enable Oracle GraalVM in Your Launcher",
+                graalGuideSteps: `
+                    <li>Download <strong>Oracle GraalVM for JDK 21</strong> (Community or Oracle GraalVM) at <code class="text-purple-300 font-mono">graalvm.org/downloads</code> (ZIP archive for Windows/Linux) and extract it to your SSD.</li>
+                    <li>In <strong>Prism Launcher / Modrinth / CurseForge</strong>, open your instance's Java settings and browse to <code class="text-emerald-300 font-mono">bin/javaw.exe</code> inside the extracted GraalVM folder.</li>
+                    <li>In Prism Launcher, enable <strong>"Skip Java compatibility checks"</strong> (Minecraft 1.20.1 defaults to Java 17, but runs significantly better on GraalVM 21).</li>
+                    <li>The Graal JIT compiler (<code class="text-purple-300 font-mono">-XX:+UseJVMCICompiler</code>) boosts 1% low FPS by up to 25% in bases packed with machines and entities.</li>
+                `,
+                sec3Title: "3. Must-Have Optimization Mods for",
+                sec3Sub: "Mod names automatically adapt as you switch between <strong>Forge</strong>, <strong>NeoForge</strong>, or <strong>Fabric</strong> and the Minecraft version at the top.",
+                mcatAll: "All",
+                mcatFps: "Render / GPU",
+                mcatRam: "RAM & Boot",
+                mcatTps: "CPU & Chunks",
+                mcatAvoid: "Avoid / Conflicts",
+                sec4Title: '4. Recommended Configurations for ALL Optimization Mods (<code class="text-blue-400 font-mono text-base">/config</code> Folder)',
+                sec4Sub: "Every configuration file below is dynamically tailored to your <strong>CPU</strong> (threads), <strong>GPU</strong> (VRAM/driver), <strong>RAM</strong> (DDR3/4/5), and <strong>Storage</strong> (NVMe/SATA/HDD).",
+                tabDriver: "9. GPU Driver & Shaders",
+                btnCopyCfg: "Copy Configuration",
+                sec5Title: "5. Quick Optimization Checklist (Any Modpack)",
+                sec5Sub: "Check off each completed step for your instance.",
+                btnResetChk: "Reset checklist",
+                toastJvmCopied: "GraalVM JVM arguments copied!",
+                toastCfgCopied: "Configuration file copied!",
+                toastChkReset: "Checklist reset!",
+                toastJava21Req: "Minecraft 1.20.6+ requires Java 21! Switched to Oracle GraalVM 21.",
+                freqStdGroup: "Standard Frequencies",
+                freqOtherGroup: "Other Frequencies"
+            }
+        };
+
+        // ============================================================================
+        // BANCO DE DADOS DE HARDWARE (CPUs, GPUs, Frequências DDR3/DDR4/DDR5, Discos)
+        // ============================================================================
+        const cpuDatabase = {
+            r5_5500:    { name: "AMD Ryzen 5 5500", cores: 6, threads: 12, arch: "Zen 3", avx: 2, l3: "16MB", concGC: 3, parGC: 8, chunkThreads: 4, fmlThreads: 10 },
+            r5_5600:    { name: "AMD Ryzen 5 5600 / 5600X", cores: 6, threads: 12, arch: "Zen 3", avx: 2, l3: "32MB", concGC: 3, parGC: 8, chunkThreads: 4, fmlThreads: 10 },
+            r5_5600g:   { name: "AMD Ryzen 5 5600G / 4600G", cores: 6, threads: 12, arch: "Zen 3/2 APU", avx: 2, l3: "16MB", concGC: 3, parGC: 8, chunkThreads: 3, fmlThreads: 10 },
+            r7_5700x:   { name: "AMD Ryzen 7 5700X / 5800X", cores: 8, threads: 16, arch: "Zen 3", avx: 2, l3: "32MB", concGC: 4, parGC: 10, chunkThreads: 6, fmlThreads: 14 },
+            r7_5700x3d: { name: "AMD Ryzen 7 5700X3D / 5800X3D", cores: 8, threads: 16, arch: "Zen 3 V-Cache", avx: 2, l3: "96MB", concGC: 4, parGC: 10, chunkThreads: 6, fmlThreads: 14 },
+            r9_5900x:   { name: "AMD Ryzen 9 5900X / 5950X", cores: 12, threads: 24, arch: "Zen 3", avx: 2, l3: "64MB", concGC: 6, parGC: 14, chunkThreads: 8, fmlThreads: 20 },
+            r5_3600:    { name: "AMD Ryzen 5 3600 / 4500", cores: 6, threads: 12, arch: "Zen 2", avx: 2, l3: "32MB/8MB", concGC: 3, parGC: 8, chunkThreads: 3, fmlThreads: 10 },
+            r3_3200g:   { name: "AMD Ryzen 3 3200G / 2200G", cores: 4, threads: 4, arch: "Zen+", avx: 2, l3: "4MB", concGC: 1, parGC: 3, chunkThreads: 2, fmlThreads: 3 },
+            r5_7600:    { name: "AMD Ryzen 5 7600 / 7600X / 9600X", cores: 6, threads: 12, arch: "Zen 4/5", avx: 3, l3: "32MB", concGC: 3, parGC: 8, chunkThreads: 4, fmlThreads: 10 },
+            r7_7800x3d: { name: "AMD Ryzen 7 7800X3D / 9800X3D", cores: 8, threads: 16, arch: "Zen 4/5 V-Cache", avx: 3, l3: "96MB", concGC: 4, parGC: 10, chunkThreads: 6, fmlThreads: 14 },
+            r9_7950x:   { name: "AMD Ryzen 9 7950X / 9950X", cores: 16, threads: 32, arch: "Zen 4/5", avx: 3, l3: "64MB", concGC: 6, parGC: 16, chunkThreads: 8, fmlThreads: 24 },
+            i3_12100f:  { name: "Intel Core i3-12100F / 13100F", cores: 4, threads: 8, arch: "Alder/Raptor Lake", avx: 2, l3: "12MB", concGC: 2, parGC: 6, chunkThreads: 3, fmlThreads: 6 },
+            i5_12400f:  { name: "Intel Core i5-12400F / 13400F", cores: 6, threads: 12, arch: "Alder/Raptor Lake", avx: 2, l3: "18MB", concGC: 3, parGC: 8, chunkThreads: 4, fmlThreads: 10 },
+            i5_13600k:  { name: "Intel Core i5-13600K / 14600K", cores: 14, threads: 20, arch: "Raptor Lake Hybrid", avx: 2, l3: "24MB", concGC: 4, parGC: 12, chunkThreads: 6, fmlThreads: 16 },
+            i7_13700k:  { name: "Intel Core i7-13700K / 14700K", cores: 16, threads: 24, arch: "Raptor Lake Hybrid", avx: 2, l3: "30MB", concGC: 5, parGC: 14, chunkThreads: 6, fmlThreads: 18 },
+            i9_14900k:  { name: "Intel Core i9-13900K / 14900K", cores: 24, threads: 32, arch: "Raptor Lake Hybrid", avx: 2, l3: "36MB", concGC: 6, parGC: 16, chunkThreads: 8, fmlThreads: 24 },
+            i5_10400f:  { name: "Intel Core i5-10400F / 11400F", cores: 6, threads: 12, arch: "Comet/Rocket Lake", avx: 2, l3: "12MB", concGC: 3, parGC: 8, chunkThreads: 3, fmlThreads: 10 },
+            i5_9400f:   { name: "Intel Core i5-9400F / i5-8400", cores: 6, threads: 6, arch: "Coffee Lake", avx: 2, l3: "9MB", concGC: 2, parGC: 4, chunkThreads: 2, fmlThreads: 5 },
+            i7_4790k:   { name: "Intel Core i7-4790K / i7-3770", cores: 4, threads: 8, arch: "Haswell/Ivy Bridge", avx: 2, l3: "8MB", concGC: 2, parGC: 6, chunkThreads: 2, fmlThreads: 6 },
+            xeon_2680v4:{ name: "Intel Xeon E5-2680 v4 / 2666 v3", cores: 12, threads: 24, arch: "Broadwell/Haswell-EP", avx: 2, l3: "35MB", concGC: 5, parGC: 12, chunkThreads: 5, fmlThreads: 18 },
+            fx_8350:    { name: "AMD FX-8350 / FX-6300", cores: 8, threads: 8, arch: "Piledriver", avx: 1, l3: "8MB", concGC: 2, parGC: 6, chunkThreads: 2, fmlThreads: 6 }
+        };
+
+        const gpuDatabase = {
+            rtx_3050_6_desk: { name: "NVIDIA RTX 3050 6GB (Desktop)", vendor: "nvidia", vram: 6, arch: "Ampere (GA107)", noErrorCtx: true, tier: "mid" },
+            rtx_3050_8:      { name: "NVIDIA RTX 3050 8GB (Desktop)", vendor: "nvidia", vram: 8, arch: "Ampere (GA106)", noErrorCtx: true, tier: "mid" },
+            rtx_3050_4_lap:  { name: "NVIDIA RTX 3050 (4GB Laptop)", vendor: "nvidia", vram: 4, arch: "Ampere Mobile", noErrorCtx: true, tier: "entry" },
+            rtx_3060_12:     { name: "NVIDIA RTX 3060 (12GB) / 3060 Ti", vendor: "nvidia", vram: 12, arch: "Ampere", noErrorCtx: true, tier: "high" },
+            rtx_4060:        { name: "NVIDIA RTX 4060 / 4060 Ti", vendor: "nvidia", vram: 8, arch: "Ada Lovelace", noErrorCtx: true, tier: "high" },
+            rtx_4070s:       { name: "NVIDIA RTX 4070 Super / 4080 / 5070", vendor: "nvidia", vram: 12, arch: "Ada/Blackwell", noErrorCtx: true, tier: "ultra" },
+            rtx_2060:        { name: "NVIDIA RTX 2060 / 2060 Super", vendor: "nvidia", vram: 6, arch: "Turing", noErrorCtx: true, tier: "mid" },
+            gtx_1660s:       { name: "NVIDIA GTX 1660 Super / Ti", vendor: "nvidia", vram: 6, arch: "Turing", noErrorCtx: true, tier: "mid" },
+            gtx_1650:        { name: "NVIDIA GTX 1650 (4GB)", vendor: "nvidia", vram: 4, arch: "Turing", noErrorCtx: true, tier: "entry" },
+            gtx_1060:        { name: "NVIDIA GTX 1060 (6GB) / 1070", vendor: "nvidia", vram: 6, arch: "Pascal", noErrorCtx: true, tier: "entry" },
+            gtx_1050ti:      { name: "NVIDIA GTX 1050 Ti / GT 1030", vendor: "nvidia", vram: 4, arch: "Pascal", noErrorCtx: true, tier: "low" },
+            rx_6600:         { name: "AMD Radeon RX 6600 / 6650 XT", vendor: "amd", vram: 8, arch: "RDNA 2", noErrorCtx: true, tier: "mid" },
+            rx_6750xt:       { name: "AMD Radeon RX 6700 XT / 6750 XT", vendor: "amd", vram: 12, arch: "RDNA 2", noErrorCtx: true, tier: "high" },
+            rx_7600:         { name: "AMD Radeon RX 7600 / 7700 XT / 7800 XT", vendor: "amd", vram: 8, arch: "RDNA 3", noErrorCtx: true, tier: "high" },
+            rx_580:          { name: "AMD Radeon RX 580 2048SP / RX 570 (8GB)", vendor: "amd", vram: 8, arch: "Polaris", noErrorCtx: false, tier: "entry" },
+            rx_470_8:        { name: "AMD Radeon RX 470 / RX 480 (8GB)", vendor: "amd", vram: 8, arch: "Polaris 10", noErrorCtx: false, tier: "entry" },
+            rx_470_4:        { name: "AMD Radeon RX 470 / RX 570 (4GB)", vendor: "amd", vram: 4, arch: "Polaris 10", noErrorCtx: false, tier: "entry" },
+            rx_550:          { name: "AMD RX 550 / Radeon Vega 7/8 iGPU", vendor: "amd", vram: 4, arch: "Polaris/Vega", noErrorCtx: false, tier: "low" },
+            arc_a750:        { name: "Intel Arc A750 / A770 / B580", vendor: "intel", vram: 8, arch: "Xe-HPG / Battlemage", noErrorCtx: false, tier: "mid" },
+            arc_a380:        { name: "Intel Arc A380 / A580", vendor: "intel", vram: 6, arch: "Xe-HPG", noErrorCtx: false, tier: "entry" },
+            intel_igpu:      { name: "Intel Iris Xe / UHD Graphics", vendor: "intel", vram: 2, arch: "Intel Gen12 iGPU", noErrorCtx: false, tier: "low" }
+        };
+
+        const ddrFrequencies = {
+            DDR3: [1066, 1333, 1600, 1866, 2133, 2400],
+            DDR4: [2133, 2400, 2666, 2933, 3000, 3200, 3600, 4000, 4400],
+            DDR5: [4800, 5200, 5600, 6000, 6400, 6800, 7200, 7600, 8000]
+        };
+
+        const storageDatabase = {
+            nvme: {
+                name: { pt: "SSD NVMe M.2 PCIe", en: "NVMe M.2 PCIe SSD" },
+                spikeTol: "5.0",
+                dynResRecommended: true,
+                ioDesc: { pt: "I/O Ultra Rápido • Dynamic Resources: Ideal", en: "Ultra-Fast I/O • Dynamic Resources: Ideal" }
+            },
+            sata: {
+                name: { pt: "SSD SATA III", en: "SATA III SSD" },
+                spikeTol: "3.5",
+                dynResRecommended: true,
+                ioDesc: { pt: "I/O Sólido (~550MB/s) • Dynamic Resources: Ativo", en: "Solid I/O (~550MB/s) • Dynamic Resources: Active" }
+            },
+            hdd: {
+                name: { pt: "HD Mecânico (HDD)", en: "Mechanical Hard Drive (HDD)" },
+                spikeTol: "2.0",
+                dynResRecommended: false,
+                ioDesc: { pt: "Alta Latência de Busca • Pré-carregar Texturas na RAM", en: "High Seek Latency • Preload Textures in RAM" }
+            }
+        };
+
+        // Estado Atual da Aplicação
+        let state = {
+            lang: 'pt',
+            cpuKey: 'r5_5500',
+            gpuKey: 'rtx_3050_6_desk',
+            ddrType: 'DDR4',
+            ramFreq: 2666,
+            sysRamGB: 32,
+            storageKey: 'nvme',
+            mcVersion: '1.20.1',
+            loader: 'forge',
+            jvmEngine: 'graal21_zgc',
+            modpackProfile: 'heavy',
+            allocRamGB: 12,
+            softMaxGB: 10,
+            metaMB: 512,
+            codeCacheMB: 512,
+            activeModCat: 'all',
+            activeConfigTab: 'modernfix'
+        };
+
+        // ============================================================================
+        // TROCA DE IDIOMA (PT-BR <-> EN-US)
+        // ============================================================================
+        function setLanguage(lang) {
+            state.lang = lang;
+            document.documentElement.lang = lang === 'pt' ? 'pt-BR' : 'en-US';
+
+            const btnPt = document.getElementById('lang-btn-pt');
+            const btnEn = document.getElementById('lang-btn-en');
+            if (lang === 'pt') {
+                btnPt.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 text-white transition flex items-center gap-1.5";
+                btnEn.className = "px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-400 hover:text-white transition flex items-center gap-1.5";
+            } else {
+                btnEn.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 text-white transition flex items-center gap-1.5";
+                btnPt.className = "px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-400 hover:text-white transition flex items-center gap-1.5";
+            }
+
+            const t = i18n[lang];
+            document.getElementById('i18n-app-title').textContent = t.appTitle;
+            document.getElementById('i18n-checklist-top').textContent = t.checklistTop;
+            document.getElementById('i18n-sec1-title').textContent = t.sec1Title;
+            document.getElementById('i18n-sec1-sub').textContent = t.sec1Sub;
+            document.getElementById('i18n-live-telemetry').textContent = t.liveTelemetry;
+            document.getElementById('i18n-lbl-cpu').textContent = t.lblCpu;
+            document.getElementById('i18n-lbl-gpu').textContent = t.lblGpu;
+            document.getElementById('i18n-lbl-ram').textContent = t.lblRam;
+            document.getElementById('i18n-lbl-storage').textContent = t.lblStorage;
+            document.getElementById('i18n-lbl-mcver').textContent = t.lblMcVer;
+            document.getElementById('i18n-lbl-loader').textContent = t.lblLoader;
+            document.getElementById('i18n-lbl-jvm').textContent = t.lblJvm;
+
+            document.getElementById('i18n-sec2-title').textContent = t.sec2Title;
+            document.getElementById('i18n-sec2-sub').innerHTML = t.sec2Sub;
+            document.getElementById('i18n-graal-pill').textContent = t.graalPill;
+
+            document.getElementById('i18n-prof-light-badge').textContent = t.profLightBadge;
+            document.getElementById('i18n-prof-light-title').textContent = t.profLightTitle;
+            document.getElementById('i18n-prof-light-desc').textContent = t.profLightDesc;
+
+            document.getElementById('i18n-prof-med-badge').textContent = t.profMedBadge;
+            document.getElementById('i18n-prof-med-title').textContent = t.profMedTitle;
+            document.getElementById('i18n-prof-med-desc').textContent = t.profMedDesc;
+
+            document.getElementById('i18n-prof-heavy-badge').textContent = t.profHeavyBadge;
+            document.getElementById('i18n-prof-heavy-title').textContent = t.profHeavyTitle;
+            document.getElementById('i18n-prof-heavy-desc').textContent = t.profHeavyDesc;
+
+            document.getElementById('i18n-prof-ext-badge').textContent = t.profExtBadge;
+            document.getElementById('i18n-prof-ext-title').textContent = t.profExtTitle;
+            document.getElementById('i18n-prof-ext-desc').textContent = t.profExtDesc;
+
+            document.getElementById('i18n-ram-slider-lbl').textContent = t.ramSliderLbl;
+            document.getElementById('i18n-chk-xmx').innerHTML = t.chkXmx;
+            document.getElementById('i18n-chk-lp').innerHTML = t.chkLp;
+            document.getElementById('i18n-leg-soft-lbl').textContent = t.legSoftLbl;
+            document.getElementById('i18n-leg-buf-lbl').textContent = t.legBufLbl;
+            document.getElementById('i18n-leg-graal-lbl').textContent = t.legGraalLbl;
+            document.getElementById('i18n-leg-free-lbl').textContent = t.legFreeLbl;
+            document.getElementById('i18n-btn-copy-jvm').textContent = t.btnCopyJvm;
+            document.getElementById('i18n-exp-flags-title').textContent = t.expFlagsTitle;
+            document.getElementById('i18n-graal-guide-title').textContent = t.graalGuideTitle;
+            document.getElementById('i18n-graal-guide-steps').innerHTML = t.graalGuideSteps;
+
+            document.getElementById('i18n-sec3-title').textContent = t.sec3Title;
+            document.getElementById('i18n-sec3-sub').innerHTML = t.sec3Sub;
+            document.getElementById('mcat-all').textContent = t.mcatAll;
+            document.getElementById('mcat-fps').textContent = t.mcatFps;
+            document.getElementById('mcat-ram').textContent = t.mcatRam;
+            document.getElementById('mcat-tps').textContent = t.mcatTps;
+            document.getElementById('mcat-avoid').textContent = t.mcatAvoid;
+
+            document.getElementById('i18n-sec4-title').innerHTML = t.sec4Title;
+            document.getElementById('i18n-sec4-sub').innerHTML = t.sec4Sub;
+            document.getElementById('i18n-tab-driver').textContent = t.tabDriver;
+            document.getElementById('i18n-btn-copy-cfg').textContent = t.btnCopyCfg;
+
+            document.getElementById('i18n-sec5-title').textContent = t.sec5Title;
+            document.getElementById('i18n-sec5-sub').textContent = t.sec5Sub;
+            document.getElementById('i18n-btn-reset-chk').textContent = t.btnResetChk;
+
+            // Traduzir options com atributos data-pt e data-en
+            document.querySelectorAll('option[data-pt]').forEach(opt => {
+                opt.textContent = opt.getAttribute(`data-${lang}`);
+            });
+
+            populateFrequencyDropdown(state.ddrType, state.ramFreq);
+            recalculateAll();
+            renderChecklist();
+        }
+
+        // ============================================================================
+        // INICIALIZAÇÃO E CONTROLES DE MUDANÇA DE HARDWARE
+        // ============================================================================
+        function populateFrequencyDropdown(ddrType, defaultFreq) {
+            const freqSelect = document.getElementById('select-ram-freq');
+            freqSelect.innerHTML = '';
+            const t = i18n[state.lang];
+
+            // Grupo principal da geração selecionada
+            const mainGroup = document.createElement('optgroup');
+            mainGroup.label = `${t.freqStdGroup} (${ddrType})`;
+            ddrFrequencies[ddrType].forEach(freq => {
+                const opt = document.createElement('option');
+                opt.value = `${ddrType}_${freq}`;
+                opt.textContent = `${ddrType} - ${freq} MHz (MT/s)`;
+                if (freq === defaultFreq) opt.selected = true;
+                mainGroup.appendChild(opt);
+            });
+            freqSelect.appendChild(mainGroup);
+
+            // Também inclui as outras gerações em optgroups abaixo para troca direta se o usuário quiser ver todas
+            Object.keys(ddrFrequencies).forEach(otherType => {
+                if (otherType !== ddrType) {
+                    const grp = document.createElement('optgroup');
+                    grp.label = `${t.freqOtherGroup} (${otherType})`;
+                    ddrFrequencies[otherType].forEach(freq => {
+                        const opt = document.createElement('option');
+                        opt.value = `${otherType}_${freq}`;
+                        opt.textContent = `${otherType} - ${freq} MHz`;
+                        grp.appendChild(opt);
+                    });
+                    freqSelect.appendChild(grp);
+                }
+            });
+        }
+
+        function onDDRTypeChange() {
+            const newType = document.getElementById('select-ddr-type').value;
+            state.ddrType = newType;
+            const defaultFreqForType = newType === 'DDR3' ? 1600 : (newType === 'DDR4' ? 2666 : 6000);
+            state.ramFreq = defaultFreqForType;
+            populateFrequencyDropdown(newType, defaultFreqForType);
+            onHardwareChange();
+        }
+
+        function onSystemRamChange() {
+            state.sysRamGB = parseInt(document.getElementById('select-sys-ram').value, 10);
+            const slider = document.getElementById('ram-slider');
+            slider.max = Math.max(6, state.sysRamGB - 2);
+
+            // Ajusta automaticamente a RAM alocada se ultrapassar o limite seguro do sistema
+            if (state.sysRamGB <= 8) {
+                selectModpackProfile('light');
+            } else if (state.sysRamGB <= 12 && state.allocRamGB > 8) {
+                onRamSliderInput(8);
+            } else if (state.sysRamGB <= 16 && state.allocRamGB > 10) {
+                onRamSliderInput(10);
+            } else {
+                recalculateAll();
+            }
+        }
+
+        function onVersionOrLoaderChange() {
+            state.mcVersion = document.getElementById('select-mc-version').value;
+            state.loader = document.getElementById('select-loader').value;
+
+            // Se escolher 1.20.6 ou 1.21+ e estiver em GraalVM 17, muda automaticamente para GraalVM 21 (pois 1.20.5+ exige Java 21 nativo)
+            if ((state.mcVersion === '1.20.6' || state.mcVersion.startsWith('1.21')) && state.jvmEngine === 'graal17_zgc') {
+                state.jvmEngine = 'graal21_zgc';
+                document.getElementById('select-jvm-engine').value = 'graal21_zgc';
+                showToast(i18n[state.lang].toastJava21Req);
+            }
+            recalculateAll();
+        }
+
+        function onHardwareChange() {
+            state.cpuKey = document.getElementById('select-cpu').value;
+            state.gpuKey = document.getElementById('select-gpu').value;
+
+            // Verifica se o usuário selecionou uma frequência de outro grupo DDR diretamente no dropdown de frequência
+            const rawFreqVal = document.getElementById('select-ram-freq').value;
+            if (rawFreqVal && rawFreqVal.includes('_')) {
+                const [pickedType, pickedFreq] = rawFreqVal.split('_');
+                state.ramFreq = parseInt(pickedFreq, 10);
+                if (pickedType !== state.ddrType) {
+                    state.ddrType = pickedType;
+                    document.getElementById('select-ddr-type').value = pickedType;
+                }
+            }
+
+            state.storageKey = document.getElementById('select-storage').value;
+            state.jvmEngine = document.getElementById('select-jvm-engine').value;
+
+            // Ajusta recomendação padrão do dynamic_resources caso mude para HDD
+            const storage = storageDatabase[state.storageKey];
+            document.getElementById('chk-mf-dynres').checked = storage.dynResRecommended;
+
+            recalculateAll();
+        }
+
+        function selectModpackProfile(profileKey) {
+            state.modpackProfile = profileKey;
+            const sysRam = state.sysRamGB;
+
+            let targetRam = 12;
+            if (profileKey === 'light') targetRam = Math.min(6, sysRam - 2);
+            if (profileKey === 'medium') targetRam = sysRam >= 16 ? 10 : Math.min(8, sysRam - 2);
+            if (profileKey === 'heavy') targetRam = sysRam >= 24 ? 12 : (sysRam >= 16 ? 10 : Math.min(8, sysRam - 2));
+            if (profileKey === 'extreme') targetRam = sysRam >= 32 ? 14 : (sysRam >= 24 ? 12 : Math.min(10, sysRam - 3));
+
+            state.allocRamGB = Math.max(4, targetRam);
+            document.getElementById('ram-slider').value = state.allocRamGB;
+
+            document.querySelectorAll('.profile-card').forEach(btn => {
+                btn.className = "profile-card text-left p-4 rounded-xl border border-gray-800 bg-gray-950/60 hover:border-gray-700 transition flex flex-col justify-between";
+            });
+            const activeBtn = document.getElementById(`profile-${profileKey}`);
+            if (activeBtn) {
+                activeBtn.className = "profile-card text-left p-4 rounded-xl border-2 border-emerald-500 bg-emerald-950/20 transition flex flex-col justify-between";
+            }
+
+            recalculateAll();
+        }
+
+        function onRamSliderInput(val) {
+            state.allocRamGB = parseInt(val, 10);
+            document.querySelectorAll('.profile-card').forEach(btn => {
+                btn.className = "profile-card text-left p-4 rounded-xl border border-gray-800 bg-gray-950/60 hover:border-gray-700 transition flex flex-col justify-between";
+            });
+            recalculateAll();
+        }
+
+        // ============================================================================
+        // MOTOR DE CÁLCULO CENTRAL (JVM ARGS, GRAALVM, BARRA DE RAM, DIAGNÓSTICOS)
+        // ============================================================================
+        function recalculateAll() {
+            const lang = state.lang;
+            const cpu = cpuDatabase[state.cpuKey];
+            const gpu = gpuDatabase[state.gpuKey];
+            const storage = storageDatabase[state.storageKey];
+            const storageName = storage.name[lang];
+
+            // 1. Atualiza badges superiores e sumário
+            const loaderNames = { forge: 'Forge', neoforge: 'NeoForge', fabric: 'Fabric' };
+            document.getElementById('header-loader-badge').textContent = `${loaderNames[state.loader]} ${state.mcVersion}`;
+            document.getElementById('header-hw-summary').textContent = `${cpu.name} (${cpu.cores}C/${cpu.threads}T) • ${gpu.name} • ${state.sysRamGB}GB ${state.ddrType} ${state.ramFreq}MHz • ${storageName}`;
+
+            document.getElementById('cpu-badge-threads').textContent = `${cpu.cores}C / ${cpu.threads}T`;
+            document.getElementById('cpu-meta-desc').textContent = `${cpu.arch} • AVX${cpu.avx === 3 ? '-512' : cpu.avx} • L3 ${cpu.l3} • ConcGC: ${cpu.concGC} / ParGC: ${cpu.parGC}`;
+
+            document.getElementById('gpu-badge-vram').textContent = `${gpu.vram}GB VRAM`;
+            document.getElementById('gpu-meta-desc').textContent = `${gpu.arch} • NoErrorCtx: ${gpu.noErrorCtx ? 'ON' : 'Safe OFF'}`;
+
+            document.getElementById('ram-badge-bw').textContent = `${state.ddrType} ${state.ramFreq}`;
+            document.getElementById('storage-badge-io').textContent = `SpikeTol: ${storage.spikeTol}`;
+            document.getElementById('storage-meta-desc').textContent = storage.ioDesc[lang];
+
+            // 2. Calcula SoftMaxHeapSize, Metaspace e CodeCache do GraalVM
+            const allocGB = state.allocRamGB;
+            const allocMB = allocGB * 1024;
+            const bufferGB = allocGB >= 9 ? 2 : 1;
+            state.softMaxGB = Math.max(3, allocGB - bufferGB);
+            state.metaMB = allocGB <= 7 ? 384 : (allocGB >= 13 ? 768 : 512);
+            state.codeCacheMB = allocGB <= 7 ? 384 : 512;
+
+            // Atualiza mostradores de RAM e barra visual
+            document.getElementById('ram-alloc-gb').textContent = `${allocGB} GB`;
+            document.getElementById('ram-alloc-mb').textContent = `(${allocMB} MiB)`;
+
+            const graalOverheadGB = +((state.metaMB + state.codeCacheMB) / 1024).toFixed(1);
+            const freeSysGB = +(state.sysRamGB - allocGB - graalOverheadGB).toFixed(1);
+
+            const warnBanner = document.getElementById('ram-warning-banner');
+            if (freeSysGB < 2.5) {
+                warnBanner.classList.remove('hidden');
+                document.getElementById('ram-warning-text').textContent = lang === 'pt'
+                    ? `Cuidado: Restam apenas ${Math.max(0, freeSysGB)} GB para o Sistema Operacional e para o compilador JIT do GraalVM! Reduza a alocação para no máximo ${state.sysRamGB - 3} GB para evitar que o jogo feche sozinho.`
+                    : `Warning: Only ${Math.max(0, freeSysGB)} GB left for the Operating System and GraalVM JIT compiler! Reduce allocation to at most ${state.sysRamGB - 3} GB to prevent crashes.`;
+            } else {
+                warnBanner.classList.add('hidden');
+            }
+
+            document.getElementById('ram-bar-title').textContent = lang === 'pt'
+                ? `Divisão dos seus ${state.sysRamGB} GB ${state.ddrType} ${state.ramFreq} MHz:`
+                : `Breakdown of your ${state.sysRamGB} GB ${state.ddrType} ${state.ramFreq} MHz:`;
+            document.getElementById('ram-bar-free-label').textContent = lang === 'pt'
+                ? `${Math.max(0, freeSysGB)} GB livres para Sistema, Driver ${gpu.vendor.toUpperCase()} e Cache Disco`
+                : `${Math.max(0, freeSysGB)} GB free for OS, ${gpu.vendor.toUpperCase()} Driver & Disk Cache`;
+
+            const pctSoft = Math.min(100, (state.softMaxGB / state.sysRamGB) * 100);
+            const pctBuf = Math.min(100 - pctSoft, (bufferGB / state.sysRamGB) * 100);
+            const pctGraal = Math.min(100 - pctSoft - pctBuf, (graalOverheadGB / state.sysRamGB) * 100);
+            const pctFree = Math.max(0, 100 - pctSoft - pctBuf - pctGraal);
+
+            document.getElementById('bar-seg-soft').style.width = `${pctSoft}%`;
+            document.getElementById('bar-seg-buf').style.width = `${pctBuf}%`;
+            document.getElementById('bar-seg-graal').style.width = `${pctGraal}%`;
+            document.getElementById('bar-seg-free').style.width = `${pctFree}%`;
+
+            document.getElementById('leg-soft').textContent = `${state.softMaxGB} GB`;
+            document.getElementById('leg-buf').textContent = `${bufferGB} GB`;
+            document.getElementById('leg-graal').textContent = `${graalOverheadGB} GB`;
+            document.getElementById('leg-free').textContent = `${Math.max(0, freeSysGB)} GB`;
+
+            // 3. Gera os Argumentos JVM Focados em GraalVM
+            generateJVMArguments(cpu, gpu, storage, allocMB);
+
+            // 4. Renderiza Diagnósticos de Hardware (CPU + RAM Latency + Storage/GPU)
+            renderHardwareDiagnostics(cpu, gpu, storage);
+
+            // 5. Renderiza Catálogo de Mods para o Loader e Versão escolhidos
+            renderDynamicMods();
+
+            // 6. Renderiza a Config Ativa da Seção 4
+            renderActiveConfigTab();
+        }
+
+        function generateJVMArguments(cpu, gpu, storage, allocMB) {
+            const lang = state.lang;
+            const storageName = storage.name[lang];
+            const includeXmx = document.getElementById('chk-include-xmx').checked;
+            const useLargePages = document.getElementById('chk-large-pages').checked;
+            const xmxPart = includeXmx ? `-Xms${allocMB}M -Xmx${allocMB}M ` : "";
+            const lpPart = useLargePages ? `-XX:+UseLargePages ` : "";
+
+            // Ajuste de tolerância de spike para memórias DDR3/DDR4 lentas + NVMe
+            let spikeTol = parseFloat(storage.spikeTol);
+            if (state.ddrType === 'DDR3' || (state.ddrType === 'DDR4' && state.ramFreq <= 2666)) {
+                spikeTol = Math.min(5.0, +(spikeTol + 0.5).toFixed(1));
+            }
+
+            // Flags do Compilador JIT do Oracle GraalVM
+            const graalJITFlags = `-XX:+UseJVMCICompiler -XX:+EagerJVMCI -Dgraal.TuneInlinerExploration=1 -Dgraal.CompilerConfiguration=community -XX:ReservedCodeCacheSize=${state.codeCacheMB}M`;
+
+            let finalArgs = "";
+            let engineLabel = "";
+
+            if (state.jvmEngine === 'graal21_zgc') {
+                engineLabel = "Oracle GraalVM 21/22+ (Generational ZGC + Graal JIT)";
+                finalArgs = `${xmxPart}-XX:+UnlockExperimentalVMOptions -XX:+UnlockDiagnosticVMOptions ${graalJITFlags} -XX:+UseZGC -XX:+ZGenerational -XX:ConcGCThreads=${cpu.concGC} -XX:ParallelGCThreads=${cpu.parGC} -XX:ZAllocationSpikeTolerance=${spikeTol} -XX:SoftMaxHeapSize=${state.softMaxGB}G -XX:MetaspaceSize=${state.metaMB}M -XX:MaxMetaspaceSize=2048M ${lpPart}-XX:+AlwaysPreTouch -XX:+DisableExplicitGC -XX:+PerfDisableSharedMem -XX:+UseStringDeduplication -XX:UseAVX=${cpu.avx} -Dfml.readTimeout=180`;
+            } else if (state.jvmEngine === 'graal21_g1') {
+                engineLabel = "Oracle GraalVM 21 (G1GC Tuned + Graal JIT)";
+                const maxPause = state.ddrType === 'DDR5' ? 90 : (state.ddrType === 'DDR3' ? 150 : 120);
+                finalArgs = `${xmxPart}-XX:+UnlockExperimentalVMOptions -XX:+UnlockDiagnosticVMOptions ${graalJITFlags} -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=${maxPause} -XX:ConcGCThreads=${cpu.concGC} -XX:ParallelGCThreads=${cpu.parGC} -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=16M -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:MaxTenuringThreshold=1 -XX:MetaspaceSize=${state.metaMB}M ${lpPart}-XX:+AlwaysPreTouch -XX:+DisableExplicitGC -XX:+PerfDisableSharedMem -XX:+UseStringDeduplication -XX:UseAVX=${cpu.avx} -Dfml.readTimeout=180`;
+            } else if (state.jvmEngine === 'graal17_zgc') {
+                engineLabel = "Oracle GraalVM 17 (Single-Gen ZGC + Graal JIT)";
+                finalArgs = `${xmxPart}-XX:+UnlockExperimentalVMOptions -XX:+UnlockDiagnosticVMOptions ${graalJITFlags} -XX:+UseZGC -XX:ConcGCThreads=${cpu.concGC} -XX:ParallelGCThreads=${cpu.parGC} -XX:ZAllocationSpikeTolerance=${spikeTol} -XX:SoftMaxHeapSize=${state.softMaxGB}G -XX:MetaspaceSize=${state.metaMB}M -XX:MaxMetaspaceSize=2048M ${lpPart}-XX:+AlwaysPreTouch -XX:+DisableExplicitGC -XX:+PerfDisableSharedMem -XX:+UseStringDeduplication -XX:UseAVX=${cpu.avx} -Dfml.readTimeout=180`;
+            } else {
+                engineLabel = "OpenJDK / Temurin 21 (Generational ZGC)";
+                finalArgs = `${xmxPart}-XX:+UnlockExperimentalVMOptions -XX:+UnlockDiagnosticVMOptions -XX:+UseZGC -XX:+ZGenerational -XX:ConcGCThreads=${cpu.concGC} -XX:ParallelGCThreads=${cpu.parGC} -XX:ZAllocationSpikeTolerance=${spikeTol} -XX:SoftMaxHeapSize=${state.softMaxGB}G -XX:MetaspaceSize=${state.metaMB}M -XX:MaxMetaspaceSize=2048M ${lpPart}-XX:+AlwaysPreTouch -XX:+DisableExplicitGC -XX:+PerfDisableSharedMem -XX:+UseStringDeduplication -XX:UseAVX=${cpu.avx} -Dfml.readTimeout=180`;
+            }
+
+            document.getElementById('jvm-args-box').textContent = finalArgs;
+            document.getElementById('jvm-command-subtitle').innerHTML = lang === 'pt'
+                ? `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>No Launcher: Alocar ${allocMB} MiB (${state.allocRamGB} GB) • ${engineLabel}`
+                : `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>In Launcher: Allocate ${allocMB} MiB (${state.allocRamGB} GB) • ${engineLabel}`;
+
+            // Explicação dinâmica das flags
+            const expList = document.getElementById('dynamic-flags-explanation');
+            if (lang === 'pt') {
+                expList.innerHTML = `
+                    <li><strong class="text-purple-300 font-mono">-XX:+UseJVMCICompiler -Dgraal.TuneInlinerExploration=1</strong>: Ativa o compilador JIT do <strong>Oracle GraalVM</strong> com inlining profundo, acelerando ticks de entidades e geração de terreno na sua <strong>${cpu.name}</strong>.</li>
+                    <li><strong class="text-emerald-300 font-mono">-XX:ConcGCThreads=${cpu.concGC} -XX:ParallelGCThreads=${cpu.parGC}</strong>: Calculado sob medida para os seus <strong>${cpu.cores} núcleos / ${cpu.threads} threads</strong>, evitando que o coletor de lixo roube processamento da thread principal de renderização.</li>
+                    <li><strong class="text-blue-300 font-mono">-XX:SoftMaxHeapSize=${state.softMaxGB}G</strong>: Como sua memória é <strong>${state.ddrType} ${state.ramFreq} MHz</strong>, manter o alvo ativo em ${state.softMaxGB} GB economiza largura de banda da RAM e deixa ${state.allocRamGB - state.softMaxGB} GB de amortecedor contra travadas.</li>
+                    <li><strong class="text-amber-300 font-mono">-XX:ZAllocationSpikeTolerance=${spikeTol} & -XX:UseAVX=${cpu.avx}</strong>: Calibrado para a taxa de leitura do seu <strong>${storageName}</strong> e instruções vetoriais <strong>AVX${cpu.avx === 3 ? '-512' : cpu.avx}</strong> da arquitetura ${cpu.arch}.</li>
+                `;
+            } else {
+                expList.innerHTML = `
+                    <li><strong class="text-purple-300 font-mono">-XX:+UseJVMCICompiler -Dgraal.TuneInlinerExploration=1</strong>: Enables the <strong>Oracle GraalVM</strong> JIT compiler with deep method inlining, accelerating entity ticks and terrain generation on your <strong>${cpu.name}</strong>.</li>
+                    <li><strong class="text-emerald-300 font-mono">-XX:ConcGCThreads=${cpu.concGC} -XX:ParallelGCThreads=${cpu.parGC}</strong>: Tailored specifically for your <strong>${cpu.cores} cores / ${cpu.threads} threads</strong>, preventing the garbage collector from stealing cycles from the main render thread.</li>
+                    <li><strong class="text-blue-300 font-mono">-XX:SoftMaxHeapSize=${state.softMaxGB}G</strong>: With <strong>${state.ddrType} ${state.ramFreq} MHz</strong> memory, keeping the active heap target at ${state.softMaxGB} GB saves memory bandwidth while leaving a ${state.allocRamGB - state.softMaxGB} GB cushion against allocation spikes.</li>
+                    <li><strong class="text-amber-300 font-mono">-XX:ZAllocationSpikeTolerance=${spikeTol} & -XX:UseAVX=${cpu.avx}</strong>: Calibrated for your <strong>${storageName}</strong> read speed and native <strong>AVX${cpu.avx === 3 ? '-512' : cpu.avx}</strong> vector instructions on ${cpu.arch}.</li>
+                `;
+            }
+        }
+
+        function renderHardwareDiagnostics(cpu, gpu, storage) {
+            const lang = state.lang;
+            const storageName = storage.name[lang];
+            const container = document.getElementById('hardware-diagnostics');
+
+            // Diagnóstico de RAM
+            let ramStatusTitle = "";
+            let ramStatusDesc = "";
+            let ramColor = "border-blue-500/30 bg-blue-950/20 text-blue-300";
+
+            if (state.ddrType === 'DDR3') {
+                ramStatusTitle = lang === 'pt'
+                    ? `Modo de Alta Compactação (${state.ddrType} ${state.ramFreq}MHz)`
+                    : `High Compression Mode (${state.ddrType} ${state.ramFreq}MHz)`;
+                ramStatusDesc = lang === 'pt'
+                    ? `Em DDR3, a largura de banda com a CPU é limitada. O painel ativou automaticamente compactFastMap no FerriteCore e deduplicação agressiva de Strings para reduzir o tráfego na memória.`
+                    : `On DDR3, memory bandwidth to the CPU is constrained. The optimizer automatically enabled compactFastMap in FerriteCore and aggressive String deduplication to reduce RAM traffic.`;
+                ramColor = "border-amber-500/40 bg-amber-950/20 text-amber-300";
+            } else if (state.ddrType === 'DDR4' && state.ramFreq <= 2666) {
+                ramStatusTitle = lang === 'pt'
+                    ? `Otimização de Latência (${state.ddrType} ${state.ramFreq}MHz)`
+                    : `Latency Optimization (${state.ddrType} ${state.ramFreq}MHz)`;
+                ramStatusDesc = lang === 'pt'
+                    ? `Frequências até 2666MHz limitam levemente o Infinity Fabric / Ring Bus. Usar GraalVM 21 + SoftMaxHeapSize=${state.softMaxGB}G evita varreduras longas na RAM e mantém o FPS estável.`
+                    : `Speeds up to 2666MHz slightly bottleneck Infinity Fabric / Ring Bus. Using GraalVM 21 + SoftMaxHeapSize=${state.softMaxGB}G avoids long RAM sweeps and keeps frametimes smooth.`;
+                ramColor = "border-emerald-500/30 bg-emerald-950/20 text-emerald-300";
+            } else {
+                ramStatusTitle = lang === 'pt'
+                    ? `Banda de Memória Rápida (${state.ddrType} ${state.ramFreq}MHz)`
+                    : `Fast Memory Bandwidth (${state.ddrType} ${state.ramFreq}MHz)`;
+                ramStatusDesc = lang === 'pt'
+                    ? `Sua memória tem excelente taxa de transferência! O ZGC Generacional no GraalVM 21 limpará objetos temporários de chunks em sub-milissegundos.`
+                    : `Your RAM offers high throughput! Generational ZGC on GraalVM 21 will sweep temporary chunk objects in sub-milliseconds.`;
+                ramColor = "border-cyan-500/30 bg-cyan-950/20 text-cyan-300";
+            }
+
+            // Diagnóstico de GPU / VRAM
+            let gpuTitle = "";
+            let gpuDesc = "";
+            if (gpu.vram <= 4) {
+                gpuTitle = lang === 'pt' ? `Alerta de VRAM (${gpu.vram}GB - ${gpu.name})` : `VRAM Alert (${gpu.vram}GB - ${gpu.name})`;
+                gpuDesc = lang === 'pt'
+                    ? `Em placas de ${gpu.vram}GB (como a ${gpu.name}), texturas de 200+ mods estouram a VRAM rapidamente. Mantenha dynamic_resources=true no ModernFix, GPUTape e folhas no Fast.`
+                    : `On ${gpu.vram}GB GPUs (like ${gpu.name}), 200+ mod textures can quickly overflow VRAM. Keep dynamic_resources=true in ModernFix, GPUTape, and Leaves set to Fast.`;
+            } else if (gpu.vram === 6) {
+                gpuTitle = lang === 'pt' ? `Otimização de VRAM 6GB (${gpu.name})` : `6GB VRAM Optimization (${gpu.name})`;
+                gpuDesc = lang === 'pt'
+                    ? `Nos 6GB de VRAM da ${gpu.name}, ative dynamic_resources=true no ModernFix + GPUTape + EntityCulling para jogar com Shaders sem estourar o buffer de vídeo.`
+                    : `For the 6GB VRAM on ${gpu.name}, enable dynamic_resources=true in ModernFix + GPUTape + EntityCulling to use Shaders without overflowing video memory.`;
+            } else {
+                gpuTitle = lang === 'pt' ? `Configuração Gráfica (${gpu.name})` : `Graphics Configuration (${gpu.name})`;
+                gpuDesc = lang === 'pt'
+                    ? `Seus ${gpu.vram}GB de VRAM comportam modpacks grandes e Shaders com folga. O Embeddium/Sodium foi ajustado com ${cpu.chunkThreads} threads de construção de chunks.`
+                    : `Your ${gpu.vram}GB VRAM handles large modpacks and Shaders effortlessly. Embeddium/Sodium is configured with ${cpu.chunkThreads} chunk builder threads.`;
+            }
+
+            // Diagnóstico de Disco
+            let diskTitle = state.storageKey === 'hdd'
+                ? (lang === 'pt' ? `Atenção: HD Mecânico Selecionado!` : `Warning: Mechanical HDD Selected!`)
+                : (lang === 'pt' ? `Streaming Rápido (${storageName})` : `Fast Asset Streaming (${storageName})`);
+            let diskDesc = state.storageKey === 'hdd'
+                ? (lang === 'pt'
+                    ? `Em HDs mecânicos, carregar modelos 3D sob demanda causa travadas ao girar a câmera. Desativamos dynamic_resources no ModernFix para pré-carregar tudo na RAM durante o boot.`
+                    : `On mechanical HDDs, loading 3D models on-demand causes stutters when turning the camera. We disabled dynamic_resources in ModernFix so models preload into RAM at boot.`)
+                : (lang === 'pt'
+                    ? `Com ${storageName}, o ModernFix pode ler modelos 3D direto do disco em micro-segundos, cortando pela metade o tempo de abertura do jogo e economizando gigabytes de RAM.`
+                    : `With ${storageName}, ModernFix streams 3D models directly from disk in microseconds, cutting game launch times in half and saving gigabytes of RAM.`);
+
+            container.innerHTML = `
+                <div class="p-3.5 rounded-xl border ${ramColor}">
+                    <div class="text-xs font-bold flex items-center gap-1.5"><i class="fa-solid fa-memory"></i> ${ramStatusTitle}</div>
+                    <p class="text-[11px] text-gray-300 mt-1 leading-relaxed">${ramStatusDesc}</p>
+                </div>
+                <div class="p-3.5 rounded-xl border border-purple-500/30 bg-purple-950/20 text-purple-300">
+                    <div class="text-xs font-bold flex items-center gap-1.5"><i class="fa-solid fa-display"></i> ${gpuTitle}</div>
+                    <p class="text-[11px] text-gray-300 mt-1 leading-relaxed">${gpuDesc}</p>
+                </div>
+                <div class="p-3.5 rounded-xl border ${state.storageKey === 'hdd' ? 'border-red-500/40 bg-red-950/20 text-red-300' : 'border-emerald-500/30 bg-emerald-950/20 text-emerald-300'}">
+                    <div class="text-xs font-bold flex items-center gap-1.5"><i class="fa-solid fa-hard-drive"></i> ${diskTitle}</div>
+                    <p class="text-[11px] text-gray-300 mt-1 leading-relaxed">${diskDesc}</p>
+                </div>
+            `;
+        }
+
+        // ============================================================================
+        // CATÁLOGO DINÂMICO DE MODS (ADAPTA NOMES E IDIOMA PARA FORGE, NEOFORGE E FABRIC)
+        // ============================================================================
+        function getModsForCurrentSetup() {
+            const lang = state.lang;
+            const isFabric = state.loader === 'fabric';
+            const isNeo = state.loader === 'neoforge';
+            const is121 = state.mcVersion.startsWith('1.21');
+
+            const rendererName = (isFabric || (isNeo && is121)) ? "Sodium + Iris Shaders" : "Embeddium + Oculus";
+            const lithiumName = (isFabric || (isNeo && is121)) ? "Lithium" : (lang === 'pt' ? "Radium Reforged (ou Canary)" : "Radium Reforged (or Canary)");
+            const netModName = isFabric ? "Krypton" : "Krypton Reforged / PacketFixer";
+
+            return [
+                {
+                    name: rendererName,
+                    cat: "fps",
+                    badge: lang === 'pt' ? "Essencial GPU" : "Core GPU",
+                    color: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40",
+                    desc: lang === 'pt'
+                        ? `Substitui o motor OpenGL do Minecraft (${state.loader.toUpperCase()} ${state.mcVersion}). Dobra o FPS na sua ${gpuDatabase[state.gpuKey].name} e libera a CPU.`
+                        : `Replaces Minecraft's OpenGL rendering engine (${state.loader.toUpperCase()} ${state.mcVersion}). Doubles FPS on your ${gpuDatabase[state.gpuKey].name} and offloads the CPU.`
+                },
+                {
+                    name: "ModernFix",
+                    cat: "ram",
+                    badge: "RAM & Boot",
+                    color: "bg-blue-500/20 text-blue-300 border-blue-500/40",
+                    desc: lang === 'pt'
+                        ? "Indispensável em qualquer versão (1.20.1 a 1.21.4). Reduz o uso de RAM/VRAM com Dynamic Resources e acelera o carregamento."
+                        : "Mandatory across all versions (1.20.1 to 1.21.4). Slashes RAM/VRAM usage via Dynamic Resources and speeds up modpack boot times."
+                },
+                {
+                    name: "FerriteCore",
+                    cat: "ram",
+                    badge: lang === 'pt' ? "Compactação RAM" : "RAM Compression",
+                    color: "bg-blue-500/20 text-blue-300 border-blue-500/40",
+                    desc: lang === 'pt'
+                        ? `Corta até 45% do consumo de memória de estados de blocos, essencial para aliviar sua memória ${state.ddrType} ${state.ramFreq}MHz.`
+                        : `Cuts blockstate memory usage by up to 45%, crucial for relieving bandwidth on your ${state.ddrType} ${state.ramFreq}MHz RAM.`
+                },
+                {
+                    name: lithiumName,
+                    cat: "tps",
+                    badge: lang === 'pt' ? "Física & TPS" : "Physics & TPS",
+                    color: "bg-orange-500/20 text-orange-300 border-orange-500/40",
+                    desc: lang === 'pt'
+                        ? `Otimiza IA de mobs, física de blocos, colisões e funis sem alterar o comportamento vanilla na sua ${cpuDatabase[state.cpuKey].name}.`
+                        : `Optimizes mob AI, block physics, collisions, and hoppers without breaking vanilla mechanics on your ${cpuDatabase[state.cpuKey].name}.`
+                },
+                {
+                    name: "ImmediatelyFast",
+                    cat: "fps",
+                    badge: lang === 'pt' ? "HUD & Inventário" : "HUD & Inventory",
+                    color: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40",
+                    desc: lang === 'pt'
+                        ? "Otimiza renderização de modo imediato (entidades, mapas, textos, barras de RPG e telas do JEI/EMI cheias de itens)."
+                        : "Optimizes immediate-mode rendering (entities, maps, text, RPG HUD bars, and JEI/EMI screens packed with items)."
+                },
+                {
+                    name: "EntityCulling + MoreCulling",
+                    cat: "fps",
+                    badge: lang === 'pt' ? "Oclusão 3D" : "3D Occlusion",
+                    color: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40",
+                    desc: lang === 'pt'
+                        ? "Usa threads secundárias da CPU para descartar mobs, baús, folhas e faces de blocos invisíveis atrás de paredes."
+                        : "Uses background CPU threads to skip rendering mobs, chests, leaves, and hidden block faces behind walls."
+                },
+                {
+                    name: "BadOptimizations",
+                    cat: "fps",
+                    badge: "Micro-Caches",
+                    color: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40",
+                    desc: lang === 'pt'
+                        ? "Elimina cálculos repetitivos a cada frame (cor do céu, lightmap, caching de renderizadores de entidades e toasts)."
+                        : "Eliminates redundant per-frame calculations (sky color, lightmap, entity renderer caching, and toasts)."
+                },
+                {
+                    name: isFabric || isNeo ? "C2ME + Noisium" : "Noisium + Chunky",
+                    cat: "tps",
+                    badge: lang === 'pt' ? "Geração de Chunks" : "Chunk Generation",
+                    color: "bg-orange-500/20 text-orange-300 border-orange-500/40",
+                    desc: lang === 'pt'
+                        ? "Acelera a geração matemática de novos biomas e estruturas usando múltiplos núcleos da CPU de forma paralela."
+                        : "Accelerates mathematical biome and structure generation across multiple CPU cores in parallel."
+                },
+                {
+                    name: state.mcVersion === '1.20.1' ? "GPUTape ( + AllTheLeaks )" : "AllTheLeaks (Memory Leak Fix)",
+                    cat: "ram",
+                    badge: "Anti-Leak",
+                    color: "bg-blue-500/20 text-blue-300 border-blue-500/40",
+                    desc: lang === 'pt'
+                        ? "Impede que a VRAM da placa de vídeo e a RAM encham após horas trocando de dimensões ou explorando."
+                        : "Prevents GPU VRAM and system RAM leaks after hours of dimension hopping or world exploration."
+                },
+                {
+                    name: netModName,
+                    cat: "tps",
+                    badge: lang === 'pt' ? "Rede & Pacotes" : "Network & Packets",
+                    color: "bg-orange-500/20 text-orange-300 border-orange-500/40",
+                    desc: lang === 'pt'
+                        ? "Otimiza a pilha de rede Netty (inclusive no servidor integrado Singleplayer) reduzindo o uso de CPU e pacotes grandes."
+                        : "Optimizes the Netty networking stack (including Singleplayer's integrated server), reducing CPU overhead and packet errors."
+                },
+                {
+                    name: "Dynamic FPS",
+                    cat: "fps",
+                    badge: lang === 'pt' ? "Economia GPU" : "GPU Saver",
+                    color: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40",
+                    desc: lang === 'pt'
+                        ? "Reduz automaticamente o uso da placa de vídeo quando o jogo está minimizado ou em segundo plano (Alt+Tab)."
+                        : "Automatically throttles GPU usage when the game window is minimized or unfocused (Alt+Tab)."
+                },
+                {
+                    name: lang === 'pt' ? "OptiFine / gpumemleakfix (Antigo)" : "OptiFine / gpumemleakfix (Legacy)",
+                    cat: "avoid",
+                    badge: lang === 'pt' ? "Não Usar!" : "Do Not Use!",
+                    color: "bg-red-500/20 text-red-300 border-red-500/40",
+                    desc: lang === 'pt'
+                        ? "Quebram mods modernos na 1.20.1+ e causam stutters severos. Sempre prefira a dupla Sodium/Embeddium + GPUTape."
+                        : "Breaks modern 1.20.1+ mods and causes severe stutters. Always use Sodium/Embeddium + GPUTape instead."
+                }
+            ];
+        }
+
+        function setModCategoryFilter(cat) {
+            state.activeModCat = cat;
+            document.querySelectorAll('.mcat-btn').forEach(b => b.classList.remove('bg-gray-800', 'text-white'));
+            document.getElementById(`mcat-${cat}`).classList.add('bg-gray-800', 'text-white');
+            renderDynamicMods();
+        }
+
+        function renderDynamicMods() {
+            const loaderNames = { forge: 'Forge', neoforge: 'NeoForge', fabric: 'Fabric' };
+            document.getElementById('mods-section-badge').textContent = `${loaderNames[state.loader]} ${state.mcVersion}`;
+
+            const isFabricOrNeo121 = state.loader === 'fabric' || (state.loader === 'neoforge' && state.mcVersion.startsWith('1.21'));
+            document.getElementById('tab-label-renderer').textContent = isFabricOrNeo121 ? "2. Sodium" : "2. Embeddium";
+            document.getElementById('tab-label-lithium').textContent = isFabricOrNeo121 ? "7. Lithium" : "7. Radium / Canary";
+
+            const mods = getModsForCurrentSetup().filter(m => state.activeModCat === 'all' || m.cat === state.activeModCat);
+            const grid = document.getElementById('dynamic-mods-grid');
+            grid.innerHTML = '';
+
+            mods.forEach(m => {
+                const div = document.createElement('div');
+                div.className = "bg-gray-950/75 border border-gray-800 rounded-xl p-4 flex flex-col justify-between hover:border-gray-700 transition";
+                div.innerHTML = `
+                    <div>
+                        <div class="flex items-start justify-between gap-2">
+                            <h3 class="text-sm font-bold text-white">${m.name}</h3>
+                            <span class="text-[11px] font-semibold px-2 py-0.5 rounded border whitespace-nowrap ${m.color}">${m.badge}</span>
+                        </div>
+                        <p class="text-xs text-gray-300 mt-2 leading-relaxed">${m.desc}</p>
+                    </div>
+                `;
+                grid.appendChild(div);
+            });
+        }
+
+        // ============================================================================
+        // GERADOR DE CONFIGURAÇÕES RECOMENDADAS PARA TODOS OS 9 MODS / DRIVERS
+        // ============================================================================
+        function selectConfigTab(tabKey) {
+            state.activeConfigTab = tabKey;
+            document.querySelectorAll('.ctab-btn').forEach(btn => {
+                btn.className = "ctab-btn px-3 py-2 rounded-lg text-xs font-semibold text-gray-400 hover:text-white transition flex items-center gap-1.5";
+            });
+            document.getElementById(`ctab-${tabKey}`).className = "ctab-btn px-3 py-2 rounded-lg text-xs font-bold bg-blue-600 text-white transition flex items-center gap-1.5";
+            renderActiveConfigTab();
+        }
+
+        function renderActiveConfigTab() {
+            const lang = state.lang;
+            const cpu = cpuDatabase[state.cpuKey];
+            const gpu = gpuDatabase[state.gpuKey];
+            const storage = storageDatabase[state.storageKey];
+            const storageName = storage.name[lang];
+            const tab = state.activeConfigTab;
+
+            const extraToggles = document.getElementById('modernfix-extra-toggles');
+            extraToggles.className = tab === 'modernfix' ? 'flex flex-wrap items-center gap-3' : 'hidden';
+
+            let filePath = "";
+            let hwTag = "";
+            let desc = "";
+            let code = "";
+            let tips = "";
+
+            if (tab === 'modernfix') {
+                const dynRes = document.getElementById('chk-mf-dynres').checked;
+                const remSpawn = document.getElementById('chk-mf-spawn').checked;
+                filePath = "config/modernfix-mixins.properties";
+                hwTag = lang === 'pt'
+                    ? `Otimizado para ${storageName} + ${gpu.vram}GB VRAM`
+                    : `Optimized for ${storageName} + ${gpu.vram}GB VRAM`;
+                desc = lang === 'pt'
+                    ? "Cole estas linhas no final do arquivo modernfix-mixins.properties (logo abaixo de # User overrides go here)."
+                    : "Paste these lines at the bottom of modernfix-mixins.properties (right below # User overrides go here).";
+                code = `# User overrides go here (${lang === 'pt' ? 'Gerado para' : 'Generated for'} ${cpu.name} + ${gpu.name})
+mixin.perf.dynamic_resources=${dynRes}
+mixin.perf.faster_item_rendering=true
+mixin.perf.dynamic_entity_renderers=true
+mixin.perf.clear_mixin_classinfo=true
+mixin.perf.deduplicate_location=true
+mixin.perf.deduplicate_climate_parameters=true
+mixin.perf.compact_bit_storage=true
+mixin.bugfix.packet_leak=true
+mixin.feature.remove_chat_signing=true${remSpawn ? '\nmixin.perf.remove_spawn_chunks=true' : ''}`;
+                tips = lang === 'pt'
+                    ? `<strong>Por que usar estas opções:</strong> <code>dynamic_resources=${dynRes}</code> economiza gigabytes de RAM e VRAM (${gpu.vram}GB) lendo modelos sob demanda do seu <strong>${storageName}</strong>. Já <code>faster_item_rendering=true</code> evita quedas de FPS ao abrir inventários com JEI/EMI lotados.`
+                    : `<strong>Why use these options:</strong> <code>dynamic_resources=${dynRes}</code> saves gigabytes of RAM and VRAM (${gpu.vram}GB) by streaming models on-demand from your <strong>${storageName}</strong>. Meanwhile, <code>faster_item_rendering=true</code> prevents FPS drops when opening inventories with JEI/EMI.`;
+            }
+            else if (tab === 'embeddium') {
+                const isSodium = state.loader === 'fabric' || (state.loader === 'neoforge' && state.mcVersion.startsWith('1.21'));
+                filePath = isSodium ? "config/sodium-options.json" : "config/embeddium-options.json";
+                hwTag = `${cpu.chunkThreads} Chunk Threads • ${gpu.vendor.toUpperCase()} Driver`;
+                desc = lang === 'pt'
+                    ? `Ajustes ideais de renderização para a combinação ${cpu.name} + ${gpu.name}.`
+                    : `Optimal rendering settings for your ${cpu.name} + ${gpu.name} combination.`;
+                code = `{
+  "quality": {
+    "leaves_quality": "${gpu.vram <= 4 ? 'FAST' : 'DEFAULT'}",
+    "enable_vignette": false
+  },
+  "performance": {
+    "chunk_builder_threads": ${cpu.chunkThreads},
+    "always_defer_chunk_updates": true,
+    "animate_only_visible_textures": true,
+    "use_entity_culling": true,
+    "use_fog_occlusion": true,
+    "use_block_face_culling": true,
+    "use_no_error_context": ${gpu.noErrorCtx}
+  },
+  "advanced": {
+    "enable_memory_tracing": false,
+    "use_advanced_staging_buffers": true,
+    "cpu_render_ahead_limit": 3
+  }
+}`;
+                tips = lang === 'pt'
+                    ? `<strong>Ajuste de Hardware:</strong> Definimos <code>chunk_builder_threads: ${cpu.chunkThreads}</code> com base nas <strong>${cpu.threads} threads</strong> da sua CPU e <code>always_defer_chunk_updates: true</code> para impedir que o carregamento de chunks atrase os frames enviados para a <strong>${gpu.name}</strong>. Além disso, trave a <strong>Distância de Simulação em 6 a 8 chunks</strong> no menu de Vídeo!`
+                    : `<strong>Hardware Tuning:</strong> We set <code>chunk_builder_threads: ${cpu.chunkThreads}</code> based on your CPU's <strong>${cpu.threads} threads</strong> and <code>always_defer_chunk_updates: true</code> so chunk building never delays frames sent to your <strong>${gpu.name}</strong>. Also lock <strong>Simulation Distance to 6–8 chunks</strong> in Video Settings!`;
+            }
+            else if (tab === 'ferrite') {
+                const isLowBandwidth = state.ddrType === 'DDR3' || (state.ddrType === 'DDR4' && state.ramFreq <= 3000) || state.sysRamGB <= 16;
+                filePath = "config/ferritecore-mixin.toml";
+                hwTag = lang === 'pt'
+                    ? `Calibrado para ${state.ddrType} ${state.ramFreq}MHz (${state.sysRamGB}GB)`
+                    : `Calibrated for ${state.ddrType} ${state.ramFreq}MHz (${state.sysRamGB}GB)`;
+                desc = lang === 'pt'
+                    ? "Configuração completa do FerriteCore para reduzir drasticamente o peso dos estados de blocos na memória."
+                    : "Complete FerriteCore configuration to drastically reduce blockstate memory footprint.";
+                code = `# FerriteCore Universal Config (${state.ddrType} ${state.ramFreq}MHz)
+# ${lang === 'pt' ? 'Compacta estados de blocos em mapa rápido (essencial para DDR3/DDR4 e modpacks grandes)' : 'Compacts blockstates into a fast map (essential for DDR3/DDR4 and large modpacks)'}
+compactFastMap = true
+# ${lang === 'pt' ? `Mantenha false em CPUs multi-thread (${cpu.threads} threads) para evitar crash concorrente em chunks` : `Keep false on multi-threaded CPUs (${cpu.threads} threads) to avoid concurrent chunk crashes`}
+useSmallThreadingDetector = false
+cacheMultipartPredicates = true
+multipartDeduplication = true
+blockstateCacheDeduplication = true
+modelResourceLocations = true
+modelSides = true
+replaceNeighborLookup = true
+populateNeighborTable = false
+replacePropertyMap = true
+bakedQuadDeduplication = true`;
+                tips = lang === 'pt'
+                    ? `<strong>Impacto na sua RAM (${state.ddrType} ${state.ramFreq}MHz):</strong> Ativar <code>compactFastMap = true</code> reduz o tamanho das tabelas de BlockState, fazendo com que os dados caibam melhor nos <strong>${cpu.l3} de Cache L3</strong> da sua ${cpu.name}${isLowBandwidth ? ' e compensando a latência da memória' : ''}.`
+                    : `<strong>Impact on your RAM (${state.ddrType} ${state.ramFreq}MHz):</strong> Enabling <code>compactFastMap = true</code> shrinks BlockState lookup tables so more data fits inside your ${cpu.name}'s <strong>${cpu.l3} L3 Cache</strong>${isLowBandwidth ? ', compensating for memory latency' : ''}.`;
+            }
+            else if (tab === 'immediatelyfast') {
+                filePath = "config/immediatelyfast.json";
+                hwTag = lang === 'pt' ? `Batching HUD & Inventário (${gpu.name})` : `HUD & Inventory Batching (${gpu.name})`;
+                desc = lang === 'pt'
+                    ? "Acelera drasticamente a renderização de textos, barras de vida/mana/ki de mods RPG, minimapas e entidades."
+                    : "Drastically accelerates rendering of text, custom RPG health/mana/ki bars, minimaps, and entities.";
+                code = `{
+  "font_atlas_resizing": true,
+  "map_atlas_generation": true,
+  "hud_batching": true,
+  "fast_text_lookup": true,
+  "fast_buffer_upload": true,
+  "dont_add_prod_info_to_crash_reports": false,
+  "experimental_screen_batching": false,
+  "experimental_sign_text_buffering": true
+}`;
+                tips = lang === 'pt'
+                    ? `<strong>Por que <code>experimental_screen_batching: false</code>?</strong> Mantemos o batching de HUD e Fontes ligado (dobrando o FPS em interfaces), mas deixamos o <em>experimental_screen_batching</em> desligado para evitar bugs visuais em barras customizadas de mods de RPG, magias e minimapas.`
+                    : `<strong>Why <code>experimental_screen_batching: false</code>?</strong> We keep HUD and Font batching enabled (doubling GUI FPS), but leave <em>experimental_screen_batching</em> off to prevent visual glitches with custom RPG bars, spell HUDs, and minimaps.`;
+            }
+            else if (tab === 'entityculling') {
+                const sleepDelay = cpu.threads >= 12 ? 10 : (cpu.threads >= 8 ? 15 : 25);
+                const traceDist = gpu.vram <= 4 ? 64 : 128;
+                filePath = "config/entityculling.json";
+                hwTag = lang === 'pt' ? `Raytracing Assíncrono (${cpu.threads} Threads)` : `Async Raytracing (${cpu.threads} Threads)`;
+                desc = lang === 'pt'
+                    ? "Configuração do EntityCulling para ocultar entidades e blocos-entidade (baús/máquinas) atrás de paredes e cavernas."
+                    : "EntityCulling configuration to skip rendering entities and block-entities (chests/machines) hidden behind walls and caves.";
+                code = `{
+  "configVersion": 6,
+  "renderNametagsThroughWalls": true,
+  "blockEntityWhitelist": [
+    "minecraft:beacon",
+    "create:rope_pulley",
+    "create:hose_pulley",
+    "botania:flame_ring"
+  ],
+  "tracingDistance": ${traceDist},
+  "debugMode": false,
+  "sleepDelay": ${sleepDelay},
+  "hitboxLimit": 50,
+  "skipMarkerArmorStands": true,
+  "tickCulling": true,
+  "tickCullingWhitelist": [
+    "minecraft:villager",
+    "minecraft:ender_dragon",
+    "create:contraption"
+  ],
+  "disableF3": false,
+  "skipHiddenEntityRendering": true,
+  "skipHiddenBlockEntityRendering": true
+}`;
+                tips = lang === 'pt'
+                    ? `<strong>Calculado para sua CPU:</strong> O <code>sleepDelay: ${sleepDelay}</code> define a velocidade com que a thread secundária da sua <strong>${cpu.name}</strong> calcula a visibilidade dos objetos. Além disso, <code>tickCulling: true</code> congela animações de mobs que você não está vendo, economizando CPU e GPU ao mesmo tempo!`
+                    : `<strong>Tailored to your CPU:</strong> <code>sleepDelay: ${sleepDelay}</code> sets how frequently your <strong>${cpu.name}</strong>'s background thread updates visibility rays. Furthermore, <code>tickCulling: true</code> skips animation ticks for occluded mobs, saving both CPU and GPU!`;
+            }
+            else if (tab === 'badopt') {
+                filePath = "config/badoptimizations.txt (or .json)";
+                hwTag = "SkyColor, Lightmap & BlockEntities Cache";
+                desc = lang === 'pt'
+                    ? "O BadOptimizations evita que o Minecraft recalcule variáveis estáticas dezenas de vezes por segundo."
+                    : "BadOptimizations prevents Minecraft from recalculating static variables dozens of times per second.";
+                code = `# BadOptimizations Universal Config
+enable_toast_optimizations = true
+enable_sky_color_caching = true
+enable_lightmap_caching = true
+enable_particle_manager_optimization = true
+enable_entity_renderer_caching = true
+enable_block_entity_renderer_caching = true
+enable_debug_renderer_disable_if_not_needed = true
+enable_remove_redundant_fov_calculations = true
+sky_color_time_change_needed_for_update = 3
+ignore_mod_incompatibilities = false`;
+                tips = lang === 'pt'
+                    ? `<strong>Ganho Direto:</strong> Em modpacks com dezenas de biomas novos (Biomes O' Plenty, Regions Unexplored, Oh The Biomes We've Gone), o cálculo de transição de cor do céu e iluminação consome muitos ciclos de CPU. Este arquivo coloca tudo em cache.`
+                    : `<strong>Direct Gain:</strong> In modpacks with dozens of custom biomes (Biomes O' Plenty, Regions Unexplored, Oh The Biomes We've Gone), sky color blending and lightmap updates consume significant CPU cycles. This config caches them.`;
+            }
+            else if (tab === 'radium') {
+                const isLithium = state.loader === 'fabric' || (state.loader === 'neoforge' && state.mcVersion.startsWith('1.21'));
+                filePath = isLithium ? "config/lithium.properties" : "config/radium.properties (or canary.properties)";
+                hwTag = lang === 'pt' ? `Otimização de Servidor Interno (${cpu.name})` : `Integrated Server Optimization (${cpu.name})`;
+                desc = lang === 'pt'
+                    ? "Otimizações de TPS (Ticks por Segundo) para IA de mobs, funis, colisões e carregamento de chunks."
+                    : "TPS (Ticks Per Second) optimizations for mob AI, hoppers, collisions, and chunk loading.";
+                code = `# Universal ${isLithium ? 'Lithium' : 'Radium Reforged / Canary'} Config
+mixin.ai.nearby_entity_tracking=true
+mixin.ai.pathing=true
+mixin.ai.poi=true
+mixin.ai.raid=true
+mixin.ai.sensor=true
+mixin.ai.task=true
+mixin.block.hopper=true
+mixin.block.moving_block_shapes=true
+mixin.block.redstone_wire=true
+mixin.chunk.block_counting=true
+mixin.chunk.entity_class_groups=true
+mixin.chunk.Palette=true
+mixin.Chunk.serialization=true
+mixin.collections.attributes=true
+mixin.collections.entity_by_type=true
+mixin.entity.collisions.movement=true
+mixin.entity.fast_elytra_check=true
+mixin.entity.fast_hand_swing=true
+mixin.entity.fast_powder_snow_check=true
+mixin.entity.inactive_navigations=true
+mixin.gen.cached_generator_settings=true
+mixin.math.fast_util=true
+mixin.math.sine_lut=true
+mixin.shapes.blockstate_cache=true
+mixin.shapes.optimized_matching=true
+mixin.world.block_entity_ticking=true
+mixin.world.chunk_access=true
+mixin.world.explosions=true
+mixin.world.tick_scheduler=true`;
+                tips = lang === 'pt'
+                    ? `<strong>Salva-vidas de TPS:</strong> Estas regras reduzem em até 45% o tempo de tick (mspt) no servidor integrado quando há muitos mobs (Alex's Mobs, Ice and Fire, chefes) ou máquinas automáticas rodando perto da sua base.`
+                    : `<strong>TPS Lifesaver:</strong> These rules cut integrated server tick time (MSPT) by up to 45% when surrounded by modded mobs (Alex's Mobs, Ice and Fire, bosses) or automated machinery.`;
+            }
+            else if (tab === 'loader') {
+                if (state.loader === 'fabric') {
+                    filePath = "config/c2me.toml (Concurrent Chunk Management Engine)";
+                    hwTag = lang === 'pt' ? `Geração Paralela Fabric (${cpu.cores} Núcleos)` : `Fabric Parallel WorldGen (${cpu.cores} Cores)`;
+                    desc = lang === 'pt'
+                        ? "No Fabric, o C2ME paraleliza a geração e leitura de chunks usando múltiplos núcleos."
+                        : "On Fabric, C2ME parallelizes chunk generation and I/O across multiple CPU cores.";
+                    code = `version = 3
+maxConcurrentTasks = ${cpu.chunkThreads}
+
+[ioSystem]
+  async = true
+  chunkStreamVersion = "DEFLATE"
+  gcFreeChunkSerializer = true
+
+[threadedWorldGen]
+  enabled = true
+  allowThreadedFeatures = true
+  reduceLockRadius = true
+
+[vanillaWorldGenOptimizations]
+  optimizeAquifer = true
+  useDensityFunctionCompiler = true`;
+                    tips = lang === 'pt'
+                        ? `<strong>C2ME + GraalVM:</strong> A opção <code>useDensityFunctionCompiler = true</code> compila as funções matemáticas de geração de cavernas e montanhas em bytecode Java puro, que o <strong>Oracle GraalVM</strong> transforma em instruções AVX nativas!`
+                        : `<strong>C2ME + GraalVM:</strong> Setting <code>useDensityFunctionCompiler = true</code> compiles mathematical cave and mountain generation functions into Java bytecode, which <strong>Oracle GraalVM</strong> then vectorizes into native AVX instructions!`;
+                } else {
+                    filePath = "config/forge-client.toml  &  config/fml.toml";
+                    hwTag = lang === 'pt'
+                        ? `Boot Rápido (${cpu.fmlThreads} Threads) + Iluminação Paralela`
+                        : `Fast Boot (${cpu.fmlThreads} Threads) + Parallel Lighting`;
+                    desc = lang === 'pt'
+                        ? "Ajustes nos arquivos nativos do Forge / NeoForge para acelerar a abertura do modpack e eliminar travadas de iluminação."
+                        : "Native Forge / NeoForge config tweaks to speed up modpack loading and eliminate lighting stutters.";
+                    code = `# --- ${lang === 'pt' ? 'No arquivo' : 'In file'}: config/forge-client.toml ---
+alwaysSetupTerrainOffThread = true
+earlyWindowControl = true
+forgeLightPipelineEnabled = true
+
+# --- ${lang === 'pt' ? 'No arquivo' : 'In file'}: config/fml.toml ---
+maxThreads = ${cpu.fmlThreads}
+versionCheck = false
+defaultConfigPath = "defaultconfigs"`;
+                    tips = lang === 'pt'
+                        ? `<strong>Ajuste Exato para ${cpu.name}:</strong> Definimos <code>maxThreads = ${cpu.fmlThreads}</code> (deixando 2 threads livres para o sistema operacional) para que o Forge compile os mods na velocidade máxima do seu <strong>${storageName}</strong>, e <code>versionCheck = false</code> para impedir que centenas de mods congelem o menu inicial buscando atualizações online.`
+                        : `<strong>Exact Match for ${cpu.name}:</strong> We set <code>maxThreads = ${cpu.fmlThreads}</code> (leaving 2 threads free for the OS) so Forge compiles mods at the full speed of your <strong>${storageName}</strong>, and <code>versionCheck = false</code> to stop hundreds of mods from stalling startup with HTTP update checks.`;
+                }
+            }
+            else if (tab === 'driver') {
+                filePath = lang === 'pt' ? `Painel de Controle do Driver (${gpu.name})` : `GPU Driver Control Panel (${gpu.name})`;
+                hwTag = `${gpu.vendor.toUpperCase()} Profile + Oculus/Iris Shaders`;
+                desc = lang === 'pt'
+                    ? "Configurações no sistema operacional e driver de vídeo para o executável javaw.exe do seu Oracle GraalVM 21."
+                    : "OS and GPU driver settings for your Oracle GraalVM 21 javaw.exe executable.";
+
+                if (gpu.vendor === 'nvidia') {
+                    code = lang === 'pt'
+                        ? `=== PAINEL DE CONTROLE DA NVIDIA (Para ${gpu.name}) ===
+1. Abra o Painel da NVIDIA -> Gerenciar as configurações em 3D -> Aba "Configurações do Programa".
+2. Clique em "Adicionar" e selecione o javaw.exe da pasta do seu Oracle GraalVM 21.
+3. Aplique exatamente estes valores:
+   • Otimização segmentada (Threaded Optimization): LIGADO (Essencial para OpenGL!)
+   • Modo de gerenciamento de energia: Preferência por desempenho máximo
+   • Modo de Baixa Latência (Low Latency Mode): Ligado
+   • Filtragem da textura - Qualidade: Alto desempenho
+   • Sincronização Vertical (V-Sync): Usar a configuração do aplicativo 3D (Desligue no jogo)
+   • Método de apresentação Vulkan/OpenGL: Preferir camadas na cadeia de troca DXGI (Ativa Auto-HDR/G-Sync em janela)`
+                        : `=== NVIDIA CONTROL PANEL (For ${gpu.name}) ===
+1. Open NVIDIA Control Panel -> Manage 3D Settings -> "Program Settings" tab.
+2. Click "Add" and select javaw.exe from your Oracle GraalVM 21 folder.
+3. Apply these exact settings:
+   • Threaded Optimization: ON (Crucial for OpenGL multi-threading!)
+   • Power Management Mode: Prefer Maximum Performance
+   • Low Latency Mode: On
+   • Texture Filtering - Quality: High Performance
+   • Vertical Sync (V-Sync): Use the 3D application setting (Turn OFF in-game)
+   • Vulkan/OpenGL present method: Prefer layered on DXGI Swapchain (Enables G-Sync/FreeSync in windowed mode)`;
+                } else if (gpu.vendor === 'amd') {
+                    code = lang === 'pt'
+                        ? `=== AMD SOFTWARE: ADRENALIN EDITION (Para ${gpu.name}) ===
+1. Abra o AMD Adrenalin -> Jogos -> Adicione manualmente o javaw.exe do seu Oracle GraalVM 21.
+2. Em versões recentes do driver Windows 11 (22.7.1+), o driver possui otimização nativa OpenGL.
+3. Aplique estes ajustes no perfil do Java:
+   • Radeon Anti-Lag: Ativado
+   • Aguardar atualização vertical: Sempre desligado
+   • Otimização de formato de superfície: Ativado (Economiza VRAM nos ${gpu.vram}GB)
+   • Qualidade de filtragem de textura: Desempenho
+   • Se usar Shaders (Oculus/Iris): Desative o "Radeon Boost" para evitar mudança brusca de resolução.`
+                        : `=== AMD SOFTWARE: ADRENALIN EDITION (For ${gpu.name}) ===
+1. Open AMD Adrenalin -> Gaming -> Manually add javaw.exe from your Oracle GraalVM 21 folder.
+2. Modern AMD drivers (22.7.1+) feature a rebuilt hardware-accelerated OpenGL pipeline.
+3. Apply these profile settings for Java:
+   • Radeon Anti-Lag: Enabled
+   • Wait for Vertical Refresh: Always Off
+   • Surface Format Optimization: Enabled (Saves VRAM on your ${gpu.vram}GB card)
+   • Texture Filtering Quality: Performance
+   • When using Shaders (Oculus/Iris): Disable "Radeon Boost" to avoid dynamic resolution artifacts.`;
+                } else {
+                    code = lang === 'pt'
+                        ? `=== INTEL ARC CONTROL / GRÁFICOS INTEL (Para ${gpu.name}) ===
+1. Nas configurações gráficas do Windows (Sistema -> Tela -> Elementos Gráficos):
+   • Adicione o javaw.exe do Oracle GraalVM 21 e marque "Alto Desempenho (${gpu.name})".
+2. Em placas Intel Arc dedicadas:
+   • Certifique-se de que o Resizable BAR (ReBAR) esteja ATIVO na BIOS da placa-mãe.
+   • No embeddium-options.json, mantivemos "use_no_error_context": false para máxima estabilidade no driver OpenGL da Intel.`
+                        : `=== INTEL ARC CONTROL / INTEL GRAPHICS (For ${gpu.name}) ===
+1. In Windows Graphics Settings (System -> Display -> Graphics):
+   • Add Oracle GraalVM 21's javaw.exe and select "High Performance (${gpu.name})".
+2. On dedicated Intel Arc GPUs:
+   • Ensure Resizable BAR (ReBAR) is ENABLED in your motherboard BIOS.
+   • In embeddium-options.json, we kept "use_no_error_context": false for maximum stability with Intel's OpenGL driver.`;
+                }
+                tips = lang === 'pt'
+                    ? `<strong>Dica de Ouro para Shaders (Oculus / Iris) na ${gpu.name}:</strong> Se usar Shaders (Complementary, Bliss ou BSL), reduza a <em>Shadow Distance (Distância das Sombras)</em> dentro das opções do Shader para <strong>8 ou 10 chunks</strong> (mesmo que sua visão seja 16 chunks). Isso aumenta o FPS da placa de vídeo em até 45% sem diferença visual perceptível!`
+                    : `<strong>Golden Shader Tip (Oculus / Iris) on ${gpu.name}:</strong> When using Shaders (Complementary, Bliss, or BSL), lower the <em>Shadow Distance</em> inside Shader Pack Settings to <strong>8 or 10 chunks</strong> (even if Render Distance is 16 chunks). This boosts GPU FPS by up to 45% with virtually zero visual loss!`;
+            }
+
+            document.getElementById('cfg-file-path').textContent = filePath;
+            document.getElementById('cfg-hw-tag').textContent = hwTag;
+            document.getElementById('cfg-file-desc').textContent = desc;
+            document.getElementById('cfg-code-output').textContent = code;
+            document.getElementById('cfg-tips-box').innerHTML = tips;
+        }
+
+        // ============================================================================
+        // UTILITÁRIOS (COPIAR, TOAST E CHECKLIST BILÍNGUE)
+        // ============================================================================
+        const checklistItems = [
+            {
+                id: "gchk-1",
+                pt: "Baixar o Oracle GraalVM 21 e selecionar o javaw.exe dele nas configurações do Launcher",
+                en: "Download Oracle GraalVM 21 and select its javaw.exe in your Launcher settings"
+            },
+            {
+                id: "gchk-2",
+                pt: "Marcar 'Ignorar verificação de compatibilidade do Java' (no Prism Launcher)",
+                en: "Enable 'Skip Java compatibility checks' (in Prism Launcher)"
+            },
+            {
+                id: "gchk-3",
+                pt: "Definir a memória RAM Mínima e Máxima iguais no Launcher conforme calculado acima",
+                en: "Set Minimum and Maximum RAM to the exact same value in Launcher as calculated above"
+            },
+            {
+                id: "gchk-4",
+                pt: "Copiar e colar a linha de Argumentos JVM (GraalVM + Generational ZGC + SoftMaxHeap)",
+                en: "Copy and paste the generated JVM Arguments (GraalVM + Generational ZGC + SoftMaxHeap)"
+            },
+            {
+                id: "gchk-5",
+                pt: "Conferir se os mods chave do Loader escolhido (Embeddium/Sodium, ModernFix, FerriteCore, Radium/Lithium) estão instalados",
+                en: "Verify that core optimization mods for your Loader (Embeddium/Sodium, ModernFix, FerriteCore, Radium/Lithium) are installed"
+            },
+            {
+                id: "gchk-6",
+                pt: "Aplicar as configurações geradas na Seção 4 nos arquivos da pasta /config",
+                en: "Apply the generated configurations from Section 4 into your /config folder files"
+            },
+            {
+                id: "gchk-7",
+                pt: "Travar a Distância de Simulação em 6 a 8 chunks nas opções de Vídeo do jogo",
+                en: "Lock Simulation Distance to 6–8 chunks in in-game Video Settings"
+            },
+            {
+                id: "gchk-8",
+                pt: "Aplicar a otimização do Driver da placa de vídeo (aba 9 da Seção 4) para o javaw.exe",
+                en: "Apply the GPU Driver optimization profile (Tab 9 of Section 4) for javaw.exe"
+            }
+        ];
+
+        function renderChecklist() {
+            const lang = state.lang;
+            const container = document.getElementById('checklist-container');
+            container.innerHTML = '';
+            let doneCount = 0;
+
+            checklistItems.forEach(item => {
+                const checked = localStorage.getItem(item.id) === 'true';
+                if (checked) doneCount++;
+
+                const label = document.createElement('label');
+                label.className = `flex items-center gap-3 p-3.5 rounded-xl border cursor-pointer transition select-none ${
+                    checked ? 'bg-emerald-950/30 border-emerald-500/40 text-emerald-200' : 'bg-gray-950/60 border-gray-800 text-gray-300 hover:border-gray-700'
+                }`;
+                label.innerHTML = `
+                    <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleCheck('${item.id}', this.checked)" class="w-4 h-4 rounded accent-emerald-500 shrink-0">
+                    <span class="text-xs font-medium leading-snug ${checked ? 'line-through opacity-75' : ''}">${item[lang]}</span>
+                `;
+                container.appendChild(label);
+            });
+
+            const pct = Math.round((doneCount / checklistItems.length) * 100);
+            document.getElementById('progress-text').textContent = `${doneCount}/${checklistItems.length} (${pct}%)`;
+            document.getElementById('progress-bar').style.width = `${pct}%`;
+        }
+
+        function toggleCheck(id, val) {
+            localStorage.setItem(id, val);
+            renderChecklist();
+        }
+
+        function resetChecklist() {
+            checklistItems.forEach(item => localStorage.removeItem(item.id));
+            renderChecklist();
+            showToast(i18n[state.lang].toastChkReset);
+        }
+
+        function copyText(elementId, typeKey) {
+            const text = document.getElementById(elementId).textContent;
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            const msg = typeKey === 'jvm' ? i18n[state.lang].toastJvmCopied : i18n[state.lang].toastCfgCopied;
+            showToast(msg);
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').textContent = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 2600);
+        }
+
+        window.onload = function() {
+            populateFrequencyDropdown('DDR4', 2666);
+            recalculateAll();
+            renderChecklist();
+        };
+    </script>
+</body>
+</html>
