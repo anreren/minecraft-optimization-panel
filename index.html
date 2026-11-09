@@ -448,11 +448,12 @@
                         <label for="select-jvm-engine" class="text-xs font-bold uppercase tracking-wider text-purple-300 block mb-1.5">
                             <i class="fa-solid fa-fire-flame-curved mr-1.5"></i><span id="i18n-lbl-jvm">Distribuição Java (Foco GraalVM)</span>
                         </label>
-                        <select id="select-jvm-engine" onchange="onHardwareChange()" class="w-full bg-gray-900 border border-purple-500/50 rounded-lg px-3 py-2 text-xs sm:text-sm text-white font-semibold focus:outline-none focus:border-purple-400">
+                        <select id="select-jvm-engine" onchange="onEngineChange()" class="w-full bg-gray-900 border border-purple-500/50 rounded-lg px-3 py-2 text-xs sm:text-sm text-white font-semibold focus:outline-none focus:border-purple-400">
                             <option value="graal21_zgc" data-pt="Oracle GraalVM 21/22+ (Generational ZGC + JIT Graal) ★" data-en="Oracle GraalVM 21/22+ (Generational ZGC + Graal JIT) ★" selected>Oracle GraalVM 21/22+ (Generational ZGC + JIT Graal) ★</option>
                             <option value="graal21_g1" data-pt="Oracle GraalVM 21 (G1GC Tuned + Graal Vectorizer)" data-en="Oracle GraalVM 21 (G1GC Tuned + Graal Vectorizer)">Oracle GraalVM 21 (G1GC Tuned + Graal Vectorizer)</option>
                             <option value="graal17_zgc" data-pt="Oracle GraalVM 17 (Para Mods 1.20.1 incompatíveis c/ Java 21)" data-en="Oracle GraalVM 17 (For 1.20.1 Mods incompatible w/ Java 21)">Oracle GraalVM 17 (Para Mods 1.20.1 incompatíveis c/ Java 21)</option>
                             <option value="temurin21_zgc" data-pt="OpenJDK / Adoptium Temurin 21 (Generational ZGC Padrão)" data-en="OpenJDK / Adoptium Temurin 21 (Standard Generational ZGC)">OpenJDK / Adoptium Temurin 21 (Generational ZGC Padrão)</option>
+                            <option value="temurin21_g1" data-pt="OpenJDK / Adoptium Temurin 21 (G1GC Tuned — PCs modestos / poucas threads)" data-en="OpenJDK / Adoptium Temurin 21 (G1GC Tuned — modest PCs / few threads)">OpenJDK / Adoptium Temurin 21 (G1GC Tuned — PCs modestos / poucas threads)</option>
                         </select>
                     </div>
                 </div>
@@ -858,6 +859,8 @@
                 igpuNoneMeta: "⚠ A CPU selecionada não possui gráficos integrados • escolha uma placa de vídeo",
                 igpuMeta: "Memória compartilhada com a RAM",
                 igpuVendorNone: "de Vídeo",
+                toastEngineLow: "CPU/RAM modestas: engine trocada para Temurin 21 + G1GC (mais leve que ZGC + Graal).",
+                toastEngineHigh: "Hardware robusto: engine ajustada para GraalVM 21 + ZGC Geracional.",
                 toastJava21Req: "Minecraft 1.20.6+ exige Java 21! Alterado para Oracle GraalVM 21.",
                 freqStdGroup: "Frequências Padrão",
                 freqOtherGroup: "Outras Frequências"
@@ -931,6 +934,8 @@
                 igpuNoneMeta: "⚠ The selected CPU has no integrated graphics • pick a graphics card",
                 igpuMeta: "Shares memory with system RAM",
                 igpuVendorNone: "Video",
+                toastEngineLow: "Modest CPU/RAM: engine switched to Temurin 21 + G1GC (lighter than ZGC + Graal).",
+                toastEngineHigh: "Robust hardware: engine set to GraalVM 21 + Generational ZGC.",
                 toastJava21Req: "Minecraft 1.20.6+ requires Java 21! Switched to Oracle GraalVM 21.",
                 freqStdGroup: "Standard Frequencies",
                 freqOtherGroup: "Other Frequencies"
@@ -1008,20 +1013,20 @@
         };
 
         const gpuDatabase = {
-            rtx_5050: { name: "NVIDIA RTX 5050 8GB", vendor: "nvidia", vram: 8, arch: "Blackwell (GB207)", noErrorCtx: true, tier: "mid" },
-            rtx_5060: { name: "NVIDIA RTX 5060 8GB", vendor: "nvidia", vram: 8, arch: "Blackwell (GB206)", noErrorCtx: true, tier: "mid" },
-            rtx_5060ti_8: { name: "NVIDIA RTX 5060 Ti 8GB", vendor: "nvidia", vram: 8, arch: "Blackwell (GB206)", noErrorCtx: true, tier: "mid" },
+            rtx_5050: { name: "NVIDIA RTX 5050 8GB", vendor: "nvidia", vram: 8, arch: "Blackwell (GB207)", noErrorCtx: true, tier: "high" },
+            rtx_5060: { name: "NVIDIA RTX 5060 8GB", vendor: "nvidia", vram: 8, arch: "Blackwell (GB206)", noErrorCtx: true, tier: "high" },
+            rtx_5060ti_8: { name: "NVIDIA RTX 5060 Ti 8GB", vendor: "nvidia", vram: 8, arch: "Blackwell (GB206)", noErrorCtx: true, tier: "high" },
             rtx_5060ti_16: { name: "NVIDIA RTX 5060 Ti 16GB", vendor: "nvidia", vram: 16, arch: "Blackwell (GB206)", noErrorCtx: true, tier: "ultra" },
-            rtx_5070: { name: "NVIDIA RTX 5070 12GB", vendor: "nvidia", vram: 12, arch: "Blackwell (GB205)", noErrorCtx: true, tier: "high" },
+            rtx_5070: { name: "NVIDIA RTX 5070 12GB", vendor: "nvidia", vram: 12, arch: "Blackwell (GB205)", noErrorCtx: true, tier: "ultra" },
             rtx_5070ti: { name: "NVIDIA RTX 5070 Ti 16GB", vendor: "nvidia", vram: 16, arch: "Blackwell (GB203)", noErrorCtx: true, tier: "ultra" },
             rtx_5080: { name: "NVIDIA RTX 5080 16GB", vendor: "nvidia", vram: 16, arch: "Blackwell (GB203)", noErrorCtx: true, tier: "ultra" },
             rtx_5090: { name: "NVIDIA RTX 5090 32GB", vendor: "nvidia", vram: 32, arch: "Blackwell (GB202)", noErrorCtx: true, tier: "ultra" },
-            rtx_4060: { name: "NVIDIA RTX 4060 8GB", vendor: "nvidia", vram: 8, arch: "Ada Lovelace (AD107)", noErrorCtx: true, tier: "mid" },
-            rtx_4060ti_8: { name: "NVIDIA RTX 4060 Ti 8GB", vendor: "nvidia", vram: 8, arch: "Ada Lovelace (AD106)", noErrorCtx: true, tier: "mid" },
+            rtx_4060: { name: "NVIDIA RTX 4060 8GB", vendor: "nvidia", vram: 8, arch: "Ada Lovelace (AD107)", noErrorCtx: true, tier: "high" },
+            rtx_4060ti_8: { name: "NVIDIA RTX 4060 Ti 8GB", vendor: "nvidia", vram: 8, arch: "Ada Lovelace (AD106)", noErrorCtx: true, tier: "ultra" },
             rtx_4060ti_16: { name: "NVIDIA RTX 4060 Ti 16GB", vendor: "nvidia", vram: 16, arch: "Ada Lovelace (AD106)", noErrorCtx: true, tier: "ultra" },
-            rtx_4070: { name: "NVIDIA RTX 4070 12GB", vendor: "nvidia", vram: 12, arch: "Ada Lovelace (AD104)", noErrorCtx: true, tier: "high" },
-            rtx_4070s: { name: "NVIDIA RTX 4070 Super 12GB", vendor: "nvidia", vram: 12, arch: "Ada Lovelace (AD104)", noErrorCtx: true, tier: "high" },
-            rtx_4070ti: { name: "NVIDIA RTX 4070 Ti 12GB", vendor: "nvidia", vram: 12, arch: "Ada Lovelace (AD104)", noErrorCtx: true, tier: "high" },
+            rtx_4070: { name: "NVIDIA RTX 4070 12GB", vendor: "nvidia", vram: 12, arch: "Ada Lovelace (AD104)", noErrorCtx: true, tier: "ultra" },
+            rtx_4070s: { name: "NVIDIA RTX 4070 Super 12GB", vendor: "nvidia", vram: 12, arch: "Ada Lovelace (AD104)", noErrorCtx: true, tier: "ultra" },
+            rtx_4070ti: { name: "NVIDIA RTX 4070 Ti 12GB", vendor: "nvidia", vram: 12, arch: "Ada Lovelace (AD104)", noErrorCtx: true, tier: "ultra" },
             rtx_4070tis: { name: "NVIDIA RTX 4070 Ti Super 16GB", vendor: "nvidia", vram: 16, arch: "Ada Lovelace (AD103)", noErrorCtx: true, tier: "ultra" },
             rtx_4080: { name: "NVIDIA RTX 4080 16GB", vendor: "nvidia", vram: 16, arch: "Ada Lovelace (AD103)", noErrorCtx: true, tier: "ultra" },
             rtx_4080s: { name: "NVIDIA RTX 4080 Super 16GB", vendor: "nvidia", vram: 16, arch: "Ada Lovelace (AD103)", noErrorCtx: true, tier: "ultra" },
@@ -1029,24 +1034,24 @@
             rtx_3050_4_lap: { name: "NVIDIA RTX 3050 (4GB Laptop)", vendor: "nvidia", vram: 4, arch: "Ampere Mobile (GA107)", noErrorCtx: true, tier: "entry" },
             rtx_3050_6_desk: { name: "NVIDIA RTX 3050 6GB (Desktop)", vendor: "nvidia", vram: 6, arch: "Ampere (GA107)", noErrorCtx: true, tier: "mid" },
             rtx_3050_8: { name: "NVIDIA RTX 3050 8GB (Desktop)", vendor: "nvidia", vram: 8, arch: "Ampere (GA106)", noErrorCtx: true, tier: "mid" },
-            rtx_3060_8: { name: "NVIDIA RTX 3060 8GB", vendor: "nvidia", vram: 8, arch: "Ampere", noErrorCtx: true, tier: "mid" },
+            rtx_3060_8: { name: "NVIDIA RTX 3060 8GB", vendor: "nvidia", vram: 8, arch: "Ampere", noErrorCtx: true, tier: "high" },
             rtx_3060_12: { name: "NVIDIA RTX 3060 12GB", vendor: "nvidia", vram: 12, arch: "Ampere (GA106)", noErrorCtx: true, tier: "high" },
-            rtx_3060ti: { name: "NVIDIA RTX 3060 Ti 8GB", vendor: "nvidia", vram: 8, arch: "Ampere (GA104)", noErrorCtx: true, tier: "mid" },
-            rtx_3070: { name: "NVIDIA RTX 3070 8GB", vendor: "nvidia", vram: 8, arch: "Ampere (GA104)", noErrorCtx: true, tier: "mid" },
-            rtx_3070ti: { name: "NVIDIA RTX 3070 Ti 8GB", vendor: "nvidia", vram: 8, arch: "Ampere (GA104)", noErrorCtx: true, tier: "mid" },
-            rtx_3080_10: { name: "NVIDIA RTX 3080 10GB", vendor: "nvidia", vram: 10, arch: "Ampere (GA102)", noErrorCtx: true, tier: "high" },
-            rtx_3080_12: { name: "NVIDIA RTX 3080 12GB", vendor: "nvidia", vram: 12, arch: "Ampere (GA102)", noErrorCtx: true, tier: "high" },
-            rtx_3080ti: { name: "NVIDIA RTX 3080 Ti 12GB", vendor: "nvidia", vram: 12, arch: "Ampere (GA102)", noErrorCtx: true, tier: "high" },
+            rtx_3060ti: { name: "NVIDIA RTX 3060 Ti 8GB", vendor: "nvidia", vram: 8, arch: "Ampere (GA104)", noErrorCtx: true, tier: "high" },
+            rtx_3070: { name: "NVIDIA RTX 3070 8GB", vendor: "nvidia", vram: 8, arch: "Ampere (GA104)", noErrorCtx: true, tier: "ultra" },
+            rtx_3070ti: { name: "NVIDIA RTX 3070 Ti 8GB", vendor: "nvidia", vram: 8, arch: "Ampere (GA104)", noErrorCtx: true, tier: "ultra" },
+            rtx_3080_10: { name: "NVIDIA RTX 3080 10GB", vendor: "nvidia", vram: 10, arch: "Ampere (GA102)", noErrorCtx: true, tier: "ultra" },
+            rtx_3080_12: { name: "NVIDIA RTX 3080 12GB", vendor: "nvidia", vram: 12, arch: "Ampere (GA102)", noErrorCtx: true, tier: "ultra" },
+            rtx_3080ti: { name: "NVIDIA RTX 3080 Ti 12GB", vendor: "nvidia", vram: 12, arch: "Ampere (GA102)", noErrorCtx: true, tier: "ultra" },
             rtx_3090: { name: "NVIDIA RTX 3090 24GB", vendor: "nvidia", vram: 24, arch: "Ampere (GA102)", noErrorCtx: true, tier: "ultra" },
             rtx_3090ti: { name: "NVIDIA RTX 3090 Ti 24GB", vendor: "nvidia", vram: 24, arch: "Ampere (GA102)", noErrorCtx: true, tier: "ultra" },
             rtx_2060: { name: "NVIDIA RTX 2060 6GB", vendor: "nvidia", vram: 6, arch: "Turing (TU106)", noErrorCtx: true, tier: "mid" },
-            rtx_2060_12: { name: "NVIDIA RTX 2060 12GB", vendor: "nvidia", vram: 12, arch: "Turing (TU106)", noErrorCtx: true, tier: "high" },
-            rtx_2060s: { name: "NVIDIA RTX 2060 Super 8GB", vendor: "nvidia", vram: 8, arch: "Turing (TU106)", noErrorCtx: true, tier: "mid" },
-            rtx_2070: { name: "NVIDIA RTX 2070 8GB", vendor: "nvidia", vram: 8, arch: "Turing (TU106)", noErrorCtx: true, tier: "mid" },
-            rtx_2070s: { name: "NVIDIA RTX 2070 Super 8GB", vendor: "nvidia", vram: 8, arch: "Turing (TU104)", noErrorCtx: true, tier: "mid" },
-            rtx_2080: { name: "NVIDIA RTX 2080 8GB", vendor: "nvidia", vram: 8, arch: "Turing (TU104)", noErrorCtx: true, tier: "mid" },
-            rtx_2080s: { name: "NVIDIA RTX 2080 Super 8GB", vendor: "nvidia", vram: 8, arch: "Turing (TU104)", noErrorCtx: true, tier: "mid" },
-            rtx_2080ti: { name: "NVIDIA RTX 2080 Ti 11GB", vendor: "nvidia", vram: 11, arch: "Turing (TU102)", noErrorCtx: true, tier: "high" },
+            rtx_2060_12: { name: "NVIDIA RTX 2060 12GB", vendor: "nvidia", vram: 12, arch: "Turing (TU106)", noErrorCtx: true, tier: "mid" },
+            rtx_2060s: { name: "NVIDIA RTX 2060 Super 8GB", vendor: "nvidia", vram: 8, arch: "Turing (TU106)", noErrorCtx: true, tier: "high" },
+            rtx_2070: { name: "NVIDIA RTX 2070 8GB", vendor: "nvidia", vram: 8, arch: "Turing (TU106)", noErrorCtx: true, tier: "high" },
+            rtx_2070s: { name: "NVIDIA RTX 2070 Super 8GB", vendor: "nvidia", vram: 8, arch: "Turing (TU104)", noErrorCtx: true, tier: "high" },
+            rtx_2080: { name: "NVIDIA RTX 2080 8GB", vendor: "nvidia", vram: 8, arch: "Turing (TU104)", noErrorCtx: true, tier: "high" },
+            rtx_2080s: { name: "NVIDIA RTX 2080 Super 8GB", vendor: "nvidia", vram: 8, arch: "Turing (TU104)", noErrorCtx: true, tier: "ultra" },
+            rtx_2080ti: { name: "NVIDIA RTX 2080 Ti 11GB", vendor: "nvidia", vram: 11, arch: "Turing (TU102)", noErrorCtx: true, tier: "ultra" },
             gtx_1650: { name: "NVIDIA GTX 1650 4GB", vendor: "nvidia", vram: 4, arch: "Turing (TU117)", noErrorCtx: true, tier: "entry" },
             gtx_1650s: { name: "NVIDIA GTX 1650 Super 4GB", vendor: "nvidia", vram: 4, arch: "Turing (TU116)", noErrorCtx: true, tier: "entry" },
             gtx_1660: { name: "NVIDIA GTX 1660 6GB", vendor: "nvidia", vram: 6, arch: "Turing (TU116)", noErrorCtx: true, tier: "mid" },
@@ -1058,57 +1063,57 @@
             gtx_1060_3: { name: "NVIDIA GTX 1060 3GB", vendor: "nvidia", vram: 3, arch: "Pascal (GP106)", noErrorCtx: true, tier: "entry" },
             gtx_1060: { name: "NVIDIA GTX 1060 6GB", vendor: "nvidia", vram: 6, arch: "Pascal (GP106)", noErrorCtx: true, tier: "mid" },
             gtx_1070: { name: "NVIDIA GTX 1070 8GB", vendor: "nvidia", vram: 8, arch: "Pascal (GP104)", noErrorCtx: true, tier: "mid" },
-            gtx_1070ti: { name: "NVIDIA GTX 1070 Ti 8GB", vendor: "nvidia", vram: 8, arch: "Pascal (GP104)", noErrorCtx: true, tier: "mid" },
-            gtx_1080: { name: "NVIDIA GTX 1080 8GB", vendor: "nvidia", vram: 8, arch: "Pascal (GP104)", noErrorCtx: true, tier: "mid" },
+            gtx_1070ti: { name: "NVIDIA GTX 1070 Ti 8GB", vendor: "nvidia", vram: 8, arch: "Pascal (GP104)", noErrorCtx: true, tier: "high" },
+            gtx_1080: { name: "NVIDIA GTX 1080 8GB", vendor: "nvidia", vram: 8, arch: "Pascal (GP104)", noErrorCtx: true, tier: "high" },
             gtx_1080ti: { name: "NVIDIA GTX 1080 Ti 11GB", vendor: "nvidia", vram: 11, arch: "Pascal (GP102)", noErrorCtx: true, tier: "high" },
-            rx_9060xt_8: { name: "AMD Radeon RX 9060 XT 8GB", vendor: "amd", vram: 8, arch: "RDNA 4 (Navi 44)", noErrorCtx: true, tier: "mid" },
+            rx_9060xt_8: { name: "AMD Radeon RX 9060 XT 8GB", vendor: "amd", vram: 8, arch: "RDNA 4 (Navi 44)", noErrorCtx: true, tier: "high" },
             rx_9060xt_16: { name: "AMD Radeon RX 9060 XT 16GB", vendor: "amd", vram: 16, arch: "RDNA 4 (Navi 44)", noErrorCtx: true, tier: "ultra" },
             rx_9070: { name: "AMD Radeon RX 9070 16GB", vendor: "amd", vram: 16, arch: "RDNA 4 (Navi 48)", noErrorCtx: true, tier: "ultra" },
             rx_9070xt: { name: "AMD Radeon RX 9070 XT 16GB", vendor: "amd", vram: 16, arch: "RDNA 4 (Navi 48)", noErrorCtx: true, tier: "ultra" },
-            rx_7600: { name: "AMD Radeon RX 7600 8GB", vendor: "amd", vram: 8, arch: "RDNA 3 (Navi 33)", noErrorCtx: true, tier: "mid" },
-            rx_7600xt: { name: "AMD Radeon RX 7600 XT 16GB", vendor: "amd", vram: 16, arch: "RDNA 3 (Navi 33)", noErrorCtx: true, tier: "ultra" },
-            rx_7700xt: { name: "AMD Radeon RX 7700 XT 12GB", vendor: "amd", vram: 12, arch: "RDNA 3 (Navi 32)", noErrorCtx: true, tier: "high" },
+            rx_7600: { name: "AMD Radeon RX 7600 8GB", vendor: "amd", vram: 8, arch: "RDNA 3 (Navi 33)", noErrorCtx: true, tier: "high" },
+            rx_7600xt: { name: "AMD Radeon RX 7600 XT 16GB", vendor: "amd", vram: 16, arch: "RDNA 3 (Navi 33)", noErrorCtx: true, tier: "high" },
+            rx_7700xt: { name: "AMD Radeon RX 7700 XT 12GB", vendor: "amd", vram: 12, arch: "RDNA 3 (Navi 32)", noErrorCtx: true, tier: "ultra" },
             rx_7800xt: { name: "AMD Radeon RX 7800 XT 16GB", vendor: "amd", vram: 16, arch: "RDNA 3 (Navi 32)", noErrorCtx: true, tier: "ultra" },
             rx_7900gre: { name: "AMD Radeon RX 7900 GRE 16GB", vendor: "amd", vram: 16, arch: "RDNA 3 (Navi 31)", noErrorCtx: true, tier: "ultra" },
             rx_7900xt: { name: "AMD Radeon RX 7900 XT 20GB", vendor: "amd", vram: 20, arch: "RDNA 3 (Navi 31)", noErrorCtx: true, tier: "ultra" },
             rx_7900xtx: { name: "AMD Radeon RX 7900 XTX 24GB", vendor: "amd", vram: 24, arch: "RDNA 3 (Navi 31)", noErrorCtx: true, tier: "ultra" },
-            rx_6400: { name: "AMD Radeon RX 6400 4GB", vendor: "amd", vram: 4, arch: "RDNA 2 (Navi 24)", noErrorCtx: true, tier: "entry" },
+            rx_6400: { name: "AMD Radeon RX 6400 4GB", vendor: "amd", vram: 4, arch: "RDNA 2 (Navi 24)", noErrorCtx: true, tier: "low" },
             rx_6500xt: { name: "AMD Radeon RX 6500 XT 4GB", vendor: "amd", vram: 4, arch: "RDNA 2 (Navi 24)", noErrorCtx: true, tier: "entry" },
             rx_6600: { name: "AMD Radeon RX 6600 8GB", vendor: "amd", vram: 8, arch: "RDNA 2 (Navi 23)", noErrorCtx: true, tier: "mid" },
-            rx_6600xt: { name: "AMD Radeon RX 6600 XT 8GB", vendor: "amd", vram: 8, arch: "RDNA 2 (Navi 23)", noErrorCtx: true, tier: "mid" },
-            rx_6650xt: { name: "AMD Radeon RX 6650 XT 8GB", vendor: "amd", vram: 8, arch: "RDNA 2 (Navi 23)", noErrorCtx: true, tier: "mid" },
+            rx_6600xt: { name: "AMD Radeon RX 6600 XT 8GB", vendor: "amd", vram: 8, arch: "RDNA 2 (Navi 23)", noErrorCtx: true, tier: "high" },
+            rx_6650xt: { name: "AMD Radeon RX 6650 XT 8GB", vendor: "amd", vram: 8, arch: "RDNA 2 (Navi 23)", noErrorCtx: true, tier: "high" },
             rx_6700: { name: "AMD Radeon RX 6700 10GB", vendor: "amd", vram: 10, arch: "RDNA 2 (Navi 22)", noErrorCtx: true, tier: "high" },
-            rx_6700xt: { name: "AMD Radeon RX 6700 XT 12GB", vendor: "amd", vram: 12, arch: "RDNA 2 (Navi 22)", noErrorCtx: true, tier: "high" },
-            rx_6750xt: { name: "AMD Radeon RX 6750 XT 12GB", vendor: "amd", vram: 12, arch: "RDNA 2 (Navi 22)", noErrorCtx: true, tier: "high" },
+            rx_6700xt: { name: "AMD Radeon RX 6700 XT 12GB", vendor: "amd", vram: 12, arch: "RDNA 2 (Navi 22)", noErrorCtx: true, tier: "ultra" },
+            rx_6750xt: { name: "AMD Radeon RX 6750 XT 12GB", vendor: "amd", vram: 12, arch: "RDNA 2 (Navi 22)", noErrorCtx: true, tier: "ultra" },
             rx_6800: { name: "AMD Radeon RX 6800 16GB", vendor: "amd", vram: 16, arch: "RDNA 2 (Navi 21)", noErrorCtx: true, tier: "ultra" },
             rx_6800xt: { name: "AMD Radeon RX 6800 XT 16GB", vendor: "amd", vram: 16, arch: "RDNA 2 (Navi 21)", noErrorCtx: true, tier: "ultra" },
             rx_6900xt: { name: "AMD Radeon RX 6900 XT 16GB", vendor: "amd", vram: 16, arch: "RDNA 2 (Navi 21)", noErrorCtx: true, tier: "ultra" },
             rx_6950xt: { name: "AMD Radeon RX 6950 XT 16GB", vendor: "amd", vram: 16, arch: "RDNA 2 (Navi 21)", noErrorCtx: true, tier: "ultra" },
             rx_5500xt_4: { name: "AMD Radeon RX 5500 XT 4GB", vendor: "amd", vram: 4, arch: "RDNA 1 (Navi 14)", noErrorCtx: true, tier: "entry" },
-            rx_5500xt_8: { name: "AMD Radeon RX 5500 XT 8GB", vendor: "amd", vram: 8, arch: "RDNA 1 (Navi 14)", noErrorCtx: true, tier: "mid" },
+            rx_5500xt_8: { name: "AMD Radeon RX 5500 XT 8GB", vendor: "amd", vram: 8, arch: "RDNA 1 (Navi 14)", noErrorCtx: true, tier: "entry" },
             rx_5600xt: { name: "AMD Radeon RX 5600 XT 6GB", vendor: "amd", vram: 6, arch: "RDNA 1 (Navi 10)", noErrorCtx: true, tier: "mid" },
-            rx_5700: { name: "AMD Radeon RX 5700 8GB", vendor: "amd", vram: 8, arch: "RDNA 1 (Navi 10)", noErrorCtx: true, tier: "mid" },
-            rx_5700xt: { name: "AMD Radeon RX 5700 XT 8GB", vendor: "amd", vram: 8, arch: "RDNA 1 (Navi 10)", noErrorCtx: true, tier: "mid" },
-            vega_56: { name: "AMD Radeon RX Vega 56 8GB", vendor: "amd", vram: 8, arch: "Vega 10 (GCN 5)", noErrorCtx: false, tier: "mid" },
-            vega_64: { name: "AMD Radeon RX Vega 64 8GB", vendor: "amd", vram: 8, arch: "Vega 10 (GCN 5)", noErrorCtx: false, tier: "mid" },
+            rx_5700: { name: "AMD Radeon RX 5700 8GB", vendor: "amd", vram: 8, arch: "RDNA 1 (Navi 10)", noErrorCtx: true, tier: "high" },
+            rx_5700xt: { name: "AMD Radeon RX 5700 XT 8GB", vendor: "amd", vram: 8, arch: "RDNA 1 (Navi 10)", noErrorCtx: true, tier: "high" },
+            vega_56: { name: "AMD Radeon RX Vega 56 8GB", vendor: "amd", vram: 8, arch: "Vega 10 (GCN 5)", noErrorCtx: false, tier: "high" },
+            vega_64: { name: "AMD Radeon RX Vega 64 8GB", vendor: "amd", vram: 8, arch: "Vega 10 (GCN 5)", noErrorCtx: false, tier: "high" },
             radeon_vii: { name: "AMD Radeon VII 16GB", vendor: "amd", vram: 16, arch: "Vega 20 (GCN 5)", noErrorCtx: false, tier: "ultra" },
-            rx_550: { name: "AMD Radeon RX 550 4GB", vendor: "amd", vram: 4, arch: "Polaris 12", noErrorCtx: false, tier: "entry" },
-            rx_460_4: { name: "AMD Radeon RX 460 4GB", vendor: "amd", vram: 4, arch: "Polaris 11", noErrorCtx: false, tier: "entry" },
-            rx_560: { name: "AMD Radeon RX 560 4GB", vendor: "amd", vram: 4, arch: "Polaris 21", noErrorCtx: false, tier: "entry" },
+            rx_550: { name: "AMD Radeon RX 550 4GB", vendor: "amd", vram: 4, arch: "Polaris 12", noErrorCtx: false, tier: "low" },
+            rx_460_4: { name: "AMD Radeon RX 460 4GB", vendor: "amd", vram: 4, arch: "Polaris 11", noErrorCtx: false, tier: "low" },
+            rx_560: { name: "AMD Radeon RX 560 4GB", vendor: "amd", vram: 4, arch: "Polaris 21", noErrorCtx: false, tier: "low" },
             rx_470_4: { name: "AMD Radeon RX 470 4GB", vendor: "amd", vram: 4, arch: "Polaris 10", noErrorCtx: false, tier: "entry" },
-            rx_470_8: { name: "AMD Radeon RX 470 8GB", vendor: "amd", vram: 8, arch: "Polaris 10", noErrorCtx: false, tier: "mid" },
-            rx_480_4: { name: "AMD Radeon RX 480 4GB", vendor: "amd", vram: 4, arch: "Polaris 10", noErrorCtx: false, tier: "entry" },
+            rx_470_8: { name: "AMD Radeon RX 470 8GB", vendor: "amd", vram: 8, arch: "Polaris 10", noErrorCtx: false, tier: "entry" },
+            rx_480_4: { name: "AMD Radeon RX 480 4GB", vendor: "amd", vram: 4, arch: "Polaris 10", noErrorCtx: false, tier: "mid" },
             rx_480_8: { name: "AMD Radeon RX 480 8GB", vendor: "amd", vram: 8, arch: "Polaris 10", noErrorCtx: false, tier: "mid" },
             rx_570_4: { name: "AMD Radeon RX 570 4GB", vendor: "amd", vram: 4, arch: "Polaris 20", noErrorCtx: false, tier: "entry" },
-            rx_570_8: { name: "AMD Radeon RX 570 8GB", vendor: "amd", vram: 8, arch: "Polaris 20", noErrorCtx: false, tier: "mid" },
-            rx_580_4: { name: "AMD Radeon RX 580 4GB", vendor: "amd", vram: 4, arch: "Polaris 20", noErrorCtx: false, tier: "entry" },
+            rx_570_8: { name: "AMD Radeon RX 570 8GB", vendor: "amd", vram: 8, arch: "Polaris 20", noErrorCtx: false, tier: "entry" },
+            rx_580_4: { name: "AMD Radeon RX 580 4GB", vendor: "amd", vram: 4, arch: "Polaris 20", noErrorCtx: false, tier: "mid" },
             rx_580: { name: "AMD Radeon RX 580 8GB", vendor: "amd", vram: 8, arch: "Polaris 20", noErrorCtx: false, tier: "mid" },
             rx_580_2048: { name: "AMD Radeon RX 580 2048SP 8GB", vendor: "amd", vram: 8, arch: "Polaris 20", noErrorCtx: false, tier: "mid" },
             rx_590: { name: "AMD Radeon RX 590 8GB", vendor: "amd", vram: 8, arch: "Polaris 30", noErrorCtx: false, tier: "mid" },
-            arc_a380: { name: "Intel Arc A380 6GB", vendor: "intel", vram: 6, arch: "Xe-HPG (Alchemist)", noErrorCtx: false, tier: "mid" },
+            arc_a380: { name: "Intel Arc A380 6GB", vendor: "intel", vram: 6, arch: "Xe-HPG (Alchemist)", noErrorCtx: false, tier: "entry" },
             arc_a580: { name: "Intel Arc A580 8GB", vendor: "intel", vram: 8, arch: "Xe-HPG (Alchemist)", noErrorCtx: false, tier: "mid" },
             arc_a750: { name: "Intel Arc A750 8GB", vendor: "intel", vram: 8, arch: "Xe-HPG (Alchemist)", noErrorCtx: false, tier: "mid" },
-            arc_a770: { name: "Intel Arc A770 16GB", vendor: "intel", vram: 16, arch: "Xe-HPG (Alchemist)", noErrorCtx: false, tier: "ultra" },
+            arc_a770: { name: "Intel Arc A770 16GB", vendor: "intel", vram: 16, arch: "Xe-HPG (Alchemist)", noErrorCtx: false, tier: "high" },
             arc_b570: { name: "Intel Arc B570 10GB", vendor: "intel", vram: 10, arch: "Xe2-HPG (Battlemage)", noErrorCtx: false, tier: "high" },
             arc_b580: { name: "Intel Arc B580 12GB", vendor: "intel", vram: 12, arch: "Xe2-HPG (Battlemage)", noErrorCtx: false, tier: "high" },
             igpu_vega3: { name: "AMD Radeon Vega 3 (iGPU)", vendor: "amd", vram: 1, arch: "Vega (GCN 5) • 3 CUs", noErrorCtx: false, tier: "low", igpu: true, short: "Vega 3" },
@@ -1117,9 +1122,9 @@
             igpu_vega11: { name: "AMD Radeon Vega 11 (iGPU)", vendor: "amd", vram: 2, arch: "Vega (GCN 5) • 11 CUs", noErrorCtx: false, tier: "low", igpu: true, short: "Vega 11" },
             igpu_rdna2_2cu: { name: "AMD Radeon Graphics 2 CU (iGPU)", vendor: "amd", vram: 1, arch: "RDNA 2 • 2 CUs", noErrorCtx: false, tier: "low", igpu: true, short: "Radeon 2CU" },
             igpu_740m: { name: "AMD Radeon 740M (iGPU)", vendor: "amd", vram: 2, arch: "RDNA 3 • 4 CUs", noErrorCtx: false, tier: "low", igpu: true, short: "740M" },
-            igpu_760m: { name: "AMD Radeon 760M (iGPU)", vendor: "amd", vram: 4, arch: "RDNA 3 • 8 CUs", noErrorCtx: false, tier: "low", igpu: true, short: "760M" },
-            igpu_780m: { name: "AMD Radeon 780M (iGPU)", vendor: "amd", vram: 4, arch: "RDNA 3 • 12 CUs", noErrorCtx: false, tier: "low", igpu: true, short: "780M" },
-            igpu_680m: { name: "AMD Radeon 680M (iGPU)", vendor: "amd", vram: 4, arch: "RDNA 2 • 12 CUs", noErrorCtx: false, tier: "low", igpu: true, short: "680M" },
+            igpu_760m: { name: "AMD Radeon 760M (iGPU)", vendor: "amd", vram: 4, arch: "RDNA 3 • 8 CUs", noErrorCtx: false, tier: "entry", igpu: true, short: "760M" },
+            igpu_780m: { name: "AMD Radeon 780M (iGPU)", vendor: "amd", vram: 4, arch: "RDNA 3 • 12 CUs", noErrorCtx: false, tier: "entry", igpu: true, short: "780M" },
+            igpu_680m: { name: "AMD Radeon 680M (iGPU)", vendor: "amd", vram: 4, arch: "RDNA 2 • 12 CUs", noErrorCtx: false, tier: "entry", igpu: true, short: "680M" },
             igpu_hd3000: { name: "Intel HD Graphics 3000 (iGPU)", vendor: "intel", vram: 1, arch: "Intel Gen6 (Sandy Bridge)", noErrorCtx: false, tier: "low", igpu: true, short: "HD 3000" },
             igpu_hd4000: { name: "Intel HD Graphics 4000 (iGPU)", vendor: "intel", vram: 1, arch: "Intel Gen7 (Ivy Bridge)", noErrorCtx: false, tier: "low", igpu: true, short: "HD 4000" },
             igpu_hd4600: { name: "Intel HD Graphics 4600 (iGPU)", vendor: "intel", vram: 1, arch: "Intel Gen7.5 (Haswell)", noErrorCtx: false, tier: "low", igpu: true, short: "HD 4600" },
@@ -1129,7 +1134,7 @@
             igpu_uhd730: { name: "Intel UHD Graphics 730 (iGPU)", vendor: "intel", vram: 2, arch: "Intel Xe-LP • 24 EU", noErrorCtx: false, tier: "low", igpu: true, short: "UHD 730" },
             igpu_uhd770: { name: "Intel UHD Graphics 770 (iGPU)", vendor: "intel", vram: 2, arch: "Intel Xe-LP • 32 EU", noErrorCtx: false, tier: "low", igpu: true, short: "UHD 770" },
             igpu_uhd_n: { name: "Intel UHD Graphics Alder Lake-N (iGPU)", vendor: "intel", vram: 2, arch: "Intel Xe-LP • 24-32 EU", noErrorCtx: false, tier: "low", igpu: true, short: "UHD N-Series" },
-            igpu_irisxe: { name: "Intel Iris Xe Graphics (iGPU)", vendor: "intel", vram: 4, arch: "Intel Xe-LP • 80-96 EU", noErrorCtx: false, tier: "low", igpu: true, short: "Iris Xe" },
+            igpu_irisxe: { name: "Intel Iris Xe Graphics (iGPU)", vendor: "intel", vram: 4, arch: "Intel Xe-LP • 80-96 EU", noErrorCtx: false, tier: "entry", igpu: true, short: "Iris Xe" },
             igpu_arc4xe: { name: "Intel Graphics Arc 4 Xe-cores (iGPU)", vendor: "intel", vram: 4, arch: "Intel Xe-LPG • Arrow Lake", noErrorCtx: false, tier: "low", igpu: true, short: "Arc 4 Xe" }
         };
 
@@ -1171,6 +1176,28 @@
             return { name: t.igpuNoneName, vendor: 'none', vendorLabel: t.igpuVendorNone, vram: 1, arch: 'N/A', noErrorCtx: false, tier: 'low', igpu: true, none: true };
         }
 
+        // Engine JVM recomendada: CPUs com poucas threads ou pouca RAM sofrem com ZGC + JIT do Graal
+        // (GC concorrente e compilador disputam núcleos e memória com o jogo) -> HotSpot C2 + G1.
+        function recommendedEngine() {
+            const cpu = cpuDatabase[state.cpuKey];
+            return (cpu.threads <= 6 || state.sysRamGB <= 12) ? 'temurin21_g1' : 'graal21_zgc';
+        }
+        function applyAutoEngine(announce) {
+            if (state.jvmEngineManual) return;
+            const rec = recommendedEngine();
+            if (state.jvmEngine === rec) return;
+            state.jvmEngine = rec;
+            document.getElementById('select-jvm-engine').value = rec;
+            if (announce) {
+                const t = i18n[state.lang];
+                showToast(rec === 'temurin21_g1' ? t.toastEngineLow : t.toastEngineHigh);
+            }
+        }
+        function onEngineChange() {
+            state.jvmEngineManual = true;
+            onHardwareChange();
+        }
+
         // Estado Atual da Aplicação
         let state = {
             lang: 'pt',
@@ -1183,6 +1210,7 @@
             mcVersion: '1.20.1',
             loader: 'forge',
             jvmEngine: 'graal21_zgc',
+            jvmEngineManual: false,
             modpackProfile: 'heavy',
             allocRamGB: 12,
             softMaxGB: 10,
@@ -1331,16 +1359,21 @@
 
         function onSystemRamChange() {
             state.sysRamGB = parseInt(document.getElementById('select-sys-ram').value, 10);
+            applyAutoEngine(true);
             const slider = document.getElementById('ram-slider');
             slider.max = Math.max(6, state.sysRamGB - 2);
 
             // Ajusta automaticamente a RAM alocada se ultrapassar o limite seguro do sistema
             if (state.sysRamGB <= 8) {
                 selectModpackProfile('light');
+            } else if (state.modpackProfile) {
+                selectModpackProfile(state.modpackProfile);
             } else if (state.sysRamGB <= 12 && state.allocRamGB > 8) {
                 onRamSliderInput(8);
             } else if (state.sysRamGB <= 16 && state.allocRamGB > 10) {
                 onRamSliderInput(10);
+            } else if (state.allocRamGB > maxSafeAllocGB()) {
+                onRamSliderInput(maxSafeAllocGB());
             } else {
                 recalculateAll();
             }
@@ -1375,13 +1408,35 @@
             }
 
             state.storageKey = document.getElementById('select-storage').value;
-            state.jvmEngine = document.getElementById('select-jvm-engine').value;
+            if (state.jvmEngineManual) {
+                state.jvmEngine = document.getElementById('select-jvm-engine').value;
+            } else {
+                applyAutoEngine(true);
+            }
 
             // Ajusta recomendação padrão do dynamic_resources caso mude para HDD
             const storage = storageDatabase[state.storageKey];
             document.getElementById('chk-mf-dynres').checked = storage.dynResRecommended;
 
             recalculateAll();
+        }
+
+        // RAM: overhead de Metaspace + code cache e reserva da iGPU (memória compartilhada)
+        function overheadGB(allocGB) {
+            const meta = allocGB <= 7 ? 384 : (allocGB >= 13 ? 768 : 512);
+            const code = allocGB <= 7 ? 384 : 512;
+            return +((meta + code) / 1024).toFixed(1);
+        }
+        function igpuReserveGB(gpu) {
+            return (gpu && gpu.igpu && !gpu.none) ? Math.min(gpu.vram, 2) : 0;
+        }
+        // Maior alocação que ainda deixa >= 2,5 GB livres para o SO
+        function maxSafeAllocGB() {
+            const reserve = igpuReserveGB(getActiveGpu());
+            for (let a = state.sysRamGB; a >= 4; a--) {
+                if (state.sysRamGB - a - overheadGB(a) - reserve >= 2.5) return a;
+            }
+            return 4;
         }
 
         function selectModpackProfile(profileKey) {
@@ -1394,7 +1449,7 @@
             if (profileKey === 'heavy') targetRam = sysRam >= 24 ? 12 : (sysRam >= 16 ? 10 : Math.min(8, sysRam - 2));
             if (profileKey === 'extreme') targetRam = sysRam >= 32 ? 14 : (sysRam >= 24 ? 12 : Math.min(10, sysRam - 3));
 
-            state.allocRamGB = Math.max(4, targetRam);
+            state.allocRamGB = Math.max(4, Math.min(targetRam, maxSafeAllocGB()));
             document.getElementById('ram-slider').value = state.allocRamGB;
 
             document.querySelectorAll('.profile-card').forEach(btn => {
@@ -1410,6 +1465,8 @@
 
         function onRamSliderInput(val) {
             state.allocRamGB = parseInt(val, 10);
+            state.modpackProfile = null;
+            document.getElementById('ram-slider').value = state.allocRamGB;
             document.querySelectorAll('.profile-card').forEach(btn => {
                 btn.className = "profile-card text-left p-4 rounded-xl border border-gray-800 bg-gray-950/60 hover:border-gray-700 transition flex flex-col justify-between";
             });
@@ -1466,14 +1523,15 @@
             document.getElementById('ram-alloc-mb').textContent = `(${allocMB} MiB)`;
 
             const graalOverheadGB = +((state.metaMB + state.codeCacheMB) / 1024).toFixed(1);
-            const freeSysGB = +(state.sysRamGB - allocGB - graalOverheadGB).toFixed(1);
+            const igpuRes = igpuReserveGB(gpu);
+            const freeSysGB = +(state.sysRamGB - allocGB - graalOverheadGB - igpuRes).toFixed(1);
 
             const warnBanner = document.getElementById('ram-warning-banner');
             if (freeSysGB < 2.5) {
                 warnBanner.classList.remove('hidden');
                 document.getElementById('ram-warning-text').textContent = lang === 'pt'
-                    ? `Cuidado: Restam apenas ${Math.max(0, freeSysGB)} GB para o Sistema Operacional e para o compilador JIT do GraalVM! Reduza a alocação para no máximo ${state.sysRamGB - 3} GB para evitar que o jogo feche sozinho.`
-                    : `Warning: Only ${Math.max(0, freeSysGB)} GB left for the Operating System and GraalVM JIT compiler! Reduce allocation to at most ${state.sysRamGB - 3} GB to prevent crashes.`;
+                    ? `Cuidado: Restam apenas ${Math.max(0, freeSysGB)} GB para o Sistema Operacional e para o compilador JIT do GraalVM! Reduza a alocação para no máximo ${maxSafeAllocGB()} GB para evitar que o jogo feche sozinho.`
+                    : `Warning: Only ${Math.max(0, freeSysGB)} GB left for the Operating System and GraalVM JIT compiler! Reduce allocation to at most ${maxSafeAllocGB()} GB to prevent crashes.`;
             } else {
                 warnBanner.classList.add('hidden');
             }
@@ -1482,13 +1540,13 @@
                 ? `Divisão dos seus ${state.sysRamGB} GB ${state.ddrType} ${state.ramFreq} MHz:`
                 : `Breakdown of your ${state.sysRamGB} GB ${state.ddrType} ${state.ramFreq} MHz:`;
             document.getElementById('ram-bar-free-label').textContent = lang === 'pt'
-                ? `${Math.max(0, freeSysGB)} GB livres para Sistema, Driver ${gpu.vendorLabel || gpu.vendor.toUpperCase()} e Cache Disco`
-                : `${Math.max(0, freeSysGB)} GB free for OS, ${gpu.vendorLabel || gpu.vendor.toUpperCase()} Driver & Disk Cache`;
+                ? `${Math.max(0, freeSysGB)} GB livres para Sistema, Driver ${gpu.vendorLabel || gpu.vendor.toUpperCase()} e Cache Disco${igpuRes ? ` (já descontando ${igpuRes} GB da iGPU)` : ''}`
+                : `${Math.max(0, freeSysGB)} GB free for OS, ${gpu.vendorLabel || gpu.vendor.toUpperCase()} Driver & Disk Cache${igpuRes ? ` (already minus ${igpuRes} GB for the iGPU)` : ''}`;
 
             const pctSoft = Math.min(100, (state.softMaxGB / state.sysRamGB) * 100);
             const pctBuf = Math.min(100 - pctSoft, (bufferGB / state.sysRamGB) * 100);
             const pctGraal = Math.min(100 - pctSoft - pctBuf, (graalOverheadGB / state.sysRamGB) * 100);
-            const pctFree = Math.max(0, 100 - pctSoft - pctBuf - pctGraal);
+            const pctFree = Math.max(0, 100 - pctSoft - pctBuf - pctGraal - (igpuRes / state.sysRamGB) * 100);
 
             document.getElementById('bar-seg-soft').style.width = `${pctSoft}%`;
             document.getElementById('bar-seg-buf').style.width = `${pctBuf}%`;
@@ -1527,6 +1585,8 @@
                 spikeTol = Math.min(5.0, +(spikeTol + 0.5).toFixed(1));
             }
 
+            const maxPause = state.ddrType === 'DDR5' ? 90 : (state.ddrType === 'DDR3' ? 150 : 120);
+
             // Flags do Compilador JIT do Oracle GraalVM
             const graalJITFlags = `-XX:+UseJVMCICompiler -XX:+EagerJVMCI -Dgraal.TuneInlinerExploration=1 -Dgraal.CompilerConfiguration=community -XX:ReservedCodeCacheSize=${state.codeCacheMB}M`;
 
@@ -1535,17 +1595,19 @@
 
             if (state.jvmEngine === 'graal21_zgc') {
                 engineLabel = "Oracle GraalVM 21/22+ (Generational ZGC + Graal JIT)";
-                finalArgs = `${xmxPart}-XX:+UnlockExperimentalVMOptions -XX:+UnlockDiagnosticVMOptions ${graalJITFlags} -XX:+UseZGC -XX:+ZGenerational -XX:ConcGCThreads=${cpu.concGC} -XX:ParallelGCThreads=${cpu.parGC} -XX:ZAllocationSpikeTolerance=${spikeTol} -XX:SoftMaxHeapSize=${state.softMaxGB}G -XX:MetaspaceSize=${state.metaMB}M -XX:MaxMetaspaceSize=2048M ${lpPart}-XX:+AlwaysPreTouch -XX:+DisableExplicitGC -XX:+PerfDisableSharedMem -XX:+UseStringDeduplication -XX:UseAVX=${cpu.avx} -Dfml.readTimeout=180`;
+                finalArgs = `${xmxPart}-XX:+UnlockExperimentalVMOptions -XX:+UnlockDiagnosticVMOptions ${graalJITFlags} -XX:+UseZGC -XX:+ZGenerational -XX:ConcGCThreads=${cpu.concGC} -XX:ParallelGCThreads=${cpu.parGC} -XX:ZAllocationSpikeTolerance=${spikeTol} -XX:SoftMaxHeapSize=${state.softMaxGB}G -XX:MetaspaceSize=${state.metaMB}M -XX:MaxMetaspaceSize=2048M ${lpPart}-XX:+AlwaysPreTouch -XX:+DisableExplicitGC -XX:+PerfDisableSharedMem -XX:+UseStringDeduplication -Dfml.readTimeout=180`;
             } else if (state.jvmEngine === 'graal21_g1') {
                 engineLabel = "Oracle GraalVM 21 (G1GC Tuned + Graal JIT)";
-                const maxPause = state.ddrType === 'DDR5' ? 90 : (state.ddrType === 'DDR3' ? 150 : 120);
-                finalArgs = `${xmxPart}-XX:+UnlockExperimentalVMOptions -XX:+UnlockDiagnosticVMOptions ${graalJITFlags} -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=${maxPause} -XX:ConcGCThreads=${cpu.concGC} -XX:ParallelGCThreads=${cpu.parGC} -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=16M -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:MaxTenuringThreshold=1 -XX:MetaspaceSize=${state.metaMB}M ${lpPart}-XX:+AlwaysPreTouch -XX:+DisableExplicitGC -XX:+PerfDisableSharedMem -XX:+UseStringDeduplication -XX:UseAVX=${cpu.avx} -Dfml.readTimeout=180`;
+                finalArgs = `${xmxPart}-XX:+UnlockExperimentalVMOptions -XX:+UnlockDiagnosticVMOptions ${graalJITFlags} -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=${maxPause} -XX:ConcGCThreads=${cpu.concGC} -XX:ParallelGCThreads=${cpu.parGC} -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=16M -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:MaxTenuringThreshold=1 -XX:MetaspaceSize=${state.metaMB}M ${lpPart}-XX:+AlwaysPreTouch -XX:+DisableExplicitGC -XX:+PerfDisableSharedMem -XX:+UseStringDeduplication -Dfml.readTimeout=180`;
             } else if (state.jvmEngine === 'graal17_zgc') {
                 engineLabel = "Oracle GraalVM 17 (Single-Gen ZGC + Graal JIT)";
-                finalArgs = `${xmxPart}-XX:+UnlockExperimentalVMOptions -XX:+UnlockDiagnosticVMOptions ${graalJITFlags} -XX:+UseZGC -XX:ConcGCThreads=${cpu.concGC} -XX:ParallelGCThreads=${cpu.parGC} -XX:ZAllocationSpikeTolerance=${spikeTol} -XX:SoftMaxHeapSize=${state.softMaxGB}G -XX:MetaspaceSize=${state.metaMB}M -XX:MaxMetaspaceSize=2048M ${lpPart}-XX:+AlwaysPreTouch -XX:+DisableExplicitGC -XX:+PerfDisableSharedMem -XX:+UseStringDeduplication -XX:UseAVX=${cpu.avx} -Dfml.readTimeout=180`;
+                finalArgs = `${xmxPart}-XX:+UnlockExperimentalVMOptions -XX:+UnlockDiagnosticVMOptions ${graalJITFlags} -XX:+UseZGC -XX:ConcGCThreads=${cpu.concGC} -XX:ParallelGCThreads=${cpu.parGC} -XX:ZAllocationSpikeTolerance=${spikeTol} -XX:SoftMaxHeapSize=${state.softMaxGB}G -XX:MetaspaceSize=${state.metaMB}M -XX:MaxMetaspaceSize=2048M ${lpPart}-XX:+AlwaysPreTouch -XX:+DisableExplicitGC -XX:+PerfDisableSharedMem -XX:+UseStringDeduplication -Dfml.readTimeout=180`;
+            } else if (state.jvmEngine === 'temurin21_g1') {
+                engineLabel = "OpenJDK / Temurin 21 (G1GC Tuned)";
+                finalArgs = `${xmxPart}-XX:+UnlockExperimentalVMOptions -XX:+UnlockDiagnosticVMOptions -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=${maxPause} -XX:ConcGCThreads=${cpu.concGC} -XX:ParallelGCThreads=${cpu.parGC} -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=16M -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:MaxTenuringThreshold=1 -XX:MetaspaceSize=${state.metaMB}M ${lpPart}-XX:+AlwaysPreTouch -XX:+DisableExplicitGC -XX:+PerfDisableSharedMem -XX:+UseStringDeduplication -Dfml.readTimeout=180`;
             } else {
                 engineLabel = "OpenJDK / Temurin 21 (Generational ZGC)";
-                finalArgs = `${xmxPart}-XX:+UnlockExperimentalVMOptions -XX:+UnlockDiagnosticVMOptions -XX:+UseZGC -XX:+ZGenerational -XX:ConcGCThreads=${cpu.concGC} -XX:ParallelGCThreads=${cpu.parGC} -XX:ZAllocationSpikeTolerance=${spikeTol} -XX:SoftMaxHeapSize=${state.softMaxGB}G -XX:MetaspaceSize=${state.metaMB}M -XX:MaxMetaspaceSize=2048M ${lpPart}-XX:+AlwaysPreTouch -XX:+DisableExplicitGC -XX:+PerfDisableSharedMem -XX:+UseStringDeduplication -XX:UseAVX=${cpu.avx} -Dfml.readTimeout=180`;
+                finalArgs = `${xmxPart}-XX:+UnlockExperimentalVMOptions -XX:+UnlockDiagnosticVMOptions -XX:+UseZGC -XX:+ZGenerational -XX:ConcGCThreads=${cpu.concGC} -XX:ParallelGCThreads=${cpu.parGC} -XX:ZAllocationSpikeTolerance=${spikeTol} -XX:SoftMaxHeapSize=${state.softMaxGB}G -XX:MetaspaceSize=${state.metaMB}M -XX:MaxMetaspaceSize=2048M ${lpPart}-XX:+AlwaysPreTouch -XX:+DisableExplicitGC -XX:+PerfDisableSharedMem -XX:+UseStringDeduplication -Dfml.readTimeout=180`;
             }
 
             document.getElementById('jvm-args-box').textContent = finalArgs;
@@ -1553,23 +1615,37 @@
                 ? `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>No Launcher: Alocar ${allocMB} MiB (${state.allocRamGB} GB) • ${engineLabel}`
                 : `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>In Launcher: Allocate ${allocMB} MiB (${state.allocRamGB} GB) • ${engineLabel}`;
 
-            // Explicação dinâmica das flags
+            // Explicação dinâmica das flags (depende da engine escolhida)
             const expList = document.getElementById('dynamic-flags-explanation');
-            if (lang === 'pt') {
-                expList.innerHTML = `
-                    <li><strong class="text-purple-300 font-mono">-XX:+UseJVMCICompiler -Dgraal.TuneInlinerExploration=1</strong>: Ativa o compilador JIT do <strong>Oracle GraalVM</strong> com inlining profundo, acelerando ticks de entidades e geração de terreno na sua <strong>${cpu.name}</strong>.</li>
-                    <li><strong class="text-emerald-300 font-mono">-XX:ConcGCThreads=${cpu.concGC} -XX:ParallelGCThreads=${cpu.parGC}</strong>: Calculado sob medida para os seus <strong>${cpu.cores} núcleos / ${cpu.threads} threads</strong>, evitando que o coletor de lixo roube processamento da thread principal de renderização.</li>
-                    <li><strong class="text-blue-300 font-mono">-XX:SoftMaxHeapSize=${state.softMaxGB}G</strong>: Como sua memória é <strong>${state.ddrType} ${state.ramFreq} MHz</strong>, manter o alvo ativo em ${state.softMaxGB} GB economiza largura de banda da RAM e deixa ${state.allocRamGB - state.softMaxGB} GB de amortecedor contra travadas.</li>
-                    <li><strong class="text-amber-300 font-mono">-XX:ZAllocationSpikeTolerance=${spikeTol} & -XX:UseAVX=${cpu.avx}</strong>: Calibrado para a taxa de leitura do seu <strong>${storageName}</strong> e instruções vetoriais <strong>AVX${cpu.avx === 3 ? '-512' : cpu.avx}</strong> da arquitetura ${cpu.arch}.</li>
-                `;
+            const isGraal = state.jvmEngine.startsWith('graal');
+            const isZgc = state.jvmEngine.includes('zgc');
+            const pt = lang === 'pt';
+            const items = [];
+            if (isGraal) {
+                items.push(pt
+                    ? `<li><strong class="text-purple-300 font-mono">-XX:+UseJVMCICompiler -Dgraal.TuneInlinerExploration=1</strong>: usa o compilador JIT do <strong>Oracle GraalVM</strong> com inlining mais exploratório. O ganho varia conforme o modpack e o JIT gasta CPU e RAM extras no aquecimento (por isso, com poucas threads ou pouca RAM, a engine passa para Temurin + G1).</li>`
+                    : `<li><strong class="text-purple-300 font-mono">-XX:+UseJVMCICompiler -Dgraal.TuneInlinerExploration=1</strong>: uses the <strong>Oracle GraalVM</strong> JIT compiler with more exploratory inlining. Gains vary by modpack and the JIT spends extra CPU and RAM while warming up (so with few threads or little RAM the engine switches to Temurin + G1).</li>`);
             } else {
-                expList.innerHTML = `
-                    <li><strong class="text-purple-300 font-mono">-XX:+UseJVMCICompiler -Dgraal.TuneInlinerExploration=1</strong>: Enables the <strong>Oracle GraalVM</strong> JIT compiler with deep method inlining, accelerating entity ticks and terrain generation on your <strong>${cpu.name}</strong>.</li>
-                    <li><strong class="text-emerald-300 font-mono">-XX:ConcGCThreads=${cpu.concGC} -XX:ParallelGCThreads=${cpu.parGC}</strong>: Tailored specifically for your <strong>${cpu.cores} cores / ${cpu.threads} threads</strong>, preventing the garbage collector from stealing cycles from the main render thread.</li>
-                    <li><strong class="text-blue-300 font-mono">-XX:SoftMaxHeapSize=${state.softMaxGB}G</strong>: With <strong>${state.ddrType} ${state.ramFreq} MHz</strong> memory, keeping the active heap target at ${state.softMaxGB} GB saves memory bandwidth while leaving a ${state.allocRamGB - state.softMaxGB} GB cushion against allocation spikes.</li>
-                    <li><strong class="text-amber-300 font-mono">-XX:ZAllocationSpikeTolerance=${spikeTol} & -XX:UseAVX=${cpu.avx}</strong>: Calibrated for your <strong>${storageName}</strong> read speed and native <strong>AVX${cpu.avx === 3 ? '-512' : cpu.avx}</strong> vector instructions on ${cpu.arch}.</li>
-                `;
+                items.push(pt
+                    ? `<li><strong class="text-purple-300 font-mono">JIT padrão (C2)</strong>: sem flags do Graal. O compilador C2 do HotSpot aquece mais rápido e gasta menos CPU/RAM que o JIT do Graal, a escolha segura para ${cpu.threads} threads e ${state.sysRamGB} GB de RAM.</li>`
+                    : `<li><strong class="text-purple-300 font-mono">Default JIT (C2)</strong>: no Graal flags. HotSpot's C2 compiler warms up faster and uses less CPU/RAM than Graal's JIT, the safe choice for ${cpu.threads} threads and ${state.sysRamGB} GB of RAM.</li>`);
             }
+            items.push(pt
+                ? `<li><strong class="text-emerald-300 font-mono">-XX:ConcGCThreads=${cpu.concGC} -XX:ParallelGCThreads=${cpu.parGC}</strong>: calculado a partir dos seus <strong>${cpu.cores} núcleos / ${cpu.threads} threads</strong>, reservando parte deles para o coletor de lixo sem ocupar todos os núcleos que o jogo e o servidor integrado usam.</li>`
+                : `<li><strong class="text-emerald-300 font-mono">-XX:ConcGCThreads=${cpu.concGC} -XX:ParallelGCThreads=${cpu.parGC}</strong>: derived from your <strong>${cpu.cores} cores / ${cpu.threads} threads</strong>, reserving some of them for the garbage collector without taking every core the game and the integrated server use.</li>`);
+            if (isZgc) {
+                items.push(pt
+                    ? `<li><strong class="text-blue-300 font-mono">-XX:SoftMaxHeapSize=${state.softMaxGB}G</strong>: pede ao ZGC que tente manter o heap em ${state.softMaxGB} GB, usando os ${state.allocRamGB - state.softMaxGB} GB restantes como folga contra picos de alocação (evita travadas por falta de memória livre).</li>`
+                    : `<li><strong class="text-blue-300 font-mono">-XX:SoftMaxHeapSize=${state.softMaxGB}G</strong>: asks ZGC to try to keep the heap at ${state.softMaxGB} GB, using the remaining ${state.allocRamGB - state.softMaxGB} GB as headroom for allocation spikes (avoids stalls from running out of free memory).</li>`);
+                items.push(pt
+                    ? `<li><strong class="text-amber-300 font-mono">-XX:ZAllocationSpikeTolerance=${spikeTol}</strong>: quanto maior, mais cedo o ZGC inicia um ciclo antes de um pico de alocação. O valor considera o seu <strong>${storageName}</strong> (e +0,5 para RAM mais lenta). É uma heurística: se o GC consumir CPU demais, volte ao padrão 2.0.</li>`
+                    : `<li><strong class="text-amber-300 font-mono">-XX:ZAllocationSpikeTolerance=${spikeTol}</strong>: the higher it is, the earlier ZGC starts a cycle ahead of an allocation spike. The value takes your <strong>${storageName}</strong> into account (and +0.5 for slower RAM). It is a heuristic: if the GC uses too much CPU, go back to the default 2.0.</li>`);
+            } else {
+                items.push(pt
+                    ? `<li><strong class="text-blue-300 font-mono">-XX:+UseG1GC -XX:MaxGCPauseMillis=${maxPause}</strong>: perfil G1 voltado a pausas curtas (meta de ${maxPause} ms, mais folgada em ${state.ddrType}), com nova geração de 30–40% do heap e coleta mista antecipada. Consome menos memória extra que o ZGC.</li>`
+                    : `<li><strong class="text-blue-300 font-mono">-XX:+UseG1GC -XX:MaxGCPauseMillis=${maxPause}</strong>: G1 profile aimed at short pauses (${maxPause} ms target, looser on ${state.ddrType}), with a 30–40% young generation and early mixed collections. Needs less extra memory than ZGC.</li>`);
+            }
+            expList.innerHTML = items.join('');
         }
 
         function renderHardwareDiagnostics(cpu, gpu, storage) {
@@ -1587,8 +1663,8 @@
                     ? `Modo de Alta Compactação (${state.ddrType} ${state.ramFreq}MHz)`
                     : `High Compression Mode (${state.ddrType} ${state.ramFreq}MHz)`;
                 ramStatusDesc = lang === 'pt'
-                    ? `Em DDR3, a largura de banda com a CPU é limitada. O painel ativou automaticamente compactFastMap no FerriteCore e deduplicação agressiva de Strings para reduzir o tráfego na memória.`
-                    : `On DDR3, memory bandwidth to the CPU is constrained. The optimizer automatically enabled compactFastMap in FerriteCore and aggressive String deduplication to reduce RAM traffic.`;
+                    ? `Em DDR3, a largura de banda com a CPU é limitada. Mantenha FerriteCore e ModernFix instalados (reduzem o volume de dados na RAM) e ative o XMP na BIOS, se disponível.`
+                    : `On DDR3, memory bandwidth to the CPU is constrained. Keep FerriteCore and ModernFix installed (they reduce the amount of data held in RAM) and enable XMP in the BIOS if available.`;
                 ramColor = "border-amber-500/40 bg-amber-950/20 text-amber-300";
             } else if (state.ddrType === 'DDR4' && state.ramFreq <= 2666) {
                 ramStatusTitle = lang === 'pt'
@@ -1624,13 +1700,13 @@
             } else if (gpu.vram <= 4) {
                 gpuTitle = lang === 'pt' ? `Alerta de VRAM (${gpu.vram}GB - ${gpu.name})` : `VRAM Alert (${gpu.vram}GB - ${gpu.name})`;
                 gpuDesc = lang === 'pt'
-                    ? `Em placas de ${gpu.vram}GB (como a ${gpu.name}), texturas de 200+ mods estouram a VRAM rapidamente. Mantenha dynamic_resources=true no ModernFix, GPUTape e folhas no Fast.`
-                    : `On ${gpu.vram}GB GPUs (like ${gpu.name}), 200+ mod textures can quickly overflow VRAM. Keep dynamic_resources=true in ModernFix, GPUTape, and Leaves set to Fast.`;
+                    ? `Em placas de ${gpu.vram}GB (como a ${gpu.name}), texturas de 200+ mods enchem a VRAM rapidamente. Prefira resource packs de 16x–32x, GPUTape/AllTheLeaks e folhas no Fast (o dynamic_resources do ModernFix alivia a RAM, não a VRAM).`
+                    : `On ${gpu.vram}GB GPUs (like ${gpu.name}), 200+ mod textures can quickly fill VRAM. Prefer 16x–32x resource packs, GPUTape/AllTheLeaks and Leaves set to Fast (ModernFix's dynamic_resources relieves RAM, not VRAM).`;
             } else if (gpu.vram === 6) {
                 gpuTitle = lang === 'pt' ? `Otimização de VRAM 6GB (${gpu.name})` : `6GB VRAM Optimization (${gpu.name})`;
                 gpuDesc = lang === 'pt'
-                    ? `Nos 6GB de VRAM da ${gpu.name}, ative dynamic_resources=true no ModernFix + GPUTape + EntityCulling para jogar com Shaders sem estourar o buffer de vídeo.`
-                    : `For the 6GB VRAM on ${gpu.name}, enable dynamic_resources=true in ModernFix + GPUTape + EntityCulling to use Shaders without overflowing video memory.`;
+                    ? `Nos 6GB de VRAM da ${gpu.name}, use texturas de até 32x, GPUTape/AllTheLeaks e EntityCulling para jogar com Shaders sem encher a VRAM (o dynamic_resources do ModernFix alivia a RAM, não a VRAM).`
+                    : `For the 6GB VRAM on ${gpu.name}, use textures up to 32x, GPUTape/AllTheLeaks and EntityCulling to run Shaders without filling VRAM (ModernFix's dynamic_resources relieves RAM, not VRAM).`;
             } else {
                 gpuTitle = lang === 'pt' ? `Configuração Gráfica (${gpu.name})` : `Graphics Configuration (${gpu.name})`;
                 gpuDesc = lang === 'pt'
@@ -1686,8 +1762,8 @@
                     badge: lang === 'pt' ? "Essencial GPU" : "Core GPU",
                     color: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40",
                     desc: lang === 'pt'
-                        ? `Substitui o motor OpenGL do Minecraft (${state.loader.toUpperCase()} ${state.mcVersion}). Dobra o FPS na sua ${getActiveGpu().name} e libera a CPU.`
-                        : `Replaces Minecraft's OpenGL rendering engine (${state.loader.toUpperCase()} ${state.mcVersion}). Doubles FPS on your ${getActiveGpu().name} and offloads the CPU.`
+                        ? `Substitui o motor OpenGL do Minecraft (${state.loader.toUpperCase()} ${state.mcVersion}). Costuma aumentar bastante o FPS na sua ${getActiveGpu().name} (o ganho varia por modpack) e alivia a CPU.`
+                        : `Replaces Minecraft's OpenGL rendering engine (${state.loader.toUpperCase()} ${state.mcVersion}). Usually boosts FPS a lot on your ${getActiveGpu().name} (gains vary by modpack) and offloads the CPU.`
                 },
                 {
                     name: "ModernFix",
@@ -1695,8 +1771,8 @@
                     badge: "RAM & Boot",
                     color: "bg-blue-500/20 text-blue-300 border-blue-500/40",
                     desc: lang === 'pt'
-                        ? "Indispensável em qualquer versão (1.20.1 a 1.21.4). Reduz o uso de RAM/VRAM com Dynamic Resources e acelera o carregamento."
-                        : "Mandatory across all versions (1.20.1 to 1.21.4). Slashes RAM/VRAM usage via Dynamic Resources and speeds up modpack boot times."
+                        ? "Indispensável em qualquer versão (1.20.1 a 1.21.4). Reduz o uso de RAM com Dynamic Resources e acelera o carregamento."
+                        : "Mandatory across all versions (1.20.1 to 1.21.4). Reduces RAM usage via Dynamic Resources and speeds up modpack boot times."
                 },
                 {
                     name: "FerriteCore",
@@ -1704,8 +1780,8 @@
                     badge: lang === 'pt' ? "Compactação RAM" : "RAM Compression",
                     color: "bg-blue-500/20 text-blue-300 border-blue-500/40",
                     desc: lang === 'pt'
-                        ? `Corta até 45% do consumo de memória de estados de blocos, essencial para aliviar sua memória ${state.ddrType} ${state.ramFreq}MHz.`
-                        : `Cuts blockstate memory usage by up to 45%, crucial for relieving bandwidth on your ${state.ddrType} ${state.ramFreq}MHz RAM.`
+                        ? `Reduz bastante o consumo de memória dos estados de blocos, ajudando principalmente em RAM ${state.ddrType} ${state.ramFreq}MHz.`
+                        : `Greatly reduces blockstate memory usage, which helps most on ${state.ddrType} ${state.ramFreq}MHz RAM.`
                 },
                 {
                     name: lithiumName,
@@ -1860,8 +1936,8 @@
                 const remSpawn = document.getElementById('chk-mf-spawn').checked;
                 filePath = "config/modernfix-mixins.properties";
                 hwTag = lang === 'pt'
-                    ? `Otimizado para ${storageName} + ${gpu.vram}GB VRAM`
-                    : `Optimized for ${storageName} + ${gpu.vram}GB VRAM`;
+                    ? `Otimizado para ${storageName}`
+                    : `Optimized for ${storageName}`;
                 desc = lang === 'pt'
                     ? "Cole estas linhas no final do arquivo modernfix-mixins.properties (logo abaixo de # User overrides go here)."
                     : "Paste these lines at the bottom of modernfix-mixins.properties (right below # User overrides go here).";
@@ -1876,8 +1952,8 @@ mixin.perf.compact_bit_storage=true
 mixin.bugfix.packet_leak=true
 mixin.feature.remove_chat_signing=true${remSpawn ? '\nmixin.perf.remove_spawn_chunks=true' : ''}`;
                 tips = lang === 'pt'
-                    ? `<strong>Por que usar estas opções:</strong> <code>dynamic_resources=${dynRes}</code> economiza gigabytes de RAM e VRAM (${gpu.vram}GB) lendo modelos sob demanda do seu <strong>${storageName}</strong>. Já <code>faster_item_rendering=true</code> evita quedas de FPS ao abrir inventários com JEI/EMI lotados.`
-                    : `<strong>Why use these options:</strong> <code>dynamic_resources=${dynRes}</code> saves gigabytes of RAM and VRAM (${gpu.vram}GB) by streaming models on-demand from your <strong>${storageName}</strong>. Meanwhile, <code>faster_item_rendering=true</code> prevents FPS drops when opening inventories with JEI/EMI.`;
+                    ? `<strong>Por que usar estas opções:</strong> <code>dynamic_resources=${dynRes}</code> economiza gigabytes de RAM lendo modelos sob demanda do seu <strong>${storageName}</strong>. Já <code>faster_item_rendering=true</code> evita quedas de FPS ao abrir inventários com JEI/EMI lotados.`
+                    : `<strong>Why use these options:</strong> <code>dynamic_resources=${dynRes}</code> saves gigabytes of RAM by streaming models on-demand from your <strong>${storageName}</strong>. Meanwhile, <code>faster_item_rendering=true</code> prevents FPS drops when opening inventories with JEI/EMI.`;
             }
             else if (tab === 'embeddium') {
                 const isSodium = state.loader === 'fabric' || (state.loader === 'neoforge' && state.mcVersion.startsWith('1.21'));
@@ -1888,17 +1964,17 @@ mixin.feature.remove_chat_signing=true${remSpawn ? '\nmixin.perf.remove_spawn_ch
                     : `Optimal rendering settings for your ${cpu.name} + ${gpu.name} combination.`;
                 code = `{
   "quality": {
-    "leaves_quality": "${gpu.vram <= 4 ? 'FAST' : 'DEFAULT'}",
+    "leaves_quality": "${(gpu.tier === 'low' || gpu.tier === 'entry') ? 'FAST' : 'DEFAULT'}",
     "enable_vignette": false
   },
   "performance": {
     "chunk_builder_threads": ${cpu.chunkThreads},
-    "always_defer_chunk_updates": true,
+    "always_defer_chunk_updates_v2": true,
     "animate_only_visible_textures": true,
     "use_entity_culling": true,
     "use_fog_occlusion": true,
     "use_block_face_culling": true,
-    "use_no_error_context": ${gpu.noErrorCtx}
+    "use_no_error_g_l_context": ${gpu.noErrorCtx}
   },
   "advanced": {
     "enable_memory_tracing": false,
@@ -1907,15 +1983,18 @@ mixin.feature.remove_chat_signing=true${remSpawn ? '\nmixin.perf.remove_spawn_ch
   }
 }`;
                 tips = lang === 'pt'
-                    ? `<strong>Ajuste de Hardware:</strong> Definimos <code>chunk_builder_threads: ${cpu.chunkThreads}</code> com base nas <strong>${cpu.threads} threads</strong> da sua CPU e <code>always_defer_chunk_updates: true</code> para impedir que o carregamento de chunks atrase os frames enviados para a <strong>${gpu.name}</strong>. Além disso, trave a <strong>Distância de Simulação em 6 a 8 chunks</strong> no menu de Vídeo!`
-                    : `<strong>Hardware Tuning:</strong> We set <code>chunk_builder_threads: ${cpu.chunkThreads}</code> based on your CPU's <strong>${cpu.threads} threads</strong> and <code>always_defer_chunk_updates: true</code> so chunk building never delays frames sent to your <strong>${gpu.name}</strong>. Also lock <strong>Simulation Distance to 6–8 chunks</strong> in Video Settings!`;
+                    ? `<strong>Ajuste de Hardware:</strong> Definimos <code>chunk_builder_threads: ${cpu.chunkThreads}</code> com base nas <strong>${cpu.threads} threads</strong> da sua CPU e <code>always_defer_chunk_updates_v2: true</code> para impedir que o carregamento de chunks atrase os frames enviados para a <strong>${gpu.name}</strong>. Além disso, trave a <strong>Distância de Simulação em 6 a 8 chunks</strong> no menu de Vídeo!`
+                    : `<strong>Hardware Tuning:</strong> We set <code>chunk_builder_threads: ${cpu.chunkThreads}</code> based on your CPU's <strong>${cpu.threads} threads</strong> and <code>always_defer_chunk_updates_v2: true</code> so chunk building never delays frames sent to your <strong>${gpu.name}</strong>. Also lock <strong>Simulation Distance to 6–8 chunks</strong> in Video Settings!`;
+                tips += lang === 'pt'
+                    ? `<br><br><em>Nota:</em> os nomes das chaves seguem o Sodium 0.5/0.6 e o Embeddium 0.3 (<code>always_defer_chunk_updates_v2</code>, <code>use_no_error_g_l_context</code>). Se o arquivo gerado pelo seu mod tiver nomes diferentes, use os dele: opções desconhecidas são ignoradas sem aviso.`
+                    : `<br><br><em>Note:</em> key names follow Sodium 0.5/0.6 and Embeddium 0.3 (<code>always_defer_chunk_updates_v2</code>, <code>use_no_error_g_l_context</code>). If the file generated by your mod uses different names, use those: unknown options are silently ignored.`;
             }
             else if (tab === 'ferrite') {
                 const isLowBandwidth = state.ddrType === 'DDR3' || (state.ddrType === 'DDR4' && state.ramFreq <= 3000) || state.sysRamGB <= 16;
                 filePath = "config/ferritecore-mixin.toml";
                 hwTag = lang === 'pt'
-                    ? `Calibrado para ${state.ddrType} ${state.ramFreq}MHz (${state.sysRamGB}GB)`
-                    : `Calibrated for ${state.ddrType} ${state.ramFreq}MHz (${state.sysRamGB}GB)`;
+                    ? `Perfil universal • sua RAM: ${state.ddrType} ${state.ramFreq}MHz (${state.sysRamGB}GB)`
+                    : `Universal profile • your RAM: ${state.ddrType} ${state.ramFreq}MHz (${state.sysRamGB}GB)`;
                 desc = lang === 'pt'
                     ? "Configuração completa do FerriteCore para reduzir drasticamente o peso dos estados de blocos na memória."
                     : "Complete FerriteCore configuration to drastically reduce blockstate memory footprint.";
@@ -1939,7 +2018,7 @@ bakedQuadDeduplication = true`;
             }
             else if (tab === 'immediatelyfast') {
                 filePath = "config/immediatelyfast.json";
-                hwTag = lang === 'pt' ? `Batching HUD & Inventário (${gpu.name})` : `HUD & Inventory Batching (${gpu.name})`;
+                hwTag = lang === 'pt' ? `Perfil universal • Batching de HUD e inventário` : `Universal profile • HUD & inventory batching`;
                 desc = lang === 'pt'
                     ? "Acelera drasticamente a renderização de textos, barras de vida/mana/ki de mods RPG, minimapas e entidades."
                     : "Drastically accelerates rendering of text, custom RPG health/mana/ki bars, minimaps, and entities.";
@@ -1954,12 +2033,12 @@ bakedQuadDeduplication = true`;
   "experimental_sign_text_buffering": true
 }`;
                 tips = lang === 'pt'
-                    ? `<strong>Por que <code>experimental_screen_batching: false</code>?</strong> Mantemos o batching de HUD e Fontes ligado (dobrando o FPS em interfaces), mas deixamos o <em>experimental_screen_batching</em> desligado para evitar bugs visuais em barras customizadas de mods de RPG, magias e minimapas.`
-                    : `<strong>Why <code>experimental_screen_batching: false</code>?</strong> We keep HUD and Font batching enabled (doubling GUI FPS), but leave <em>experimental_screen_batching</em> off to prevent visual glitches with custom RPG bars, spell HUDs, and minimaps.`;
+                    ? `<strong>Por que <code>experimental_screen_batching: false</code>?</strong> Mantemos o batching de HUD e Fontes ligado (acelerando interfaces cheias), mas deixamos o <em>experimental_screen_batching</em> desligado para evitar bugs visuais em barras customizadas de mods de RPG, magias e minimapas.`
+                    : `<strong>Why <code>experimental_screen_batching: false</code>?</strong> We keep HUD and Font batching enabled (speeding up crowded GUIs), but leave <em>experimental_screen_batching</em> off to prevent visual glitches with custom RPG bars, spell HUDs, and minimaps.`;
             }
             else if (tab === 'entityculling') {
                 const sleepDelay = cpu.threads >= 12 ? 10 : (cpu.threads >= 8 ? 15 : 25);
-                const traceDist = gpu.vram <= 4 ? 64 : 128;
+                const traceDist = cpu.threads >= 12 ? 128 : (cpu.threads >= 8 ? 96 : 64);
                 filePath = "config/entityculling.json";
                 hwTag = lang === 'pt' ? `Raytracing Assíncrono (${cpu.threads} Threads)` : `Async Raytracing (${cpu.threads} Threads)`;
                 desc = lang === 'pt'
@@ -1992,6 +2071,9 @@ bakedQuadDeduplication = true`;
                 tips = lang === 'pt'
                     ? `<strong>Calculado para sua CPU:</strong> O <code>sleepDelay: ${sleepDelay}</code> define a velocidade com que a thread secundária da sua <strong>${cpu.name}</strong> calcula a visibilidade dos objetos. Além disso, <code>tickCulling: true</code> congela animações de mobs que você não está vendo, economizando CPU e GPU ao mesmo tempo!`
                     : `<strong>Tailored to your CPU:</strong> <code>sleepDelay: ${sleepDelay}</code> sets how frequently your <strong>${cpu.name}</strong>'s background thread updates visibility rays. Furthermore, <code>tickCulling: true</code> skips animation ticks for occluded mobs, saving both CPU and GPU!`;
+                tips += lang === 'pt'
+                    ? ` Já o <code>tracingDistance: ${traceDist}</code> também vem da CPU (${cpu.threads} threads): é a distância do raytracing de visibilidade, que roda na CPU, então CPUs menores usam alcance menor.`
+                    : ` The <code>tracingDistance: ${traceDist}</code> also comes from the CPU (${cpu.threads} threads): it is the visibility raytracing range, which runs on the CPU, so smaller CPUs use a shorter range.`;
             }
             else if (tab === 'badopt') {
                 filePath = "config/badoptimizations.txt (or .json)";
@@ -2017,7 +2099,7 @@ ignore_mod_incompatibilities = false`;
             else if (tab === 'radium') {
                 const isLithium = state.loader === 'fabric' || (state.loader === 'neoforge' && state.mcVersion.startsWith('1.21'));
                 filePath = isLithium ? "config/lithium.properties" : "config/radium.properties (or canary.properties)";
-                hwTag = lang === 'pt' ? `Otimização de Servidor Interno (${cpu.name})` : `Integrated Server Optimization (${cpu.name})`;
+                hwTag = lang === 'pt' ? `Perfil universal (servidor integrado)` : `Universal profile (integrated server)`;
                 desc = lang === 'pt'
                     ? "Otimizações de TPS (Ticks por Segundo) para IA de mobs, funis, colisões e carregamento de chunks."
                     : "TPS (Ticks Per Second) optimizations for mob AI, hoppers, collisions, and chunk loading.";
@@ -2033,8 +2115,8 @@ mixin.block.moving_block_shapes=true
 mixin.block.redstone_wire=true
 mixin.chunk.block_counting=true
 mixin.chunk.entity_class_groups=true
-mixin.chunk.Palette=true
-mixin.Chunk.serialization=true
+mixin.chunk.palette=true
+mixin.chunk.serialization=true
 mixin.collections.attributes=true
 mixin.collections.entity_by_type=true
 mixin.entity.collisions.movement=true
@@ -2052,8 +2134,8 @@ mixin.world.chunk_access=true
 mixin.world.explosions=true
 mixin.world.tick_scheduler=true`;
                 tips = lang === 'pt'
-                    ? `<strong>Salva-vidas de TPS:</strong> Estas regras reduzem em até 45% o tempo de tick (mspt) no servidor integrado quando há muitos mobs (Alex's Mobs, Ice and Fire, chefes) ou máquinas automáticas rodando perto da sua base.`
-                    : `<strong>TPS Lifesaver:</strong> These rules cut integrated server tick time (MSPT) by up to 45% when surrounded by modded mobs (Alex's Mobs, Ice and Fire, bosses) or automated machinery.`;
+                    ? `<strong>Salva-vidas de TPS:</strong> Estas regras podem reduzir o tempo de tick (mspt) no servidor integrado quando há muitos mobs (Alex's Mobs, Ice and Fire, chefes) ou máquinas automáticas rodando perto da sua base.`
+                    : `<strong>TPS Lifesaver:</strong> These rules can reduce integrated server tick time (MSPT) when surrounded by modded mobs (Alex's Mobs, Ice and Fire, bosses) or automated machinery.`;
             }
             else if (tab === 'loader') {
                 if (state.loader === 'fabric') {
@@ -2079,8 +2161,8 @@ maxConcurrentTasks = ${cpu.chunkThreads}
   optimizeAquifer = true
   useDensityFunctionCompiler = true`;
                     tips = lang === 'pt'
-                        ? `<strong>C2ME + GraalVM:</strong> A opção <code>useDensityFunctionCompiler = true</code> compila as funções matemáticas de geração de cavernas e montanhas em bytecode Java puro, que o <strong>Oracle GraalVM</strong> transforma em instruções AVX nativas!`
-                        : `<strong>C2ME + GraalVM:</strong> Setting <code>useDensityFunctionCompiler = true</code> compiles mathematical cave and mountain generation functions into Java bytecode, which <strong>Oracle GraalVM</strong> then vectorizes into native AVX instructions!`;
+                        ? `<strong>C2ME + GraalVM:</strong> A opção <code>useDensityFunctionCompiler = true</code> compila as funções matemáticas de geração de cavernas e montanhas em bytecode Java puro, que o JIT (Graal ou C2) consegue otimizar bem.`
+                        : `<strong>C2ME + GraalVM:</strong> Setting <code>useDensityFunctionCompiler = true</code> compiles mathematical cave and mountain generation functions into Java bytecode, which the JIT (Graal or C2) can optimize well.`;
                 } else {
                     filePath = "config/forge-client.toml  &  config/fml.toml";
                     hwTag = lang === 'pt'
@@ -2091,30 +2173,52 @@ maxConcurrentTasks = ${cpu.chunkThreads}
                         : "Native Forge / NeoForge config tweaks to speed up modpack loading and eliminate lighting stutters.";
                     code = `# --- ${lang === 'pt' ? 'No arquivo' : 'In file'}: config/forge-client.toml ---
 alwaysSetupTerrainOffThread = true
-earlyWindowControl = true
 forgeLightPipelineEnabled = true
 
 # --- ${lang === 'pt' ? 'No arquivo' : 'In file'}: config/fml.toml ---
+earlyWindowControl = true
 maxThreads = ${cpu.fmlThreads}
 versionCheck = false
 defaultConfigPath = "defaultconfigs"`;
+                    if (state.loader === 'neoforge') {
+                        filePath = "config/fml.toml";
+                        code = `# --- ${lang === 'pt' ? 'No arquivo' : 'In file'}: config/fml.toml ---
+earlyWindowControl = true
+maxThreads = ${cpu.fmlThreads}
+versionCheck = false
+defaultConfigPath = "defaultconfigs"`;
+                    }
                     tips = lang === 'pt'
                         ? `<strong>Ajuste Exato para ${cpu.name}:</strong> Definimos <code>maxThreads = ${cpu.fmlThreads}</code> (deixando 2 threads livres para o sistema operacional) para que o Forge compile os mods na velocidade máxima do seu <strong>${storageName}</strong>, e <code>versionCheck = false</code> para impedir que centenas de mods congelem o menu inicial buscando atualizações online.`
                         : `<strong>Exact Match for ${cpu.name}:</strong> We set <code>maxThreads = ${cpu.fmlThreads}</code> (leaving 2 threads free for the OS) so Forge compiles mods at the full speed of your <strong>${storageName}</strong>, and <code>versionCheck = false</code> to stop hundreds of mods from stalling startup with HTTP update checks.`;
+                    if (state.loader === 'neoforge') {
+                        tips += lang === 'pt'
+                            ? `<br><br><em>NeoForge:</em> o arquivo do cliente se chama <code>neoforge-client.toml</code> e as opções de terreno/iluminação do <code>forge-client.toml</code> não se aplicam; o Sodium/Embeddium já cuida disso. Por isso aplicamos só o <code>fml.toml</code>.`
+                            : `<br><br><em>NeoForge:</em> the client file is called <code>neoforge-client.toml</code> and the terrain/lighting options from <code>forge-client.toml</code> do not apply; Sodium/Embeddium already handles that. That is why only <code>fml.toml</code> is applied.`;
+                    }
                 }
             }
             else if (tab === 'driver') {
                 filePath = lang === 'pt' ? `Painel de Controle do Driver (${gpu.name})` : `GPU Driver Control Panel (${gpu.name})`;
                 hwTag = `${gpu.vendorLabel || gpu.vendor.toUpperCase()} Profile + Oculus/Iris Shaders`;
                 desc = lang === 'pt'
-                    ? "Configurações no sistema operacional e driver de vídeo para o executável javaw.exe do seu Oracle GraalVM 21."
-                    : "OS and GPU driver settings for your Oracle GraalVM 21 javaw.exe executable.";
+                    ? "Configurações no sistema operacional e driver de vídeo para o executável javaw.exe do seu Java 21."
+                    : "OS and GPU driver settings for your Java 21 javaw.exe executable.";
 
-                if (gpu.vendor === 'nvidia') {
+                if (gpu.none) {
+                    filePath = lang === 'pt' ? 'Painel de Controle do Driver (sem GPU definida)' : 'GPU Driver Control Panel (no GPU selected)';
+                    hwTag = lang === 'pt' ? 'Aguardando uma GPU' : 'Waiting for a GPU';
+                    desc = lang === 'pt'
+                        ? 'A CPU selecionada não tem vídeo integrado, então não há driver de vídeo para configurar.'
+                        : 'The selected CPU has no integrated graphics, so there is no video driver to configure.';
+                    code = lang === 'pt'
+                        ? 'Selecione uma placa de vídeo dedicada na lista de GPU ou uma CPU com gráficos integrados (ex.: Ryzen 5 5600G, Core i5-12400) para ver as configurações do driver.'
+                        : 'Pick a dedicated graphics card from the GPU list or a CPU with integrated graphics (e.g. Ryzen 5 5600G, Core i5-12400) to see the driver settings.';
+                } else if (gpu.vendor === 'nvidia') {
                     code = lang === 'pt'
                         ? `=== PAINEL DE CONTROLE DA NVIDIA (Para ${gpu.name}) ===
 1. Abra o Painel da NVIDIA -> Gerenciar as configurações em 3D -> Aba "Configurações do Programa".
-2. Clique em "Adicionar" e selecione o javaw.exe da pasta do seu Oracle GraalVM 21.
+2. Clique em "Adicionar" e selecione o javaw.exe da pasta do seu Java 21.
 3. Aplique exatamente estes valores:
    • Otimização segmentada (Threaded Optimization): LIGADO (Essencial para OpenGL!)
    • Modo de gerenciamento de energia: Preferência por desempenho máximo
@@ -2124,7 +2228,7 @@ defaultConfigPath = "defaultconfigs"`;
    • Método de apresentação Vulkan/OpenGL: Preferir camadas na cadeia de troca DXGI (Ativa Auto-HDR/G-Sync em janela)`
                         : `=== NVIDIA CONTROL PANEL (For ${gpu.name}) ===
 1. Open NVIDIA Control Panel -> Manage 3D Settings -> "Program Settings" tab.
-2. Click "Add" and select javaw.exe from your Oracle GraalVM 21 folder.
+2. Click "Add" and select javaw.exe from your Java 21 folder.
 3. Apply these exact settings:
    • Threaded Optimization: ON (Crucial for OpenGL multi-threading!)
    • Power Management Mode: Prefer Maximum Performance
@@ -2135,7 +2239,7 @@ defaultConfigPath = "defaultconfigs"`;
                 } else if (gpu.vendor === 'amd') {
                     code = lang === 'pt'
                         ? `=== AMD SOFTWARE: ADRENALIN EDITION (Para ${gpu.name}) ===
-1. Abra o AMD Adrenalin -> Jogos -> Adicione manualmente o javaw.exe do seu Oracle GraalVM 21.
+1. Abra o AMD Adrenalin -> Jogos -> Adicione manualmente o javaw.exe do seu Java 21.
 2. Em versões recentes do driver Windows 11 (22.7.1+), o driver possui otimização nativa OpenGL.
 3. Aplique estes ajustes no perfil do Java:
    • Radeon Anti-Lag: Ativado
@@ -2144,7 +2248,7 @@ defaultConfigPath = "defaultconfigs"`;
    • Qualidade de filtragem de textura: Desempenho
    • Se usar Shaders (Oculus/Iris): Desative o "Radeon Boost" para evitar mudança brusca de resolução.`
                         : `=== AMD SOFTWARE: ADRENALIN EDITION (For ${gpu.name}) ===
-1. Open AMD Adrenalin -> Gaming -> Manually add javaw.exe from your Oracle GraalVM 21 folder.
+1. Open AMD Adrenalin -> Gaming -> Manually add javaw.exe from your Java 21 folder.
 2. Modern AMD drivers (22.7.1+) feature a rebuilt hardware-accelerated OpenGL pipeline.
 3. Apply these profile settings for Java:
    • Radeon Anti-Lag: Enabled
@@ -2156,20 +2260,31 @@ defaultConfigPath = "defaultconfigs"`;
                     code = lang === 'pt'
                         ? `=== INTEL ARC CONTROL / GRÁFICOS INTEL (Para ${gpu.name}) ===
 1. Nas configurações gráficas do Windows (Sistema -> Tela -> Elementos Gráficos):
-   • Adicione o javaw.exe do Oracle GraalVM 21 e marque "Alto Desempenho (${gpu.name})".
+   • Adicione o javaw.exe do Java 21 e marque "Alto Desempenho (${gpu.name})".
 2. Em placas Intel Arc dedicadas:
    • Certifique-se de que o Resizable BAR (ReBAR) esteja ATIVO na BIOS da placa-mãe.
-   • No embeddium-options.json, mantivemos "use_no_error_context": false para máxima estabilidade no driver OpenGL da Intel.`
+   • No embeddium-options.json, mantivemos "use_no_error_g_l_context": false para máxima estabilidade no driver OpenGL da Intel.`
                         : `=== INTEL ARC CONTROL / INTEL GRAPHICS (For ${gpu.name}) ===
 1. In Windows Graphics Settings (System -> Display -> Graphics):
-   • Add Oracle GraalVM 21's javaw.exe and select "High Performance (${gpu.name})".
+   • Add Java 21's javaw.exe and select "High Performance (${gpu.name})".
 2. On dedicated Intel Arc GPUs:
    • Ensure Resizable BAR (ReBAR) is ENABLED in your motherboard BIOS.
-   • In embeddium-options.json, we kept "use_no_error_context": false for maximum stability with Intel's OpenGL driver.`;
+   • In embeddium-options.json, we kept "use_no_error_g_l_context": false for maximum stability with Intel's OpenGL driver.`;
                 }
-                tips = lang === 'pt'
-                    ? `<strong>Dica de Ouro para Shaders (Oculus / Iris) na ${gpu.name}:</strong> Se usar Shaders (Complementary, Bliss ou BSL), reduza a <em>Shadow Distance (Distância das Sombras)</em> dentro das opções do Shader para <strong>8 ou 10 chunks</strong> (mesmo que sua visão seja 16 chunks). Isso aumenta o FPS da placa de vídeo em até 45% sem diferença visual perceptível!`
-                    : `<strong>Golden Shader Tip (Oculus / Iris) on ${gpu.name}:</strong> When using Shaders (Complementary, Bliss, or BSL), lower the <em>Shadow Distance</em> inside Shader Pack Settings to <strong>8 or 10 chunks</strong> (even if Render Distance is 16 chunks). This boosts GPU FPS by up to 45% with virtually zero visual loss!`;
+                let shaderAdvPt, shaderAdvEn;
+                if (gpu.igpu || gpu.tier === 'low' || gpu.tier === 'entry') {
+                    shaderAdvPt = 'esta GPU é de nível básico: evite Shaders. Se quiser testar, use o perfil Low e <strong>Shadow Distance de 4 a 6 chunks</strong>.';
+                    shaderAdvEn = 'this is an entry-level GPU: avoid Shaders. If you want to try, use the Low profile and a <strong>Shadow Distance of 4 to 6 chunks</strong>.';
+                } else if (gpu.tier === 'mid') {
+                    shaderAdvPt = 'prefira Shaders leves (ex.: Complementary Reimagined em Low/Medium) e reduza a <em>Shadow Distance</em> para <strong>6 a 8 chunks</strong>.';
+                    shaderAdvEn = 'prefer light Shaders (e.g. Complementary Reimagined on Low/Medium) and lower the <em>Shadow Distance</em> to <strong>6 to 8 chunks</strong>.';
+                } else {
+                    shaderAdvPt = 'reduza a <em>Shadow Distance</em> para <strong>8 a 10 chunks</strong> (mesmo com visão de 16 chunks): alivia bastante a GPU com pouca perda visual.';
+                    shaderAdvEn = 'lower the <em>Shadow Distance</em> to <strong>8 to 10 chunks</strong> (even with a 16-chunk render distance): it relieves the GPU a lot with little visual loss.';
+                }
+                tips = gpu.none ? '' : (lang === 'pt'
+                    ? `<strong>Dica para Shaders (Oculus / Iris) na ${gpu.name}:</strong> ${shaderAdvPt}`
+                    : `<strong>Shader tip (Oculus / Iris) on ${gpu.name}:</strong> ${shaderAdvEn}`);
             }
 
             document.getElementById('cfg-file-path').textContent = filePath;
@@ -2185,8 +2300,8 @@ defaultConfigPath = "defaultconfigs"`;
         const checklistItems = [
             {
                 id: "gchk-1",
-                pt: "Baixar o Oracle GraalVM 21 e selecionar o javaw.exe dele nas configurações do Launcher",
-                en: "Download Oracle GraalVM 21 and select its javaw.exe in your Launcher settings"
+                pt: "Baixar o Java da engine escolhida (Oracle GraalVM 21 ou Temurin 21) e selecionar o javaw.exe dele nas configurações do Launcher",
+                en: "Download the Java of the chosen engine (Oracle GraalVM 21 or Temurin 21) and select its javaw.exe in your Launcher settings"
             },
             {
                 id: "gchk-2",
@@ -2200,8 +2315,8 @@ defaultConfigPath = "defaultconfigs"`;
             },
             {
                 id: "gchk-4",
-                pt: "Copiar e colar a linha de Argumentos JVM (GraalVM + Generational ZGC + SoftMaxHeap)",
-                en: "Copy and paste the generated JVM Arguments (GraalVM + Generational ZGC + SoftMaxHeap)"
+                pt: "Copiar e colar a linha de Argumentos JVM gerada (conforme a engine escolhida)",
+                en: "Copy and paste the generated JVM Arguments (for the chosen engine)"
             },
             {
                 id: "gchk-5",
@@ -2285,6 +2400,7 @@ defaultConfigPath = "defaultconfigs"`;
 
         window.onload = function() {
             populateFrequencyDropdown('DDR4', 2666);
+            applyAutoEngine(false);
             recalculateAll();
             renderChecklist();
         };
