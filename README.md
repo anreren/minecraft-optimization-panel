@@ -44,6 +44,10 @@ Each CPU in the database carries its own values, roughly **25% of its threads** 
 * **Chunk builder threads** (Sodium/Embeddium) and **C2ME threads** are also taken from the CPU entry. APUs and low-power chips get one thread less, since their iGPU shares memory bandwidth.
 * **EntityCulling `tracingDistance`** follows the CPU (128 with 12+ threads, 96 with 8+, otherwise 64), because the visibility raytracing runs on the CPU.
 * **Leaves quality and shader advice** follow a per-GPU performance tier (low / entry / mid / high / ultra), not VRAM size.
+* **Single-thread tier (low / mid / high / top):** every CPU also carries a rough single-thread speed rating, because Minecraft is mostly bound by its main thread. Low-clock chips (older Xeons, Athlon, N100...) get a dedicated warning instead of benefiting from "more cores", and the tier feeds the recommended in-game settings below.
+
+### 2b. Recommended In-Game Settings
+Render distance, simulation distance, entity distance and a shader verdict are derived from the CPU single-thread tier, the GPU tier (iGPUs are capped), the modpack profile (heavy / extreme lower the values) and the RAM channels. They are starting points, not guarantees.
 
 ### 3. Storage I/O & ZGC Spike Tolerance (`-XX:ZAllocationSpikeTolerance`)
 ZGC engines only. A higher value makes the collector start a cycle earlier ahead of an allocation spike:
@@ -52,10 +56,16 @@ ZGC engines only. A higher value makes the collector start a cycle earlier ahead
 * This is a heuristic: if the GC uses too much CPU, go back to `2.0`.
 * `-Dfml.readTimeout=180` is added to every profile to avoid singleplayer watchdog timeouts. `dynamic_resources` is turned off by default on HDDs.
 
+### 3b. Memory Channels
+A *Dual-channel or more / Single-channel* selector estimates the theoretical bandwidth (`MT/s × 8 bytes × channels`). Single-channel raises the ZGC spike tolerance by `0.5`, turns on the low-bandwidth profile for FerriteCore, shows a warning (stronger when an iGPU shares that bandwidth) and lowers the recommended render distance for iGPUs.
+
 ### 4. RAM Budget & SoftMax Caching (`-XX:SoftMaxHeapSize`)
 * The optimizer reserves a fixed heap (e.g. `-Xms12G -Xmx12G`) and, on ZGC, sets a **SoftMaxHeapSize** (e.g. `10G`) so the collector tries to stay below it and keeps the rest as headroom for allocation spikes. The cushion is **2 GB** for allocations of 9 GB or more, otherwise **1 GB**.
 * Modpack profiles (light / medium / heavy / extreme) are capped so that at least **2.5 GB stay free** for the OS after the JVM overhead (Metaspace + code cache) and, when using integrated graphics, up to **2 GB reserved for the iGPU**. A warning appears if you push the slider past that.
 * On slow memory the tool does not change any flag: it recommends keeping FerriteCore and ModernFix installed and enabling XMP/DOCP in the BIOS.
+
+### 4b. Notebooks (iGPU + dedicated GPU)
+Mobile CPUs and laptop GPUs are flagged. With a dedicated GPU the tool warns that Windows often launches Java on the iGPU and shows how to force `javaw.exe` to *High performance*. On integrated graphics only it reminds you to use the charger and a high-performance power plan.
 
 ### 5. Oracle GraalVM JIT Flags (`-XX:+UseJVMCICompiler`)
 Used only by the GraalVM engines:
@@ -66,7 +76,7 @@ Used only by the GraalVM engines:
 
 ## 🎛️ Interactive Features
 
-* **Hardware Customizer:** Pick your CPU (AMD Ryzen / APUs / Athlon / FX, Intel Core / Core Ultra / Pentium, popular **Xeon** E3, E5 and Gold models, plus laptop and mini-PC chips), GPU (NVIDIA GTX 10/16 and RTX 20/30/40/50, AMD RX 400 to RX 9000 and Vega, Intel Arc), RAM generation (DDR3 to DDR5, 1066 to 8000 MHz) and storage type. Every GPU model and VRAM variant is listed separately.
+* **Hardware Customizer:** Pick your CPU (AMD Ryzen / APUs / Athlon / FX, Intel Core / Core Ultra / Pentium, popular **Xeon** E3, E5 and Gold models, plus laptop H/U-series and mini-PC chips), GPU (NVIDIA GTX 10/16 and RTX 20/30/40/50, AMD RX 400 to RX 9000 and Vega, Intel Arc, plus popular notebook GPUs), RAM generation (DDR3 to DDR5, 1066 to 8000 MHz), memory channels and storage type. Every GPU model and VRAM variant is listed separately.
 * **Integrated Graphics Detection:** Choose *Integrated Graphics (iGPU)* in the GPU list and the iGPU is detected from the selected CPU (e.g. Ryzen 3 3200G → Radeon Vega 8, Core i5-12400 → UHD 730). CPUs without video output (F/KF models, FX, Xeon) trigger a warning, and shared-memory advice replaces the VRAM alerts.
 * **Bilingual Support (PT-BR / EN-US):** Instant interface switching between Portuguese and English.
 * **Dynamic Mod Catalog:** Adapts mod recommendations based on your chosen Mod Loader (**Forge**, **NeoForge**, or **Fabric**) and Minecraft version (**1.20.1** to **1.21.4+**).
@@ -83,10 +93,30 @@ Used only by the GraalVM engines:
 
 ---
 
+## 📁 Project Structure
+
+```
+├── index.html        # UI, i18n, calculation logic and config generators
+├── data/
+│   ├── cpus.js       # CPU database (threads, GC values, single-thread tier, iGPU link)
+│   └── gpus.js       # GPU database (dedicated, notebook and integrated GPUs)
+└── README.md
+```
+
+### Adding hardware
+1. Add an entry to `data/cpus.js` or `data/gpus.js` (the field list is documented at the top of each file).
+2. Add the matching `<option value="your_key">` to `#select-cpu` or `#select-gpu` in `index.html`.
+3. For a CPU with integrated graphics, set its `igpu` field to the key of an iGPU entry in `gpus.js` (iGPUs are not listed in the dropdown).
+
+The data files are plain scripts (no modules or build step), so the site works on GitHub Pages and when opening `index.html` locally.
+
+---
+
 ## 🛠️ Tech Stack
 
 * **Frontend:** Pure HTML5, Tailwind CSS (via CDN), and FontAwesome.
 * **Logic:** Vanilla JavaScript (ES6+), real-time reactive recalculations.
+* **Data:** Hardware databases kept in separate plain-script files under `data/`.
 * **Deployment:** Hosted statically via **GitHub Pages**.
 
 ---

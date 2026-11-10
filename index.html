@@ -161,6 +161,8 @@
                             <option value="r7_5700u">AMD Ryzen 7 5700U / 5800U (8C/16T - Zen 2/3 Mobile • iGPU)</option>
                             <option value="r7_6800h">AMD Ryzen 7 6800H / 7735HS (8C/16T - Zen 3+ Mobile • iGPU)</option>
                             <option value="r7_7840hs">AMD Ryzen 7 7840HS / 8845HS (8C/16T - Zen 4 Mobile • iGPU)</option>
+                            <option value="r5_5600h">AMD Ryzen 5 5600H / 5600HS (6C/12T - Zen 3 Mobile • iGPU)</option>
+                            <option value="r5_7535hs">AMD Ryzen 5 6600H / 7535HS (6C/12T - Zen 3+ Mobile • iGPU)</option>
                         </optgroup>
                         <optgroup label="Intel Core Ultra 200S (LGA1851)">
                             <option value="ultra_5_245k">Intel Core Ultra 5 245K (14C/14T - Arrow Lake • iGPU)</option>
@@ -198,6 +200,8 @@
                             <option value="i5_8250u">Intel Core i5-8250U / i7-8550U (4C/8T - Kaby Lake R Mobile • iGPU)</option>
                             <option value="i5_1135g7">Intel Core i5-1135G7 / i7-1165G7 (4C/8T - Tiger Lake Mobile • iGPU)</option>
                             <option value="i5_1240p">Intel Core i5-1240P / i7-1260P (12C/16T - Alder Lake-P Mobile • iGPU)</option>
+                            <option value="i5_12450h">Intel Core i5-12450H / i5-13420H (8C/12T - Alder/Raptor Lake-H • iGPU)</option>
+                            <option value="i7_12700h">Intel Core i7-12700H / i7-13700H (14C/20T - Alder/Raptor Lake-H • iGPU)</option>
                             <option value="n100">Intel N100 / N95 / N97 (4C/4T - Alder Lake-N • iGPU)</option>
                             <option value="n305">Intel Core i3-N305 / N300 (8C/8T - Alder Lake-N • iGPU)</option>
                         </optgroup>
@@ -352,6 +356,20 @@
                             <option value="rx_580_2048">AMD Radeon RX 580 2048SP (8GB - Polaris 20)</option>
                             <option value="rx_590">AMD Radeon RX 590 (8GB - Polaris 30)</option>
                         </optgroup>
+                        <optgroup label="Notebook GPUs (NVIDIA / AMD)">
+                            <option value="gtx_1650_lap">NVIDIA GTX 1650 Laptop (4GB - Turing)</option>
+                            <option value="gtx_1660ti_lap">NVIDIA GTX 1660 Ti Laptop (6GB - Turing)</option>
+                            <option value="rtx_2060_lap">NVIDIA RTX 2060 Laptop (6GB - Turing)</option>
+                            <option value="rtx_3060_lap">NVIDIA RTX 3060 Laptop (6GB - Ampere)</option>
+                            <option value="rtx_3070_lap">NVIDIA RTX 3070 Laptop (8GB - Ampere)</option>
+                            <option value="rtx_4050_lap">NVIDIA RTX 4050 Laptop (6GB - Ada Lovelace)</option>
+                            <option value="rtx_4060_lap">NVIDIA RTX 4060 Laptop (8GB - Ada Lovelace)</option>
+                            <option value="rtx_4070_lap">NVIDIA RTX 4070 Laptop (8GB - Ada Lovelace)</option>
+                            <option value="rtx_4080_lap">NVIDIA RTX 4080 Laptop (12GB - Ada Lovelace)</option>
+                            <option value="rtx_5060_lap">NVIDIA RTX 5060 Laptop (8GB - Blackwell)</option>
+                            <option value="rx_6600m">AMD Radeon RX 6600M (8GB - RDNA 2)</option>
+                            <option value="rx_7600s">AMD Radeon RX 7600S (8GB - RDNA 3)</option>
+                        </optgroup>
                         <optgroup label="Intel Arc (Alchemist / Battlemage)">
                             <option value="arc_a380">Intel Arc A380 (6GB - Xe-HPG)</option>
                             <option value="arc_a580">Intel Arc A580 (8GB - Xe-HPG)</option>
@@ -391,6 +409,12 @@
                             <option value="32" data-pt="32 GB de RAM Total no PC" data-en="32 GB Total System RAM" selected>32 GB de RAM Total no PC</option>
                             <option value="48" data-pt="48 GB de RAM Total no PC" data-en="48 GB Total System RAM">48 GB de RAM Total no PC</option>
                             <option value="64" data-pt="64 GB de RAM Total no PC" data-en="64 GB Total System RAM">64 GB de RAM Total no PC</option>
+                        </select>
+                    </div>
+                    <div class="pt-0.5">
+                        <select id="select-mem-channels" onchange="onHardwareChange()" aria-label="Canais de memória" class="w-full bg-gray-900 border border-gray-700/80 rounded-lg px-2.5 py-1.5 text-xs text-gray-200 font-medium focus:outline-none focus:border-blue-500">
+                            <option value="2" data-pt="Dual-channel ou mais (2+ pentes iguais)" data-en="Dual-channel or more (2+ matching sticks)" selected>Dual-channel ou mais (2+ pentes iguais)</option>
+                            <option value="1" data-pt="Single-channel (1 pente só)" data-en="Single-channel (single stick)">Single-channel (1 pente só)</option>
                         </select>
                     </div>
                 </div>
@@ -785,6 +809,8 @@
         </a>
     </footer>
 
+    <script src="data/cpus.js"></script>
+    <script src="data/gpus.js"></script>
     <script>
         // ============================================================================
         // DICIONÁRIO DE IDIOMAS (PORTUGUÊS BR & ENGLISH US)
@@ -859,6 +885,8 @@
                 igpuNoneMeta: "⚠ A CPU selecionada não possui gráficos integrados • escolha uma placa de vídeo",
                 igpuMeta: "Memória compartilhada com a RAM",
                 igpuVendorNone: "de Vídeo",
+                stLabel: "Thread única",
+                stNames: { low: "Baixa", mid: "Média", high: "Alta", top: "Topo" },
                 toastEngineLow: "CPU/RAM modestas: engine trocada para Temurin 21 + G1GC (mais leve que ZGC + Graal).",
                 toastEngineHigh: "Hardware robusto: engine ajustada para GraalVM 21 + ZGC Geracional.",
                 toastJava21Req: "Minecraft 1.20.6+ exige Java 21! Alterado para Oracle GraalVM 21.",
@@ -934,6 +962,8 @@
                 igpuNoneMeta: "⚠ The selected CPU has no integrated graphics • pick a graphics card",
                 igpuMeta: "Shares memory with system RAM",
                 igpuVendorNone: "Video",
+                stLabel: "Single-thread",
+                stNames: { low: "Low", mid: "Mid", high: "High", top: "Top" },
                 toastEngineLow: "Modest CPU/RAM: engine switched to Temurin 21 + G1GC (lighter than ZGC + Graal).",
                 toastEngineHigh: "Robust hardware: engine set to GraalVM 21 + Generational ZGC.",
                 toastJava21Req: "Minecraft 1.20.6+ requires Java 21! Switched to Oracle GraalVM 21.",
@@ -943,200 +973,9 @@
         };
 
         // ============================================================================
-        // BANCO DE DADOS DE HARDWARE (CPUs, GPUs, Frequências DDR3/DDR4/DDR5, Discos)
+        // BANCO DE DADOS DE HARDWARE (Frequências DDR3/DDR4/DDR5, Discos; CPUs e GPUs em data/)
         // ============================================================================
-        const cpuDatabase = {
-            r5_5500: { name: "AMD Ryzen 5 5500", cores: 6, threads: 12, arch: "Zen 3", avx: 2, l3: "16MB", concGC: 3, parGC: 8, chunkThreads: 4, fmlThreads: 10, igpu: null },
-            r5_5600: { name: "AMD Ryzen 5 5600 / 5600X", cores: 6, threads: 12, arch: "Zen 3", avx: 2, l3: "32MB", concGC: 3, parGC: 8, chunkThreads: 4, fmlThreads: 10, igpu: null },
-            r7_5700x: { name: "AMD Ryzen 7 5700X / 5800X", cores: 8, threads: 16, arch: "Zen 3", avx: 2, l3: "32MB", concGC: 4, parGC: 10, chunkThreads: 6, fmlThreads: 14, igpu: null },
-            r7_5700x3d: { name: "AMD Ryzen 7 5700X3D / 5800X3D", cores: 8, threads: 16, arch: "Zen 3 V-Cache", avx: 2, l3: "96MB", concGC: 4, parGC: 10, chunkThreads: 6, fmlThreads: 14, igpu: null },
-            r9_5900x: { name: "AMD Ryzen 9 5900X / 5950X", cores: 12, threads: 24, arch: "Zen 3", avx: 2, l3: "64MB", concGC: 6, parGC: 14, chunkThreads: 8, fmlThreads: 20, igpu: null },
-            r5_3600: { name: "AMD Ryzen 5 3600 / 4500", cores: 6, threads: 12, arch: "Zen 2", avx: 2, l3: "32MB/8MB", concGC: 3, parGC: 8, chunkThreads: 3, fmlThreads: 10, igpu: null },
-            r5_7500f: { name: "AMD Ryzen 5 7500F", cores: 6, threads: 12, arch: "Zen 4", avx: 3, l3: "32MB", concGC: 3, parGC: 8, chunkThreads: 4, fmlThreads: 10, igpu: null },
-            r5_7600: { name: "AMD Ryzen 5 7600 / 7600X / 9600X", cores: 6, threads: 12, arch: "Zen 4/5", avx: 3, l3: "32MB", concGC: 3, parGC: 8, chunkThreads: 4, fmlThreads: 10, igpu: "igpu_rdna2_2cu" },
-            r7_7800x3d: { name: "AMD Ryzen 7 7800X3D / 9800X3D", cores: 8, threads: 16, arch: "Zen 4/5 V-Cache", avx: 3, l3: "96MB", concGC: 4, parGC: 10, chunkThreads: 6, fmlThreads: 14, igpu: "igpu_rdna2_2cu" },
-            r9_7950x: { name: "AMD Ryzen 9 7950X / 9950X", cores: 16, threads: 32, arch: "Zen 4/5", avx: 3, l3: "64MB", concGC: 6, parGC: 16, chunkThreads: 8, fmlThreads: 24, igpu: "igpu_rdna2_2cu" },
-            athlon_3000g: { name: "AMD Athlon 3000G / 200GE / 300GE", cores: 2, threads: 4, arch: "Zen / Zen+", avx: 2, l3: "4MB", concGC: 1, parGC: 3, chunkThreads: 1, fmlThreads: 3, igpu: "igpu_vega3" },
-            r3_3200g: { name: "AMD Ryzen 3 3200G / 2200G", cores: 4, threads: 4, arch: "Zen+", avx: 2, l3: "4MB", concGC: 1, parGC: 3, chunkThreads: 2, fmlThreads: 3, igpu: "igpu_vega8" },
-            r5_3400g: { name: "AMD Ryzen 5 3400G / 2400G", cores: 4, threads: 8, arch: "Zen / Zen+", avx: 2, l3: "4MB", concGC: 2, parGC: 6, chunkThreads: 2, fmlThreads: 6, igpu: "igpu_vega11" },
-            r5_5600g: { name: "AMD Ryzen 5 5600G / 4600G", cores: 6, threads: 12, arch: "Zen 3/2 APU", avx: 2, l3: "16MB", concGC: 3, parGC: 8, chunkThreads: 3, fmlThreads: 10, igpu: "igpu_vega7" },
-            r5_5600gt: { name: "AMD Ryzen 5 5600GT / 5500GT", cores: 6, threads: 12, arch: "Zen 3 APU", avx: 2, l3: "16MB", concGC: 3, parGC: 8, chunkThreads: 3, fmlThreads: 10, igpu: "igpu_vega7" },
-            r7_5700g: { name: "AMD Ryzen 7 5700G / 4700G", cores: 8, threads: 16, arch: "Zen 3/2 APU", avx: 2, l3: "16MB", concGC: 4, parGC: 10, chunkThreads: 5, fmlThreads: 14, igpu: "igpu_vega8" },
-            r5_8500g: { name: "AMD Ryzen 5 8500G", cores: 6, threads: 12, arch: "Zen 4 / 4c APU", avx: 3, l3: "16MB", concGC: 3, parGC: 8, chunkThreads: 3, fmlThreads: 10, igpu: "igpu_740m" },
-            r5_8600g: { name: "AMD Ryzen 5 8600G", cores: 6, threads: 12, arch: "Zen 4 APU", avx: 3, l3: "16MB", concGC: 3, parGC: 8, chunkThreads: 3, fmlThreads: 10, igpu: "igpu_760m" },
-            r7_8700g: { name: "AMD Ryzen 7 8700G", cores: 8, threads: 16, arch: "Zen 4 APU", avx: 3, l3: "16MB", concGC: 4, parGC: 10, chunkThreads: 5, fmlThreads: 14, igpu: "igpu_780m" },
-            r5_5500u: { name: "AMD Ryzen 5 5500U / 5600U", cores: 6, threads: 12, arch: "Zen 2/3 Mobile", avx: 2, l3: "8MB/16MB", concGC: 3, parGC: 8, chunkThreads: 3, fmlThreads: 10, igpu: "igpu_vega7" },
-            r7_5700u: { name: "AMD Ryzen 7 5700U / 5800U", cores: 8, threads: 16, arch: "Zen 2/3 Mobile", avx: 2, l3: "8MB/16MB", concGC: 4, parGC: 10, chunkThreads: 5, fmlThreads: 14, igpu: "igpu_vega8" },
-            r7_6800h: { name: "AMD Ryzen 7 6800H / 7735HS", cores: 8, threads: 16, arch: "Zen 3+ Mobile", avx: 2, l3: "16MB", concGC: 4, parGC: 10, chunkThreads: 5, fmlThreads: 14, igpu: "igpu_680m" },
-            r7_7840hs: { name: "AMD Ryzen 7 7840HS / 8845HS", cores: 8, threads: 16, arch: "Zen 4 Mobile", avx: 3, l3: "16MB", concGC: 4, parGC: 10, chunkThreads: 5, fmlThreads: 14, igpu: "igpu_780m" },
-            ultra_5_245k: { name: "Intel Core Ultra 5 245K", cores: 14, threads: 14, arch: "Arrow Lake", avx: 2, l3: "24MB", concGC: 3, parGC: 8, chunkThreads: 3, fmlThreads: 12, igpu: "igpu_arc4xe" },
-            ultra_7_265k: { name: "Intel Core Ultra 7 265K", cores: 20, threads: 20, arch: "Arrow Lake", avx: 2, l3: "30MB", concGC: 4, parGC: 12, chunkThreads: 5, fmlThreads: 16, igpu: "igpu_arc4xe" },
-            ultra_9_285k: { name: "Intel Core Ultra 9 285K", cores: 24, threads: 24, arch: "Arrow Lake", avx: 2, l3: "36MB", concGC: 5, parGC: 14, chunkThreads: 7, fmlThreads: 20, igpu: "igpu_arc4xe" },
-            i3_12100f: { name: "Intel Core i3-12100F / 13100F / 14100F", cores: 4, threads: 8, arch: "Alder/Raptor Lake", avx: 2, l3: "12MB", concGC: 2, parGC: 6, chunkThreads: 3, fmlThreads: 6, igpu: null },
-            i3_12100: { name: "Intel Core i3-12100 / 13100 / 14100", cores: 4, threads: 8, arch: "Alder/Raptor Lake", avx: 2, l3: "12MB", concGC: 2, parGC: 6, chunkThreads: 3, fmlThreads: 6, igpu: "igpu_uhd730" },
-            i5_12400f: { name: "Intel Core i5-12400F / 13400F", cores: 6, threads: 12, arch: "Alder/Raptor Lake", avx: 2, l3: "18MB", concGC: 3, parGC: 8, chunkThreads: 4, fmlThreads: 10, igpu: null },
-            i5_12400: { name: "Intel Core i5-12400", cores: 6, threads: 12, arch: "Alder Lake", avx: 2, l3: "18MB", concGC: 3, parGC: 8, chunkThreads: 4, fmlThreads: 10, igpu: "igpu_uhd730" },
-            i5_13400: { name: "Intel Core i5-13400 / 14400", cores: 10, threads: 16, arch: "Raptor Lake Hybrid", avx: 2, l3: "20MB", concGC: 4, parGC: 10, chunkThreads: 6, fmlThreads: 14, igpu: "igpu_uhd730" },
-            i5_13600k: { name: "Intel Core i5-13600K / 14600K", cores: 14, threads: 20, arch: "Raptor Lake Hybrid", avx: 2, l3: "24MB", concGC: 4, parGC: 12, chunkThreads: 6, fmlThreads: 16, igpu: "igpu_uhd770" },
-            i7_13700k: { name: "Intel Core i7-13700K / 14700K", cores: 16, threads: 24, arch: "Raptor Lake Hybrid", avx: 2, l3: "30MB", concGC: 5, parGC: 14, chunkThreads: 6, fmlThreads: 18, igpu: "igpu_uhd770" },
-            i9_14900k: { name: "Intel Core i9-13900K / 14900K", cores: 24, threads: 32, arch: "Raptor Lake Hybrid", avx: 2, l3: "36MB", concGC: 6, parGC: 16, chunkThreads: 8, fmlThreads: 24, igpu: "igpu_uhd770" },
-            pentium_g6400: { name: "Intel Pentium Gold G6400 / G5400", cores: 2, threads: 4, arch: "Comet/Coffee Lake", avx: 2, l3: "4MB", concGC: 1, parGC: 3, chunkThreads: 2, fmlThreads: 3, igpu: "igpu_uhd610" },
-            i3_8100: { name: "Intel Core i3-8100 / i3-9100", cores: 4, threads: 4, arch: "Coffee Lake", avx: 2, l3: "6MB", concGC: 1, parGC: 3, chunkThreads: 2, fmlThreads: 3, igpu: "igpu_uhd630" },
-            i3_10100: { name: "Intel Core i3-10100", cores: 4, threads: 8, arch: "Comet Lake", avx: 2, l3: "6MB", concGC: 2, parGC: 6, chunkThreads: 3, fmlThreads: 6, igpu: "igpu_uhd630" },
-            i5_8400: { name: "Intel Core i5-8400 / i5-9400 / i5-9500", cores: 6, threads: 6, arch: "Coffee Lake", avx: 2, l3: "9MB", concGC: 2, parGC: 4, chunkThreads: 2, fmlThreads: 5, igpu: "igpu_uhd630" },
-            i5_9400f: { name: "Intel Core i5-9400F", cores: 6, threads: 6, arch: "Coffee Lake", avx: 2, l3: "9MB", concGC: 2, parGC: 4, chunkThreads: 2, fmlThreads: 5, igpu: null },
-            i5_10400: { name: "Intel Core i5-10400 / 10600", cores: 6, threads: 12, arch: "Comet Lake", avx: 2, l3: "12MB", concGC: 3, parGC: 8, chunkThreads: 4, fmlThreads: 10, igpu: "igpu_uhd630" },
-            i5_10400f: { name: "Intel Core i5-10400F / 11400F", cores: 6, threads: 12, arch: "Comet/Rocket Lake", avx: 2, l3: "12MB", concGC: 3, parGC: 8, chunkThreads: 3, fmlThreads: 10, igpu: null },
-            i5_11400: { name: "Intel Core i5-11400 / 11600", cores: 6, threads: 12, arch: "Rocket Lake", avx: 3, l3: "12MB", concGC: 3, parGC: 8, chunkThreads: 4, fmlThreads: 10, igpu: "igpu_uhd730" },
-            i7_2600: { name: "Intel Core i7-2600 / 2600K", cores: 4, threads: 8, arch: "Sandy Bridge", avx: 1, l3: "8MB", concGC: 2, parGC: 6, chunkThreads: 3, fmlThreads: 6, igpu: "igpu_hd3000" },
-            i5_2500: { name: "Intel Core i5-2500 / 2500K", cores: 4, threads: 4, arch: "Sandy Bridge", avx: 1, l3: "6MB", concGC: 1, parGC: 3, chunkThreads: 2, fmlThreads: 3, igpu: "igpu_hd3000" },
-            i7_3770: { name: "Intel Core i7-3770 / 3770K", cores: 4, threads: 8, arch: "Ivy Bridge", avx: 1, l3: "8MB", concGC: 2, parGC: 6, chunkThreads: 3, fmlThreads: 6, igpu: "igpu_hd4000" },
-            i5_4460: { name: "Intel Core i5-4460 / 4570 / 4590", cores: 4, threads: 4, arch: "Haswell", avx: 2, l3: "6MB", concGC: 1, parGC: 3, chunkThreads: 2, fmlThreads: 3, igpu: "igpu_hd4600" },
-            i7_4790k: { name: "Intel Core i7-4790K / 4770K / 4790", cores: 4, threads: 8, arch: "Haswell", avx: 2, l3: "8MB", concGC: 2, parGC: 6, chunkThreads: 2, fmlThreads: 6, igpu: "igpu_hd4600" },
-            i5_8250u: { name: "Intel Core i5-8250U / i7-8550U", cores: 4, threads: 8, arch: "Kaby Lake R Mobile", avx: 2, l3: "6MB/8MB", concGC: 2, parGC: 6, chunkThreads: 2, fmlThreads: 6, igpu: "igpu_uhd620" },
-            i5_1135g7: { name: "Intel Core i5-1135G7 / i7-1165G7", cores: 4, threads: 8, arch: "Tiger Lake Mobile", avx: 3, l3: "8MB/12MB", concGC: 2, parGC: 6, chunkThreads: 2, fmlThreads: 6, igpu: "igpu_irisxe" },
-            i5_1240p: { name: "Intel Core i5-1240P / i7-1260P", cores: 12, threads: 16, arch: "Alder Lake-P Mobile", avx: 2, l3: "12MB/18MB", concGC: 4, parGC: 10, chunkThreads: 5, fmlThreads: 14, igpu: "igpu_irisxe" },
-            n100: { name: "Intel N100 / N95 / N97", cores: 4, threads: 4, arch: "Alder Lake-N", avx: 2, l3: "6MB", concGC: 1, parGC: 3, chunkThreads: 1, fmlThreads: 3, igpu: "igpu_uhd_n" },
-            n305: { name: "Intel Core i3-N305 / N300", cores: 8, threads: 8, arch: "Alder Lake-N", avx: 2, l3: "6MB", concGC: 2, parGC: 6, chunkThreads: 1, fmlThreads: 6, igpu: "igpu_uhd_n" },
-            xeon_e3_1230v2: { name: "Intel Xeon E3-1230 v2 / E3-1240 v2", cores: 4, threads: 8, arch: "Ivy Bridge (LGA1155)", avx: 1, l3: "8MB", concGC: 2, parGC: 6, chunkThreads: 3, fmlThreads: 6, igpu: null },
-            xeon_e3_1230v3: { name: "Intel Xeon E3-1230 v3 / E3-1231 v3 / E3-1270 v3", cores: 4, threads: 8, arch: "Haswell (LGA1150)", avx: 2, l3: "8MB", concGC: 2, parGC: 6, chunkThreads: 3, fmlThreads: 6, igpu: null },
-            xeon_e3_1270v5: { name: "Intel Xeon E3-1270 v5 / E3-1230 v6", cores: 4, threads: 8, arch: "Skylake/Kaby Lake (LGA1151)", avx: 2, l3: "8MB", concGC: 2, parGC: 6, chunkThreads: 3, fmlThreads: 6, igpu: null },
-            xeon_2650v2: { name: "Intel Xeon E5-2650 v2 / E5-2670 (X79)", cores: 8, threads: 16, arch: "Ivy/Sandy Bridge-EP (LGA2011)", avx: 1, l3: "20MB", concGC: 4, parGC: 10, chunkThreads: 6, fmlThreads: 14, igpu: null },
-            xeon_2620v3: { name: "Intel Xeon E5-2620 v3", cores: 6, threads: 12, arch: "Haswell-EP (X99)", avx: 2, l3: "15MB", concGC: 3, parGC: 8, chunkThreads: 4, fmlThreads: 10, igpu: null },
-            xeon_2630v4: { name: "Intel Xeon E5-2630 v4 / E5-2640 v4 / E5-2666 v3", cores: 10, threads: 20, arch: "Broadwell/Haswell-EP (X99)", avx: 2, l3: "25MB", concGC: 4, parGC: 12, chunkThreads: 6, fmlThreads: 16, igpu: null },
-            xeon_2670v3: { name: "Intel Xeon E5-2650 v4 / E5-2670 v3 / E5-2680 v3", cores: 12, threads: 24, arch: "Broadwell/Haswell-EP (X99)", avx: 2, l3: "30MB", concGC: 5, parGC: 14, chunkThreads: 8, fmlThreads: 20, igpu: null },
-            xeon_2680v4: { name: "Intel Xeon E5-2680 v4 / E5-2690 v4 / E5-2697 v3", cores: 14, threads: 28, arch: "Broadwell/Haswell-EP (X99)", avx: 2, l3: "35MB", concGC: 6, parGC: 14, chunkThreads: 8, fmlThreads: 22, igpu: null },
-            xeon_2696v3: { name: "Intel Xeon E5-2696 v3 / E5-2697 v4 / E5-2699 v3", cores: 18, threads: 36, arch: "Broadwell/Haswell-EP (X99)", avx: 2, l3: "45MB", concGC: 7, parGC: 16, chunkThreads: 8, fmlThreads: 24, igpu: null },
-            xeon_2699v4: { name: "Intel Xeon E5-2699 v4 / E5-2696 v4", cores: 22, threads: 44, arch: "Broadwell-EP (X99)", avx: 2, l3: "55MB", concGC: 8, parGC: 18, chunkThreads: 8, fmlThreads: 24, igpu: null },
-            xeon_gold_6130: { name: "Intel Xeon Gold 6130 / Silver 4216", cores: 16, threads: 32, arch: "Skylake/Cascade Lake-SP", avx: 3, l3: "22MB", concGC: 6, parGC: 16, chunkThreads: 8, fmlThreads: 24, igpu: null },
-            fx_8350: { name: "AMD FX-8350 / FX-6300", cores: 8, threads: 8, arch: "Piledriver", avx: 1, l3: "8MB", concGC: 2, parGC: 6, chunkThreads: 2, fmlThreads: 6, igpu: null }
-        };
-
-        const gpuDatabase = {
-            rtx_5050: { name: "NVIDIA RTX 5050 8GB", vendor: "nvidia", vram: 8, arch: "Blackwell (GB207)", noErrorCtx: true, tier: "high" },
-            rtx_5060: { name: "NVIDIA RTX 5060 8GB", vendor: "nvidia", vram: 8, arch: "Blackwell (GB206)", noErrorCtx: true, tier: "high" },
-            rtx_5060ti_8: { name: "NVIDIA RTX 5060 Ti 8GB", vendor: "nvidia", vram: 8, arch: "Blackwell (GB206)", noErrorCtx: true, tier: "high" },
-            rtx_5060ti_16: { name: "NVIDIA RTX 5060 Ti 16GB", vendor: "nvidia", vram: 16, arch: "Blackwell (GB206)", noErrorCtx: true, tier: "ultra" },
-            rtx_5070: { name: "NVIDIA RTX 5070 12GB", vendor: "nvidia", vram: 12, arch: "Blackwell (GB205)", noErrorCtx: true, tier: "ultra" },
-            rtx_5070ti: { name: "NVIDIA RTX 5070 Ti 16GB", vendor: "nvidia", vram: 16, arch: "Blackwell (GB203)", noErrorCtx: true, tier: "ultra" },
-            rtx_5080: { name: "NVIDIA RTX 5080 16GB", vendor: "nvidia", vram: 16, arch: "Blackwell (GB203)", noErrorCtx: true, tier: "ultra" },
-            rtx_5090: { name: "NVIDIA RTX 5090 32GB", vendor: "nvidia", vram: 32, arch: "Blackwell (GB202)", noErrorCtx: true, tier: "ultra" },
-            rtx_4060: { name: "NVIDIA RTX 4060 8GB", vendor: "nvidia", vram: 8, arch: "Ada Lovelace (AD107)", noErrorCtx: true, tier: "high" },
-            rtx_4060ti_8: { name: "NVIDIA RTX 4060 Ti 8GB", vendor: "nvidia", vram: 8, arch: "Ada Lovelace (AD106)", noErrorCtx: true, tier: "ultra" },
-            rtx_4060ti_16: { name: "NVIDIA RTX 4060 Ti 16GB", vendor: "nvidia", vram: 16, arch: "Ada Lovelace (AD106)", noErrorCtx: true, tier: "ultra" },
-            rtx_4070: { name: "NVIDIA RTX 4070 12GB", vendor: "nvidia", vram: 12, arch: "Ada Lovelace (AD104)", noErrorCtx: true, tier: "ultra" },
-            rtx_4070s: { name: "NVIDIA RTX 4070 Super 12GB", vendor: "nvidia", vram: 12, arch: "Ada Lovelace (AD104)", noErrorCtx: true, tier: "ultra" },
-            rtx_4070ti: { name: "NVIDIA RTX 4070 Ti 12GB", vendor: "nvidia", vram: 12, arch: "Ada Lovelace (AD104)", noErrorCtx: true, tier: "ultra" },
-            rtx_4070tis: { name: "NVIDIA RTX 4070 Ti Super 16GB", vendor: "nvidia", vram: 16, arch: "Ada Lovelace (AD103)", noErrorCtx: true, tier: "ultra" },
-            rtx_4080: { name: "NVIDIA RTX 4080 16GB", vendor: "nvidia", vram: 16, arch: "Ada Lovelace (AD103)", noErrorCtx: true, tier: "ultra" },
-            rtx_4080s: { name: "NVIDIA RTX 4080 Super 16GB", vendor: "nvidia", vram: 16, arch: "Ada Lovelace (AD103)", noErrorCtx: true, tier: "ultra" },
-            rtx_4090: { name: "NVIDIA RTX 4090 24GB", vendor: "nvidia", vram: 24, arch: "Ada Lovelace (AD102)", noErrorCtx: true, tier: "ultra" },
-            rtx_3050_4_lap: { name: "NVIDIA RTX 3050 (4GB Laptop)", vendor: "nvidia", vram: 4, arch: "Ampere Mobile (GA107)", noErrorCtx: true, tier: "entry" },
-            rtx_3050_6_desk: { name: "NVIDIA RTX 3050 6GB (Desktop)", vendor: "nvidia", vram: 6, arch: "Ampere (GA107)", noErrorCtx: true, tier: "mid" },
-            rtx_3050_8: { name: "NVIDIA RTX 3050 8GB (Desktop)", vendor: "nvidia", vram: 8, arch: "Ampere (GA106)", noErrorCtx: true, tier: "mid" },
-            rtx_3060_8: { name: "NVIDIA RTX 3060 8GB", vendor: "nvidia", vram: 8, arch: "Ampere", noErrorCtx: true, tier: "high" },
-            rtx_3060_12: { name: "NVIDIA RTX 3060 12GB", vendor: "nvidia", vram: 12, arch: "Ampere (GA106)", noErrorCtx: true, tier: "high" },
-            rtx_3060ti: { name: "NVIDIA RTX 3060 Ti 8GB", vendor: "nvidia", vram: 8, arch: "Ampere (GA104)", noErrorCtx: true, tier: "high" },
-            rtx_3070: { name: "NVIDIA RTX 3070 8GB", vendor: "nvidia", vram: 8, arch: "Ampere (GA104)", noErrorCtx: true, tier: "ultra" },
-            rtx_3070ti: { name: "NVIDIA RTX 3070 Ti 8GB", vendor: "nvidia", vram: 8, arch: "Ampere (GA104)", noErrorCtx: true, tier: "ultra" },
-            rtx_3080_10: { name: "NVIDIA RTX 3080 10GB", vendor: "nvidia", vram: 10, arch: "Ampere (GA102)", noErrorCtx: true, tier: "ultra" },
-            rtx_3080_12: { name: "NVIDIA RTX 3080 12GB", vendor: "nvidia", vram: 12, arch: "Ampere (GA102)", noErrorCtx: true, tier: "ultra" },
-            rtx_3080ti: { name: "NVIDIA RTX 3080 Ti 12GB", vendor: "nvidia", vram: 12, arch: "Ampere (GA102)", noErrorCtx: true, tier: "ultra" },
-            rtx_3090: { name: "NVIDIA RTX 3090 24GB", vendor: "nvidia", vram: 24, arch: "Ampere (GA102)", noErrorCtx: true, tier: "ultra" },
-            rtx_3090ti: { name: "NVIDIA RTX 3090 Ti 24GB", vendor: "nvidia", vram: 24, arch: "Ampere (GA102)", noErrorCtx: true, tier: "ultra" },
-            rtx_2060: { name: "NVIDIA RTX 2060 6GB", vendor: "nvidia", vram: 6, arch: "Turing (TU106)", noErrorCtx: true, tier: "mid" },
-            rtx_2060_12: { name: "NVIDIA RTX 2060 12GB", vendor: "nvidia", vram: 12, arch: "Turing (TU106)", noErrorCtx: true, tier: "mid" },
-            rtx_2060s: { name: "NVIDIA RTX 2060 Super 8GB", vendor: "nvidia", vram: 8, arch: "Turing (TU106)", noErrorCtx: true, tier: "high" },
-            rtx_2070: { name: "NVIDIA RTX 2070 8GB", vendor: "nvidia", vram: 8, arch: "Turing (TU106)", noErrorCtx: true, tier: "high" },
-            rtx_2070s: { name: "NVIDIA RTX 2070 Super 8GB", vendor: "nvidia", vram: 8, arch: "Turing (TU104)", noErrorCtx: true, tier: "high" },
-            rtx_2080: { name: "NVIDIA RTX 2080 8GB", vendor: "nvidia", vram: 8, arch: "Turing (TU104)", noErrorCtx: true, tier: "high" },
-            rtx_2080s: { name: "NVIDIA RTX 2080 Super 8GB", vendor: "nvidia", vram: 8, arch: "Turing (TU104)", noErrorCtx: true, tier: "ultra" },
-            rtx_2080ti: { name: "NVIDIA RTX 2080 Ti 11GB", vendor: "nvidia", vram: 11, arch: "Turing (TU102)", noErrorCtx: true, tier: "ultra" },
-            gtx_1650: { name: "NVIDIA GTX 1650 4GB", vendor: "nvidia", vram: 4, arch: "Turing (TU117)", noErrorCtx: true, tier: "entry" },
-            gtx_1650s: { name: "NVIDIA GTX 1650 Super 4GB", vendor: "nvidia", vram: 4, arch: "Turing (TU116)", noErrorCtx: true, tier: "entry" },
-            gtx_1660: { name: "NVIDIA GTX 1660 6GB", vendor: "nvidia", vram: 6, arch: "Turing (TU116)", noErrorCtx: true, tier: "mid" },
-            gtx_1660s: { name: "NVIDIA GTX 1660 Super 6GB", vendor: "nvidia", vram: 6, arch: "Turing (TU116)", noErrorCtx: true, tier: "mid" },
-            gtx_1660ti: { name: "NVIDIA GTX 1660 Ti 6GB", vendor: "nvidia", vram: 6, arch: "Turing (TU116)", noErrorCtx: true, tier: "mid" },
-            gt_1030: { name: "NVIDIA GT 1030 2GB", vendor: "nvidia", vram: 2, arch: "Pascal (GP108)", noErrorCtx: true, tier: "low" },
-            gtx_1050_2: { name: "NVIDIA GTX 1050 2GB", vendor: "nvidia", vram: 2, arch: "Pascal (GP107)", noErrorCtx: true, tier: "low" },
-            gtx_1050ti: { name: "NVIDIA GTX 1050 Ti 4GB", vendor: "nvidia", vram: 4, arch: "Pascal (GP107)", noErrorCtx: true, tier: "entry" },
-            gtx_1060_3: { name: "NVIDIA GTX 1060 3GB", vendor: "nvidia", vram: 3, arch: "Pascal (GP106)", noErrorCtx: true, tier: "entry" },
-            gtx_1060: { name: "NVIDIA GTX 1060 6GB", vendor: "nvidia", vram: 6, arch: "Pascal (GP106)", noErrorCtx: true, tier: "mid" },
-            gtx_1070: { name: "NVIDIA GTX 1070 8GB", vendor: "nvidia", vram: 8, arch: "Pascal (GP104)", noErrorCtx: true, tier: "mid" },
-            gtx_1070ti: { name: "NVIDIA GTX 1070 Ti 8GB", vendor: "nvidia", vram: 8, arch: "Pascal (GP104)", noErrorCtx: true, tier: "high" },
-            gtx_1080: { name: "NVIDIA GTX 1080 8GB", vendor: "nvidia", vram: 8, arch: "Pascal (GP104)", noErrorCtx: true, tier: "high" },
-            gtx_1080ti: { name: "NVIDIA GTX 1080 Ti 11GB", vendor: "nvidia", vram: 11, arch: "Pascal (GP102)", noErrorCtx: true, tier: "high" },
-            rx_9060xt_8: { name: "AMD Radeon RX 9060 XT 8GB", vendor: "amd", vram: 8, arch: "RDNA 4 (Navi 44)", noErrorCtx: true, tier: "high" },
-            rx_9060xt_16: { name: "AMD Radeon RX 9060 XT 16GB", vendor: "amd", vram: 16, arch: "RDNA 4 (Navi 44)", noErrorCtx: true, tier: "ultra" },
-            rx_9070: { name: "AMD Radeon RX 9070 16GB", vendor: "amd", vram: 16, arch: "RDNA 4 (Navi 48)", noErrorCtx: true, tier: "ultra" },
-            rx_9070xt: { name: "AMD Radeon RX 9070 XT 16GB", vendor: "amd", vram: 16, arch: "RDNA 4 (Navi 48)", noErrorCtx: true, tier: "ultra" },
-            rx_7600: { name: "AMD Radeon RX 7600 8GB", vendor: "amd", vram: 8, arch: "RDNA 3 (Navi 33)", noErrorCtx: true, tier: "high" },
-            rx_7600xt: { name: "AMD Radeon RX 7600 XT 16GB", vendor: "amd", vram: 16, arch: "RDNA 3 (Navi 33)", noErrorCtx: true, tier: "high" },
-            rx_7700xt: { name: "AMD Radeon RX 7700 XT 12GB", vendor: "amd", vram: 12, arch: "RDNA 3 (Navi 32)", noErrorCtx: true, tier: "ultra" },
-            rx_7800xt: { name: "AMD Radeon RX 7800 XT 16GB", vendor: "amd", vram: 16, arch: "RDNA 3 (Navi 32)", noErrorCtx: true, tier: "ultra" },
-            rx_7900gre: { name: "AMD Radeon RX 7900 GRE 16GB", vendor: "amd", vram: 16, arch: "RDNA 3 (Navi 31)", noErrorCtx: true, tier: "ultra" },
-            rx_7900xt: { name: "AMD Radeon RX 7900 XT 20GB", vendor: "amd", vram: 20, arch: "RDNA 3 (Navi 31)", noErrorCtx: true, tier: "ultra" },
-            rx_7900xtx: { name: "AMD Radeon RX 7900 XTX 24GB", vendor: "amd", vram: 24, arch: "RDNA 3 (Navi 31)", noErrorCtx: true, tier: "ultra" },
-            rx_6400: { name: "AMD Radeon RX 6400 4GB", vendor: "amd", vram: 4, arch: "RDNA 2 (Navi 24)", noErrorCtx: true, tier: "low" },
-            rx_6500xt: { name: "AMD Radeon RX 6500 XT 4GB", vendor: "amd", vram: 4, arch: "RDNA 2 (Navi 24)", noErrorCtx: true, tier: "entry" },
-            rx_6600: { name: "AMD Radeon RX 6600 8GB", vendor: "amd", vram: 8, arch: "RDNA 2 (Navi 23)", noErrorCtx: true, tier: "mid" },
-            rx_6600xt: { name: "AMD Radeon RX 6600 XT 8GB", vendor: "amd", vram: 8, arch: "RDNA 2 (Navi 23)", noErrorCtx: true, tier: "high" },
-            rx_6650xt: { name: "AMD Radeon RX 6650 XT 8GB", vendor: "amd", vram: 8, arch: "RDNA 2 (Navi 23)", noErrorCtx: true, tier: "high" },
-            rx_6700: { name: "AMD Radeon RX 6700 10GB", vendor: "amd", vram: 10, arch: "RDNA 2 (Navi 22)", noErrorCtx: true, tier: "high" },
-            rx_6700xt: { name: "AMD Radeon RX 6700 XT 12GB", vendor: "amd", vram: 12, arch: "RDNA 2 (Navi 22)", noErrorCtx: true, tier: "ultra" },
-            rx_6750xt: { name: "AMD Radeon RX 6750 XT 12GB", vendor: "amd", vram: 12, arch: "RDNA 2 (Navi 22)", noErrorCtx: true, tier: "ultra" },
-            rx_6800: { name: "AMD Radeon RX 6800 16GB", vendor: "amd", vram: 16, arch: "RDNA 2 (Navi 21)", noErrorCtx: true, tier: "ultra" },
-            rx_6800xt: { name: "AMD Radeon RX 6800 XT 16GB", vendor: "amd", vram: 16, arch: "RDNA 2 (Navi 21)", noErrorCtx: true, tier: "ultra" },
-            rx_6900xt: { name: "AMD Radeon RX 6900 XT 16GB", vendor: "amd", vram: 16, arch: "RDNA 2 (Navi 21)", noErrorCtx: true, tier: "ultra" },
-            rx_6950xt: { name: "AMD Radeon RX 6950 XT 16GB", vendor: "amd", vram: 16, arch: "RDNA 2 (Navi 21)", noErrorCtx: true, tier: "ultra" },
-            rx_5500xt_4: { name: "AMD Radeon RX 5500 XT 4GB", vendor: "amd", vram: 4, arch: "RDNA 1 (Navi 14)", noErrorCtx: true, tier: "entry" },
-            rx_5500xt_8: { name: "AMD Radeon RX 5500 XT 8GB", vendor: "amd", vram: 8, arch: "RDNA 1 (Navi 14)", noErrorCtx: true, tier: "entry" },
-            rx_5600xt: { name: "AMD Radeon RX 5600 XT 6GB", vendor: "amd", vram: 6, arch: "RDNA 1 (Navi 10)", noErrorCtx: true, tier: "mid" },
-            rx_5700: { name: "AMD Radeon RX 5700 8GB", vendor: "amd", vram: 8, arch: "RDNA 1 (Navi 10)", noErrorCtx: true, tier: "high" },
-            rx_5700xt: { name: "AMD Radeon RX 5700 XT 8GB", vendor: "amd", vram: 8, arch: "RDNA 1 (Navi 10)", noErrorCtx: true, tier: "high" },
-            vega_56: { name: "AMD Radeon RX Vega 56 8GB", vendor: "amd", vram: 8, arch: "Vega 10 (GCN 5)", noErrorCtx: false, tier: "high" },
-            vega_64: { name: "AMD Radeon RX Vega 64 8GB", vendor: "amd", vram: 8, arch: "Vega 10 (GCN 5)", noErrorCtx: false, tier: "high" },
-            radeon_vii: { name: "AMD Radeon VII 16GB", vendor: "amd", vram: 16, arch: "Vega 20 (GCN 5)", noErrorCtx: false, tier: "ultra" },
-            rx_550: { name: "AMD Radeon RX 550 4GB", vendor: "amd", vram: 4, arch: "Polaris 12", noErrorCtx: false, tier: "low" },
-            rx_460_4: { name: "AMD Radeon RX 460 4GB", vendor: "amd", vram: 4, arch: "Polaris 11", noErrorCtx: false, tier: "low" },
-            rx_560: { name: "AMD Radeon RX 560 4GB", vendor: "amd", vram: 4, arch: "Polaris 21", noErrorCtx: false, tier: "low" },
-            rx_470_4: { name: "AMD Radeon RX 470 4GB", vendor: "amd", vram: 4, arch: "Polaris 10", noErrorCtx: false, tier: "entry" },
-            rx_470_8: { name: "AMD Radeon RX 470 8GB", vendor: "amd", vram: 8, arch: "Polaris 10", noErrorCtx: false, tier: "entry" },
-            rx_480_4: { name: "AMD Radeon RX 480 4GB", vendor: "amd", vram: 4, arch: "Polaris 10", noErrorCtx: false, tier: "mid" },
-            rx_480_8: { name: "AMD Radeon RX 480 8GB", vendor: "amd", vram: 8, arch: "Polaris 10", noErrorCtx: false, tier: "mid" },
-            rx_570_4: { name: "AMD Radeon RX 570 4GB", vendor: "amd", vram: 4, arch: "Polaris 20", noErrorCtx: false, tier: "entry" },
-            rx_570_8: { name: "AMD Radeon RX 570 8GB", vendor: "amd", vram: 8, arch: "Polaris 20", noErrorCtx: false, tier: "entry" },
-            rx_580_4: { name: "AMD Radeon RX 580 4GB", vendor: "amd", vram: 4, arch: "Polaris 20", noErrorCtx: false, tier: "mid" },
-            rx_580: { name: "AMD Radeon RX 580 8GB", vendor: "amd", vram: 8, arch: "Polaris 20", noErrorCtx: false, tier: "mid" },
-            rx_580_2048: { name: "AMD Radeon RX 580 2048SP 8GB", vendor: "amd", vram: 8, arch: "Polaris 20", noErrorCtx: false, tier: "mid" },
-            rx_590: { name: "AMD Radeon RX 590 8GB", vendor: "amd", vram: 8, arch: "Polaris 30", noErrorCtx: false, tier: "mid" },
-            arc_a380: { name: "Intel Arc A380 6GB", vendor: "intel", vram: 6, arch: "Xe-HPG (Alchemist)", noErrorCtx: false, tier: "entry" },
-            arc_a580: { name: "Intel Arc A580 8GB", vendor: "intel", vram: 8, arch: "Xe-HPG (Alchemist)", noErrorCtx: false, tier: "mid" },
-            arc_a750: { name: "Intel Arc A750 8GB", vendor: "intel", vram: 8, arch: "Xe-HPG (Alchemist)", noErrorCtx: false, tier: "mid" },
-            arc_a770: { name: "Intel Arc A770 16GB", vendor: "intel", vram: 16, arch: "Xe-HPG (Alchemist)", noErrorCtx: false, tier: "high" },
-            arc_b570: { name: "Intel Arc B570 10GB", vendor: "intel", vram: 10, arch: "Xe2-HPG (Battlemage)", noErrorCtx: false, tier: "high" },
-            arc_b580: { name: "Intel Arc B580 12GB", vendor: "intel", vram: 12, arch: "Xe2-HPG (Battlemage)", noErrorCtx: false, tier: "high" },
-            igpu_vega3: { name: "AMD Radeon Vega 3 (iGPU)", vendor: "amd", vram: 1, arch: "Vega (GCN 5) • 3 CUs", noErrorCtx: false, tier: "low", igpu: true, short: "Vega 3" },
-            igpu_vega7: { name: "AMD Radeon Vega 7 (iGPU)", vendor: "amd", vram: 2, arch: "Vega (GCN 5) • 7 CUs", noErrorCtx: false, tier: "low", igpu: true, short: "Vega 7" },
-            igpu_vega8: { name: "AMD Radeon Vega 8 (iGPU)", vendor: "amd", vram: 2, arch: "Vega (GCN 5) • 8 CUs", noErrorCtx: false, tier: "low", igpu: true, short: "Vega 8" },
-            igpu_vega11: { name: "AMD Radeon Vega 11 (iGPU)", vendor: "amd", vram: 2, arch: "Vega (GCN 5) • 11 CUs", noErrorCtx: false, tier: "low", igpu: true, short: "Vega 11" },
-            igpu_rdna2_2cu: { name: "AMD Radeon Graphics 2 CU (iGPU)", vendor: "amd", vram: 1, arch: "RDNA 2 • 2 CUs", noErrorCtx: false, tier: "low", igpu: true, short: "Radeon 2CU" },
-            igpu_740m: { name: "AMD Radeon 740M (iGPU)", vendor: "amd", vram: 2, arch: "RDNA 3 • 4 CUs", noErrorCtx: false, tier: "low", igpu: true, short: "740M" },
-            igpu_760m: { name: "AMD Radeon 760M (iGPU)", vendor: "amd", vram: 4, arch: "RDNA 3 • 8 CUs", noErrorCtx: false, tier: "entry", igpu: true, short: "760M" },
-            igpu_780m: { name: "AMD Radeon 780M (iGPU)", vendor: "amd", vram: 4, arch: "RDNA 3 • 12 CUs", noErrorCtx: false, tier: "entry", igpu: true, short: "780M" },
-            igpu_680m: { name: "AMD Radeon 680M (iGPU)", vendor: "amd", vram: 4, arch: "RDNA 2 • 12 CUs", noErrorCtx: false, tier: "entry", igpu: true, short: "680M" },
-            igpu_hd3000: { name: "Intel HD Graphics 3000 (iGPU)", vendor: "intel", vram: 1, arch: "Intel Gen6 (Sandy Bridge)", noErrorCtx: false, tier: "low", igpu: true, short: "HD 3000" },
-            igpu_hd4000: { name: "Intel HD Graphics 4000 (iGPU)", vendor: "intel", vram: 1, arch: "Intel Gen7 (Ivy Bridge)", noErrorCtx: false, tier: "low", igpu: true, short: "HD 4000" },
-            igpu_hd4600: { name: "Intel HD Graphics 4600 (iGPU)", vendor: "intel", vram: 1, arch: "Intel Gen7.5 (Haswell)", noErrorCtx: false, tier: "low", igpu: true, short: "HD 4600" },
-            igpu_uhd610: { name: "Intel UHD Graphics 610 (iGPU)", vendor: "intel", vram: 1, arch: "Intel Gen9.5", noErrorCtx: false, tier: "low", igpu: true, short: "UHD 610" },
-            igpu_uhd620: { name: "Intel UHD Graphics 620 (iGPU)", vendor: "intel", vram: 2, arch: "Intel Gen9.5", noErrorCtx: false, tier: "low", igpu: true, short: "UHD 620" },
-            igpu_uhd630: { name: "Intel UHD Graphics 630 (iGPU)", vendor: "intel", vram: 2, arch: "Intel Gen9.5", noErrorCtx: false, tier: "low", igpu: true, short: "UHD 630" },
-            igpu_uhd730: { name: "Intel UHD Graphics 730 (iGPU)", vendor: "intel", vram: 2, arch: "Intel Xe-LP • 24 EU", noErrorCtx: false, tier: "low", igpu: true, short: "UHD 730" },
-            igpu_uhd770: { name: "Intel UHD Graphics 770 (iGPU)", vendor: "intel", vram: 2, arch: "Intel Xe-LP • 32 EU", noErrorCtx: false, tier: "low", igpu: true, short: "UHD 770" },
-            igpu_uhd_n: { name: "Intel UHD Graphics Alder Lake-N (iGPU)", vendor: "intel", vram: 2, arch: "Intel Xe-LP • 24-32 EU", noErrorCtx: false, tier: "low", igpu: true, short: "UHD N-Series" },
-            igpu_irisxe: { name: "Intel Iris Xe Graphics (iGPU)", vendor: "intel", vram: 4, arch: "Intel Xe-LP • 80-96 EU", noErrorCtx: false, tier: "entry", igpu: true, short: "Iris Xe" },
-            igpu_arc4xe: { name: "Intel Graphics Arc 4 Xe-cores (iGPU)", vendor: "intel", vram: 4, arch: "Intel Xe-LPG • Arrow Lake", noErrorCtx: false, tier: "low", igpu: true, short: "Arc 4 Xe" }
-        };
+        // CPUs e GPUs ficam em data/cpus.js e data/gpus.js (carregados antes deste script).
 
         const ddrFrequencies = {
             DDR3: [1066, 1333, 1600, 1866, 2133, 2400],
@@ -1176,6 +1015,35 @@
             return { name: t.igpuNoneName, vendor: 'none', vendorLabel: t.igpuVendorNone, vram: 1, arch: 'N/A', noErrorCtx: false, tier: 'low', igpu: true, none: true };
         }
 
+        // ---- Largura de banda, notebook híbrido e recomendações no jogo ----
+        // Banda teórica da RAM em GB/s: MT/s x 8 bytes x canais
+        function memBandwidthGBs(channels) {
+            return +(state.ramFreq * 8 * (channels || state.memChannels) / 1000).toFixed(1);
+        }
+        const ST_TIER_SCORE = { low: 0, mid: 1, high: 2, top: 3 };
+        const GPU_TIER_SCORE = { low: 0, entry: 1, mid: 2, high: 3, ultra: 4 };
+        function isNotebook(cpu, gpu) { return !!(cpu.mobile || gpu.laptop); }
+        function isHybridNotebook(cpu, gpu) { return isNotebook(cpu, gpu) && !gpu.igpu && !gpu.none; }
+        // Distâncias recomendadas: CPU (thread única) limita render/simulação, GPU limita render e shaders
+        function recommendedVideoSettings(cpu, gpu) {
+            const cs = ST_TIER_SCORE[cpu.st];
+            const gs = gpu.none ? 0 : GPU_TIER_SCORE[gpu.tier];
+            const penalty = state.modpackProfile === 'extreme' ? 2 : (state.modpackProfile === 'heavy' ? 1 : 0);
+            const cpuRD = [8, 10, 14, 18][cs];
+            let gpuRD = [6, 10, 12, 16, 20][gs];
+            if (gpu.igpu) {
+                gpuRD = Math.min(gpuRD, 8);
+                if (state.memChannels === 1) gpuRD = Math.min(gpuRD, 6);
+            }
+            const render = Math.max(6, Math.min(cpuRD, gpuRD) - penalty);
+            let sim = [4, 5, 8, 10][cs] - penalty;
+            if (cpu.threads <= 4) sim = Math.min(sim, 6);
+            sim = Math.max(4, Math.min(sim, render));
+            const entity = cs === 0 ? 50 : ((cs === 1 || gs <= 1) ? 75 : 100);
+            const shaders = (gpu.igpu || gs <= 1) ? 'off' : (gs === 2 ? 'light' : 'ok');
+            return { render, sim, entity, shaders };
+        }
+
         // Engine JVM recomendada: CPUs com poucas threads ou pouca RAM sofrem com ZGC + JIT do Graal
         // (GC concorrente e compilador disputam núcleos e memória com o jogo) -> HotSpot C2 + G1.
         function recommendedEngine() {
@@ -1207,6 +1075,7 @@
             ramFreq: 2666,
             sysRamGB: 32,
             storageKey: 'nvme',
+            memChannels: 2,
             mcVersion: '1.20.1',
             loader: 'forge',
             jvmEngine: 'graal21_zgc',
@@ -1408,6 +1277,7 @@
             }
 
             state.storageKey = document.getElementById('select-storage').value;
+            state.memChannels = parseInt(document.getElementById('select-mem-channels').value, 10) || 2;
             if (state.jvmEngineManual) {
                 state.jvmEngine = document.getElementById('select-jvm-engine').value;
             } else {
@@ -1486,10 +1356,10 @@
             // 1. Atualiza badges superiores e sumário
             const loaderNames = { forge: 'Forge', neoforge: 'NeoForge', fabric: 'Fabric' };
             document.getElementById('header-loader-badge').textContent = `${loaderNames[state.loader]} ${state.mcVersion}`;
-            document.getElementById('header-hw-summary').textContent = `${cpu.name} (${cpu.cores}C/${cpu.threads}T) • ${gpu.name} • ${state.sysRamGB}GB ${state.ddrType} ${state.ramFreq}MHz • ${storageName}`;
+            document.getElementById('header-hw-summary').textContent = `${cpu.name} (${cpu.cores}C/${cpu.threads}T) • ${gpu.name} • ${state.sysRamGB}GB ${state.ddrType} ${state.ramFreq}MHz${state.memChannels === 1 ? ' (1ch)' : ''} • ${storageName}`;
 
             document.getElementById('cpu-badge-threads').textContent = `${cpu.cores}C / ${cpu.threads}T`;
-            document.getElementById('cpu-meta-desc').textContent = `${cpu.arch} • AVX${cpu.avx === 3 ? '-512' : cpu.avx} • L3 ${cpu.l3} • ConcGC: ${cpu.concGC} / ParGC: ${cpu.parGC}`;
+            document.getElementById('cpu-meta-desc').textContent = `${cpu.arch} • ${i18n[lang].stLabel}: ${i18n[lang].stNames[cpu.st]} • L3 ${cpu.l3} • ConcGC: ${cpu.concGC} / ParGC: ${cpu.parGC}`;
 
             const tI = i18n[lang];
             const igpuOpt = document.getElementById('opt-gpu-igpu');
@@ -1506,7 +1376,7 @@
                 document.getElementById('gpu-meta-desc').textContent = `${gpu.arch} • NoErrorCtx: ${gpu.noErrorCtx ? 'ON' : 'Safe OFF'}`;
             }
 
-            document.getElementById('ram-badge-bw').textContent = `${state.ddrType} ${state.ramFreq}`;
+            document.getElementById('ram-badge-bw').textContent = `${state.ddrType} ${state.ramFreq} • ${state.memChannels === 1 ? 'Single' : 'Dual'}`;
             document.getElementById('storage-badge-io').textContent = `SpikeTol: ${storage.spikeTol}`;
             document.getElementById('storage-meta-desc').textContent = storage.ioDesc[lang];
 
@@ -1581,7 +1451,7 @@
 
             // Ajuste de tolerância de spike para memórias DDR3/DDR4 lentas + NVMe
             let spikeTol = parseFloat(storage.spikeTol);
-            if (state.ddrType === 'DDR3' || (state.ddrType === 'DDR4' && state.ramFreq <= 2666)) {
+            if (state.ddrType === 'DDR3' || (state.ddrType === 'DDR4' && state.ramFreq <= 2666) || state.memChannels === 1) {
                 spikeTol = Math.min(5.0, +(spikeTol + 0.5).toFixed(1));
             }
 
@@ -1684,6 +1554,17 @@
                 ramColor = "border-cyan-500/30 bg-cyan-950/20 text-cyan-300";
             }
 
+            // Canais de memória / largura de banda teórica
+            const bwNow = memBandwidthGBs();
+            if (state.memChannels === 1) {
+                ramStatusDesc += lang === 'pt'
+                    ? ` Single-channel: banda teórica de ~${bwNow} GB/s (em dual-channel seriam ~${memBandwidthGBs(2)} GB/s). ${gpu.igpu ? 'Com iGPU o impacto é grande, pois ela divide essa banda com a CPU. ' : ''}Instale um segundo pente idêntico.`
+                    : ` Single-channel: theoretical bandwidth of ~${bwNow} GB/s (dual-channel would give ~${memBandwidthGBs(2)} GB/s). ${gpu.igpu ? 'With an iGPU the impact is large, since it shares that bandwidth with the CPU. ' : ''}Install a second matching stick.`;
+                ramColor = "border-amber-500/40 bg-amber-950/20 text-amber-300";
+            } else {
+                ramStatusDesc += lang === 'pt' ? ` Banda teórica: ~${bwNow} GB/s.` : ` Theoretical bandwidth: ~${bwNow} GB/s.`;
+            }
+
             // Diagnóstico de GPU / VRAM
             let gpuTitle = "";
             let gpuDesc = "";
@@ -1726,6 +1607,73 @@
                     ? `Com ${storageName}, o ModernFix pode ler modelos 3D direto do disco em micro-segundos, cortando pela metade o tempo de abertura do jogo e economizando gigabytes de RAM.`
                     : `With ${storageName}, ModernFix streams 3D models directly from disk in microseconds, cutting game launch times in half and saving gigabytes of RAM.`);
 
+            // Diagnóstico da CPU (velocidade de thread única)
+            const stName = i18n[lang].stNames[cpu.st];
+            const isXeon = cpu.name.includes('Xeon');
+            let cpuTitle, cpuDesc, cpuColor;
+            if (cpu.st === 'low') {
+                cpuColor = 'border-amber-500/40 bg-amber-950/20 text-amber-300';
+                if (isXeon) {
+                    cpuTitle = lang === 'pt' ? `Clock baixo: gargalo na thread principal (${cpu.name})` : `Low clock: main-thread bottleneck (${cpu.name})`;
+                    cpuDesc = lang === 'pt'
+                        ? `Xeons de servidor/workstation têm clock baixo (2,x–3,x GHz). As ${cpu.threads} threads ajudam nos chunk builders e no servidor integrado, mas o FPS fica limitado pela thread principal. Priorize ModernFix, FerriteCore e Lithium/Radium e mantenha a simulation distance baixa.`
+                        : `Server/workstation Xeons have low clocks (2.x–3.x GHz). The ${cpu.threads} threads help chunk builders and the integrated server, but FPS is capped by the main thread. Prioritize ModernFix, FerriteCore and Lithium/Radium and keep simulation distance low.`;
+                } else {
+                    cpuTitle = lang === 'pt' ? `Thread principal fraca (${cpu.name})` : `Weak main thread (${cpu.name})`;
+                    cpuDesc = lang === 'pt'
+                        ? `O Minecraft depende da velocidade de uma única thread (principal + servidor integrado), então mais núcleos pouco ajudam. Mantenha a simulation distance em 4–5, evite packs muito pesados e prefira ModernFix, FerriteCore e Lithium/Radium.`
+                        : `Minecraft depends on single-thread speed (main + integrated server), so extra cores help little. Keep simulation distance at 4–5, avoid very heavy packs and prefer ModernFix, FerriteCore and Lithium/Radium.`;
+                }
+            } else if (cpu.st === 'mid') {
+                cpuColor = 'border-blue-500/30 bg-blue-950/20 text-blue-300';
+                cpuTitle = lang === 'pt' ? `Thread principal moderada (${cpu.name})` : `Moderate main thread (${cpu.name})`;
+                cpuDesc = lang === 'pt'
+                    ? `Velocidade de thread única moderada: dá conta de modpacks médios. Em packs pesados, reduza a simulation distance (5–8) e use Radium/Lithium.`
+                    : `Moderate single-thread speed: fine for medium modpacks. On heavy packs, lower simulation distance (5–8) and use Radium/Lithium.`;
+            } else {
+                cpuColor = cpu.st === 'top' ? 'border-cyan-500/30 bg-cyan-950/20 text-cyan-300' : 'border-emerald-500/30 bg-emerald-950/20 text-emerald-300';
+                cpuTitle = lang === 'pt' ? `Thread principal forte (${cpu.name})` : `Strong main thread (${cpu.name})`;
+                cpuDesc = lang === 'pt'
+                    ? `Boa velocidade de thread única: aguenta packs pesados e distâncias maiores, e as ${cpu.threads} threads são bem aproveitadas pelos chunk builders e pelo servidor integrado.`
+                    : `Strong single-thread speed: handles heavy packs and longer distances, and the ${cpu.threads} threads are well used by chunk builders and the integrated server.`;
+            }
+            const nb = isNotebook(cpu, gpu);
+            const hybrid = isHybridNotebook(cpu, gpu);
+            let nbCard = '';
+            if (nb) {
+                const nbTitle = hybrid
+                    ? (lang === 'pt' ? 'Notebook com GPU dedicada + iGPU' : 'Notebook with dedicated GPU + iGPU')
+                    : (lang === 'pt' ? 'Notebook com gráficos integrados' : 'Notebook with integrated graphics');
+                const nbDesc = hybrid
+                    ? (lang === 'pt'
+                        ? `O Windows costuma abrir o Java na iGPU. Em Configurações > Sistema > Vídeo > Elementos gráficos, adicione o <code>javaw.exe</code> e marque "Alto desempenho"; sem isso o jogo pode rodar na iGPU com metade do FPS. Use o notebook na tomada, com perfil de energia de alto desempenho (e o modo GPU dedicada/MUX, se existir).`
+                        : `Windows often launches Java on the iGPU. Under Settings > System > Display > Graphics, add <code>javaw.exe</code> and set "High performance"; otherwise the game may run on the iGPU at half the FPS. Keep the laptop plugged in with a high-performance power plan (and use dGPU/MUX mode if available).`)
+                    : (lang === 'pt'
+                        ? `Na bateria o clock cai muito: use o notebook na tomada, com perfil de energia de alto desempenho, e mantenha as saídas de ar livres para evitar thermal throttling. Memória em dual-channel faz grande diferença na iGPU.`
+                        : `On battery the clocks drop a lot: keep the laptop plugged in with a high-performance power plan and keep the vents clear to avoid thermal throttling. Dual-channel memory makes a big difference on the iGPU.`);
+                nbCard = `
+                <div class="md:col-span-2 p-3.5 rounded-xl border border-amber-500/40 bg-amber-950/20 text-amber-300">
+                    <div class="text-xs font-bold flex items-center gap-1.5"><i class="fa-solid fa-laptop"></i> ${nbTitle}</div>
+                    <p class="text-[11px] text-gray-300 mt-1 leading-relaxed">${nbDesc}</p>
+                </div>`;
+            }
+            const rv = recommendedVideoSettings(cpu, gpu);
+            const shaderTxt = { off: lang === 'pt' ? 'Evite' : 'Avoid', light: lang === 'pt' ? 'Leves' : 'Light', ok: 'OK' }[rv.shaders];
+            const tile = (label, value) => `<div class="rounded-lg bg-gray-900/70 border border-gray-800 p-2 text-center"><div class="text-[10px] uppercase tracking-wider text-gray-500">${label}</div><div class="text-sm font-bold text-white font-mono">${value}</div></div>`;
+            const settingsCard = `
+                <div class="md:col-span-3 p-3.5 rounded-xl border border-gray-700/60 bg-gray-950/60 text-gray-200">
+                    <div class="text-xs font-bold flex items-center gap-1.5"><i class="fa-solid fa-sliders"></i> ${lang === 'pt' ? 'Configurações recomendadas no jogo' : 'Recommended in-game settings'}</div>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-2">
+                        ${tile('Render Distance', `${rv.render} chunks`)}
+                        ${tile('Simulation Distance', `${rv.sim} chunks`)}
+                        ${tile('Entity Distance', `${rv.entity}%`)}
+                        ${tile('Shaders', shaderTxt)}
+                    </div>
+                    <p class="text-[11px] text-gray-400 mt-2 leading-relaxed">${lang === 'pt'
+                        ? `Calculado a partir da thread única da CPU (${stName}), do tier da GPU, do perfil de modpack e dos canais de RAM. São pontos de partida: ajuste conforme o FPS e o MSPT do seu pack.`
+                        : `Based on CPU single-thread speed (${stName}), GPU tier, modpack profile and RAM channels. They are starting points: adjust according to your pack's FPS and MSPT.`}</p>
+                </div>`;
+
             container.innerHTML = `
                 <div class="p-3.5 rounded-xl border ${ramColor}">
                     <div class="text-xs font-bold flex items-center gap-1.5"><i class="fa-solid fa-memory"></i> ${ramStatusTitle}</div>
@@ -1739,6 +1687,10 @@
                     <div class="text-xs font-bold flex items-center gap-1.5"><i class="fa-solid fa-hard-drive"></i> ${diskTitle}</div>
                     <p class="text-[11px] text-gray-300 mt-1 leading-relaxed">${diskDesc}</p>
                 </div>
+                <div class="${nb ? 'md:col-span-1' : 'md:col-span-3'} p-3.5 rounded-xl border ${cpuColor}">
+                    <div class="text-xs font-bold flex items-center gap-1.5"><i class="fa-solid fa-microchip"></i> ${cpuTitle}</div>
+                    <p class="text-[11px] text-gray-300 mt-1 leading-relaxed">${cpuDesc}</p>
+                </div>${nbCard}${settingsCard}
             `;
         }
 
@@ -1990,7 +1942,7 @@ mixin.feature.remove_chat_signing=true${remSpawn ? '\nmixin.perf.remove_spawn_ch
                     : `<br><br><em>Note:</em> key names follow Sodium 0.5/0.6 and Embeddium 0.3 (<code>always_defer_chunk_updates_v2</code>, <code>use_no_error_g_l_context</code>). If the file generated by your mod uses different names, use those: unknown options are silently ignored.`;
             }
             else if (tab === 'ferrite') {
-                const isLowBandwidth = state.ddrType === 'DDR3' || (state.ddrType === 'DDR4' && state.ramFreq <= 3000) || state.sysRamGB <= 16;
+                const isLowBandwidth = state.ddrType === 'DDR3' || (state.ddrType === 'DDR4' && state.ramFreq <= 3000) || state.sysRamGB <= 16 || state.memChannels === 1;
                 filePath = "config/ferritecore-mixin.toml";
                 hwTag = lang === 'pt'
                     ? `Perfil universal • sua RAM: ${state.ddrType} ${state.ramFreq}MHz (${state.sysRamGB}GB)`
@@ -2285,6 +2237,11 @@ defaultConfigPath = "defaultconfigs"`;
                 tips = gpu.none ? '' : (lang === 'pt'
                     ? `<strong>Dica para Shaders (Oculus / Iris) na ${gpu.name}:</strong> ${shaderAdvPt}`
                     : `<strong>Shader tip (Oculus / Iris) on ${gpu.name}:</strong> ${shaderAdvEn}`);
+                if (isHybridNotebook(cpu, gpu)) {
+                    tips += lang === 'pt'
+                        ? `<br><br><strong>Notebook:</strong> em Configurações > Sistema > Vídeo > Elementos gráficos, adicione o <code>javaw.exe</code> como "Alto desempenho" para forçar a GPU dedicada.`
+                        : `<br><br><strong>Laptop:</strong> under Settings > System > Display > Graphics, add <code>javaw.exe</code> as "High performance" to force the dedicated GPU.`;
+                }
             }
 
             document.getElementById('cfg-file-path').textContent = filePath;
