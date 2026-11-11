@@ -1,11 +1,11 @@
 <div align="center">
 
 # 🚀 Universal Minecraft Modded Optimizer & Simulator
-### *Dynamic JVM Arguments, RAM Allocation & Config Generator for Java 21 (Oracle GraalVM / Temurin)*
+### *Dynamic JVM Arguments, RAM Allocation & Config Generator for Windows, Linux and macOS (Oracle GraalVM / Temurin)*
 
 <p align="center">
   <img src="https://img.shields.io/badge/Minecraft-1.20.1%20to%201.21.4+-emerald?style=for-the-badge&logo=minecraft&logoColor=white" alt="Minecraft Versions">
-  <img src="https://img.shields.io/badge/Java%2021-GraalVM%20%7C%20Temurin%20%7C%20ZGC%20%7C%20G1-purple?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java 21 (GraalVM / Temurin)">
+  <img src="https://img.shields.io/badge/Java%2017%20%7C%2021%20%7C%2023%2B-GraalVM%20%7C%20Temurin%20%7C%20ZGC%20%7C%20G1-purple?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java 17 / 21 / 23+ (GraalVM / Temurin)">
   <img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="License">
   <img src="https://img.shields.io/badge/Languages-PT--BR%20%7C%20EN--US-orange?style=for-the-badge" alt="Bilingual">
 </p>
@@ -35,8 +35,8 @@ The core JavaScript engine turns your hardware choices into JVM flags, memory bu
 ### 1. JVM Engine Auto-Selection (GraalVM + ZGC vs. Temurin + G1)
 Concurrent GC threads and the Graal JIT compiler both compete with the game for cores and memory, so the best engine depends on your machine:
 * **6 threads or fewer, or 12 GB of RAM or less:** switches to **OpenJDK / Temurin 21 + G1GC** (HotSpot C2 JIT, no Graal flags, lower memory overhead).
-* **More than 6 threads and more than 12 GB:** uses **Oracle GraalVM 21 + Generational ZGC**.
-* The engine can always be overridden manually, and your choice is kept when you change other hardware.
+* **More than 6 threads and more than 12 GB:** uses **Oracle GraalVM + ZGC**.
+* The engine (vendor + GC) is independent from the **Java version** selector (17, 21 or 23+). The engine can always be overridden manually, and your choice is kept when you change other hardware.
 * `-XX:UseAVX` is intentionally **not** set: the JVM detects the supported vector level on its own.
 
 ### 2. CPU Thread Allocation (`ConcGCThreads` & `ParallelGCThreads`)
@@ -67,8 +67,16 @@ A *Dual-channel or more / Single-channel* selector estimates the theoretical ban
 ### 4b. Notebooks (iGPU + dedicated GPU)
 Mobile CPUs and laptop GPUs are flagged. With a dedicated GPU the tool warns that Windows often launches Java on the iGPU and shows how to force `javaw.exe` to *High performance*. On integrated graphics only it reminds you to use the charger and a high-performance power plan.
 
+### 4c. Java Version, Operating System & Launcher
+* **Java version (17 / 21 / 23+):** `-XX:+ZGenerational` is only emitted on **Java 21**. Java 17 only has the non-generational ZGC, and on Java 23+ the generational mode is the default and the flag is obsolete (the JVM warns), so it is omitted. Minecraft 1.20.6+ forces Java 21 or newer.
+* **Operating system (Windows / Linux / macOS):**
+  * *Windows:* `-XX:+UseLargePages` option (needs the "Lock pages in memory" policy), `javaw.exe` and Windows Graphics settings.
+  * *Linux:* the same option becomes `-XX:+UseTransparentHugePages`, and the Driver tab lists the launcher environment variables (Mesa: `mesa_glthread`, `vblank_mode`, `DRI_PRIME`; NVIDIA: `__GL_THREADED_OPTIMIZATIONS`, `__NV_PRIME_RENDER_OFFLOAD`).
+  * *macOS (Apple Silicon, M1 to M4):* picking an Apple chip switches to macOS, locks the DDR/channel/GPU selectors (unified memory, real bandwidth shown) and recommends an ARM64 Java.
+* **Launcher (Prism/MultiMC, CurseForge, Modrinth, ATLauncher, official, other):** launchers with their own memory field get a line **without** `-Xms/-Xmx` (so memory is not duplicated), while the official launcher gets the full line. A step-by-step guide shows where to paste each part, and warns if the two settings conflict.
+
 ### 5. Oracle GraalVM JIT Flags (`-XX:+UseJVMCICompiler`)
-Used only by the GraalVM engines:
+Used only by the GraalVM engines. On **Java 23+** the `-Dgraal.*` options are omitted, because their prefix changed in newer GraalVM versions:
 * `-XX:+UseJVMCICompiler -XX:+EagerJVMCI -Dgraal.TuneInlinerExploration=1 -Dgraal.CompilerConfiguration=community`
 * More exploratory inlining on heavy mod loops. The gain varies by modpack, and the JIT spends extra CPU and RAM while warming up, which is why weaker machines are moved to Temurin + G1.
 
@@ -77,6 +85,7 @@ Used only by the GraalVM engines:
 ## 🎛️ Interactive Features
 
 * **Hardware Customizer:** Pick your CPU (AMD Ryzen / APUs / Athlon / FX, Intel Core / Core Ultra / Pentium, popular **Xeon** E3, E5 and Gold models, plus laptop H/U-series and mini-PC chips), GPU (NVIDIA GTX 10/16 and RTX 20/30/40/50, AMD RX 400 to RX 9000 and Vega, Intel Arc, plus popular notebook GPUs), RAM generation (DDR3 to DDR5, 1066 to 8000 MHz), memory channels and storage type. Every GPU model and VRAM variant is listed separately.
+* **Apple Silicon:** M1, M2, M3 and M4 families (base and Pro/Max) with their GPU, unified memory and macOS-specific advice.
 * **Integrated Graphics Detection:** Choose *Integrated Graphics (iGPU)* in the GPU list and the iGPU is detected from the selected CPU (e.g. Ryzen 3 3200G → Radeon Vega 8, Core i5-12400 → UHD 730). CPUs without video output (F/KF models, FX, Xeon) trigger a warning, and shared-memory advice replaces the VRAM alerts.
 * **Bilingual Support (PT-BR / EN-US):** Instant interface switching between Portuguese and English.
 * **Dynamic Mod Catalog:** Adapts mod recommendations based on your chosen Mod Loader (**Forge**, **NeoForge**, or **Fabric**) and Minecraft version (**1.20.1** to **1.21.4+**).
@@ -89,7 +98,9 @@ Used only by the GraalVM engines:
 
 * The generated option names follow **Sodium 0.5/0.6** and **Embeddium 0.3**. Mods ignore unknown keys silently, so if the config file created by your own mod version uses different names, trust its names.
 * Thread counts, GC values and tiers are heuristics. Minecraft is mostly bound by single-thread speed, so a many-thread, low-clock CPU (such as an older Xeon) gains chunk-builder threads but will not match a modern desktop CPU.
-* Java 21 is required from Minecraft 1.20.5. Some 1.20.1 packs with older mods still need Java 17, which is why a GraalVM 17 option exists.
+* Java 21 or newer is required from Minecraft 1.20.5. Some 1.20.1 packs with older mods still need Java 17, which is why Java 17 can be selected for them.
+* The generated JVM flags were checked against a real OpenJDK 21 for every engine, Java version and OS combination. The Graal-specific flags could not be tested without GraalVM, and Java 17 and 23+ were only validated through the flag logic, not on those JVMs.
+* Menu names in the launcher guide may differ between launcher versions.
 
 ---
 

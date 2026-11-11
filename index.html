@@ -221,6 +221,16 @@
                         <optgroup label="AMD FX (AM3+ - DDR3)">
                             <option value="fx_8350">AMD FX-8350 / FX-6300 (8C/8T - Piledriver)</option>
                         </optgroup>
+                        <optgroup label="Apple Silicon (macOS)">
+                            <option value="m1">Apple M1 (8C/8T - ARM64 • 4P+4E • iGPU)</option>
+                            <option value="m1_pro">Apple M1 Pro / M1 Max (10C/10T - ARM64 • 8P+2E • iGPU)</option>
+                            <option value="m2">Apple M2 (8C/8T - ARM64 • 4P+4E • iGPU)</option>
+                            <option value="m2_pro">Apple M2 Pro / M2 Max (12C/12T - ARM64 • 8P+4E • iGPU)</option>
+                            <option value="m3">Apple M3 (8C/8T - ARM64 • 4P+4E • iGPU)</option>
+                            <option value="m3_pro">Apple M3 Pro / M3 Max (12C/12T - ARM64 • 6P+6E • iGPU)</option>
+                            <option value="m4">Apple M4 (10C/10T - ARM64 • 4P+6E • iGPU)</option>
+                            <option value="m4_pro">Apple M4 Pro / M4 Max (14C/14T - ARM64 • 10P+4E • iGPU)</option>
+                        </optgroup>
                     </select>
                     <p id="cpu-meta-desc" class="text-[11px] text-gray-400 font-mono">Zen 3 • AVX2 • 16MB L3 • ConcGC: 3 / Parallel: 8</p>
                 </div>
@@ -473,12 +483,40 @@
                             <i class="fa-solid fa-fire-flame-curved mr-1.5"></i><span id="i18n-lbl-jvm">Distribuição Java (Foco GraalVM)</span>
                         </label>
                         <select id="select-jvm-engine" onchange="onEngineChange()" class="w-full bg-gray-900 border border-purple-500/50 rounded-lg px-3 py-2 text-xs sm:text-sm text-white font-semibold focus:outline-none focus:border-purple-400">
-                            <option value="graal21_zgc" data-pt="Oracle GraalVM 21/22+ (Generational ZGC + JIT Graal) ★" data-en="Oracle GraalVM 21/22+ (Generational ZGC + Graal JIT) ★" selected>Oracle GraalVM 21/22+ (Generational ZGC + JIT Graal) ★</option>
-                            <option value="graal21_g1" data-pt="Oracle GraalVM 21 (G1GC Tuned + Graal Vectorizer)" data-en="Oracle GraalVM 21 (G1GC Tuned + Graal Vectorizer)">Oracle GraalVM 21 (G1GC Tuned + Graal Vectorizer)</option>
-                            <option value="graal17_zgc" data-pt="Oracle GraalVM 17 (Para Mods 1.20.1 incompatíveis c/ Java 21)" data-en="Oracle GraalVM 17 (For 1.20.1 Mods incompatible w/ Java 21)">Oracle GraalVM 17 (Para Mods 1.20.1 incompatíveis c/ Java 21)</option>
-                            <option value="temurin21_zgc" data-pt="OpenJDK / Adoptium Temurin 21 (Generational ZGC Padrão)" data-en="OpenJDK / Adoptium Temurin 21 (Standard Generational ZGC)">OpenJDK / Adoptium Temurin 21 (Generational ZGC Padrão)</option>
-                            <option value="temurin21_g1" data-pt="OpenJDK / Adoptium Temurin 21 (G1GC Tuned — PCs modestos / poucas threads)" data-en="OpenJDK / Adoptium Temurin 21 (G1GC Tuned — modest PCs / few threads)">OpenJDK / Adoptium Temurin 21 (G1GC Tuned — PCs modestos / poucas threads)</option>
+                            <option value="graal_zgc" data-pt="Oracle GraalVM (ZGC + JIT Graal) ★" data-en="Oracle GraalVM (ZGC + Graal JIT) ★" selected>Oracle GraalVM (ZGC + JIT Graal) ★</option>
+                            <option value="graal_g1" data-pt="Oracle GraalVM (G1GC Tuned + JIT Graal)" data-en="Oracle GraalVM (G1GC Tuned + Graal JIT)">Oracle GraalVM (G1GC Tuned + JIT Graal)</option>
+                            <option value="temurin_zgc" data-pt="OpenJDK / Adoptium Temurin (ZGC)" data-en="OpenJDK / Adoptium Temurin (ZGC)">OpenJDK / Adoptium Temurin (ZGC)</option>
+                            <option value="temurin_g1" data-pt="OpenJDK / Adoptium Temurin (G1GC Tuned — PCs modestos / poucas threads)" data-en="OpenJDK / Adoptium Temurin (G1GC Tuned — modest PCs / few threads)">OpenJDK / Adoptium Temurin (G1GC Tuned — PCs modestos / poucas threads)</option>
                         </select>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-2.5">
+                            <div>
+                                <label for="select-java-version" id="i18n-lbl-java" class="text-[10px] font-bold uppercase tracking-wider text-gray-400 block mb-1">Versão do Java</label>
+                                <select id="select-java-version" onchange="onJavaChange()" class="w-full bg-gray-900 border border-gray-700/80 rounded-lg px-2.5 py-1.5 text-xs text-gray-200 font-medium focus:outline-none focus:border-purple-400">
+                                    <option value="17" data-pt="Java 17 (mods 1.20.1 incompatíveis com Java 21)" data-en="Java 17 (1.20.1 mods incompatible with Java 21)">Java 17 (mods 1.20.1 incompatíveis com Java 21)</option>
+                                    <option value="21" data-pt="Java 21 (recomendado) ★" data-en="Java 21 (recommended) ★" selected>Java 21 (recomendado) ★</option>
+                                    <option value="23" data-pt="Java 23 ou superior (ex.: 25 LTS)" data-en="Java 23 or newer (e.g. 25 LTS)">Java 23 ou superior (ex.: 25 LTS)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="select-os" id="i18n-lbl-os" class="text-[10px] font-bold uppercase tracking-wider text-gray-400 block mb-1">Sistema operacional</label>
+                                <select id="select-os" onchange="onOsChange()" class="w-full bg-gray-900 border border-gray-700/80 rounded-lg px-2.5 py-1.5 text-xs text-gray-200 font-medium focus:outline-none focus:border-purple-400">
+                                    <option value="windows" selected>Windows</option>
+                                    <option value="linux">Linux</option>
+                                    <option value="macos" data-pt="macOS (Apple Silicon)" data-en="macOS (Apple Silicon)">macOS (Apple Silicon)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="select-launcher" id="i18n-lbl-launcher" class="text-[10px] font-bold uppercase tracking-wider text-gray-400 block mb-1">Launcher</label>
+                                <select id="select-launcher" onchange="onLauncherChange()" class="w-full bg-gray-900 border border-gray-700/80 rounded-lg px-2.5 py-1.5 text-xs text-gray-200 font-medium focus:outline-none focus:border-purple-400">
+                                    <option value="prism" selected>Prism Launcher / MultiMC</option>
+                                    <option value="curseforge">CurseForge App</option>
+                                    <option value="modrinth">Modrinth App</option>
+                                    <option value="atlauncher">ATLauncher</option>
+                                    <option value="vanilla" data-pt="Launcher oficial da Mojang" data-en="Official Mojang Launcher">Launcher oficial da Mojang</option>
+                                    <option value="other" data-pt="Outro launcher" data-en="Other launcher">Outro launcher</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -664,10 +702,7 @@
                         <i class="fa-solid fa-download"></i> <span id="i18n-graal-guide-title">Como Ativar o Oracle GraalVM no Seu Launcher</span>
                     </h3>
                     <ol id="i18n-graal-guide-steps" class="text-xs text-gray-300 space-y-2 list-decimal list-inside leading-relaxed">
-                        <li>Baixe o <strong>Oracle GraalVM for JDK 21</strong> (Community ou Oracle GraalVM) em <code class="text-purple-300 font-mono">graalvm.org/downloads</code> (arquivo ZIP para Windows/Linux) e extraia no seu SSD.</li>
-                        <li>No <strong>Prism Launcher / Modrinth / CurseForge</strong>, vá nas configurações de Java da instância e aponte para o <code class="text-emerald-300 font-mono">bin/javaw.exe</code> da pasta do GraalVM.</li>
-                        <li>No Prism Launcher, marque <strong>"Ignorar verificação de compatibilidade do Java"</strong> (pois a 1.20.1 pede Java 17 por padrão, mas roda muito melhor no GraalVM 21).</li>
-                        <li>O compilador JIT Graal (<code class="text-purple-300 font-mono">-XX:+UseJVMCICompiler</code>) eleva o FPS mínimo (1% lows) em até 25% em bases cheias de máquinas e entidades.</li>
+                        <!-- Populado via JS (renderLauncherGuide) -->
                     </ol>
                 </div>
             </div>
@@ -829,6 +864,9 @@
                 lblMcVer: "Versão do Minecraft",
                 lblLoader: "Mod Loader (Carregador)",
                 lblJvm: "Distribuição Java (Foco GraalVM)",
+                lblJava: "Versão do Java",
+                lblOs: "Sistema operacional",
+                lblLauncher: "Launcher",
                 sec2Title: "2. Alocação Inteligente de RAM & Argumentos JVM (Oracle GraalVM)",
                 sec2Sub: "O compilador JIT do <strong>Oracle GraalVM</strong> usa parte da RAM nativa para otimizar loops de mods em código de máquina. Escolha o porte do modpack abaixo:",
                 graalPill: "GraalVM JIT Compiler Ativo",
@@ -853,13 +891,7 @@
                 legFreeLbl: "Livre SO / VRAM",
                 btnCopyJvm: "Copiar Argumentos JVM Otimizados",
                 expFlagsTitle: "Por que essas flags foram geradas para o seu PC?",
-                graalGuideTitle: "Como Ativar o Oracle GraalVM no Seu Launcher",
-                graalGuideSteps: `
-                    <li>Baixe o <strong>Oracle GraalVM for JDK 21</strong> (Community ou Oracle GraalVM) em <code class="text-purple-300 font-mono">graalvm.org/downloads</code> (arquivo ZIP para Windows/Linux) e extraia no seu SSD.</li>
-                    <li>No <strong>Prism Launcher / Modrinth / CurseForge</strong>, vá nas configurações de Java da instância e aponte para o <code class="text-emerald-300 font-mono">bin/javaw.exe</code> da pasta do GraalVM.</li>
-                    <li>No Prism Launcher, marque <strong>"Ignorar verificação de compatibilidade do Java"</strong> (pois a 1.20.1 pede Java 17 por padrão, mas roda muito melhor no GraalVM 21).</li>
-                    <li>O compilador JIT Graal (<code class="text-purple-300 font-mono">-XX:+UseJVMCICompiler</code>) eleva o FPS mínimo (1% lows) em até 25% em bases cheias de máquinas e entidades.</li>
-                `,
+                graalGuideTitle: "Como aplicar no seu Launcher",
                 sec3Title: "3. Mods de Otimização Obrigatórios para",
                 sec3Sub: "Os nomes dos mods mudam automaticamente conforme você escolhe <strong>Forge</strong>, <strong>NeoForge</strong> ou <strong>Fabric</strong> e a versão do Minecraft no topo.",
                 mcatAll: "Todos",
@@ -887,9 +919,11 @@
                 igpuVendorNone: "de Vídeo",
                 stLabel: "Thread única",
                 stNames: { low: "Baixa", mid: "Média", high: "Alta", top: "Topo" },
-                toastEngineLow: "CPU/RAM modestas: engine trocada para Temurin 21 + G1GC (mais leve que ZGC + Graal).",
-                toastEngineHigh: "Hardware robusto: engine ajustada para GraalVM 21 + ZGC Geracional.",
-                toastJava21Req: "Minecraft 1.20.6+ exige Java 21! Alterado para Oracle GraalVM 21.",
+                toastEngineLow: "CPU/RAM modestas: engine trocada para Temurin + G1GC (mais leve que ZGC + Graal).",
+                toastMacCpu: "O macOS roda apenas em chips Apple: CPU alterada para Apple M2.",
+                toastNonMacCpu: "Chips Apple só rodam macOS: CPU e GPU restauradas para Ryzen 5 5500 / RTX 3050.",
+                toastEngineHigh: "Hardware robusto: engine ajustada para GraalVM + ZGC.",
+                toastJava21Req: "Minecraft 1.20.6+ exige Java 21! Versão do Java alterada para 21.",
                 freqStdGroup: "Frequências Padrão",
                 freqOtherGroup: "Outras Frequências"
             },
@@ -906,6 +940,9 @@
                 lblMcVer: "Minecraft Version",
                 lblLoader: "Mod Loader",
                 lblJvm: "Java Distribution (GraalVM Focus)",
+                lblJava: "Java version",
+                lblOs: "Operating system",
+                lblLauncher: "Launcher",
                 sec2Title: "2. Smart RAM Allocation & JVM Arguments (Oracle GraalVM)",
                 sec2Sub: "The <strong>Oracle GraalVM</strong> JIT compiler uses native memory to compile heavy mod loops into fast machine code. Choose your modpack size below:",
                 graalPill: "GraalVM JIT Compiler Active",
@@ -930,13 +967,7 @@
                 legFreeLbl: "Free OS / VRAM",
                 btnCopyJvm: "Copy Optimized JVM Arguments",
                 expFlagsTitle: "Why were these specific flags generated for your PC?",
-                graalGuideTitle: "How to Enable Oracle GraalVM in Your Launcher",
-                graalGuideSteps: `
-                    <li>Download <strong>Oracle GraalVM for JDK 21</strong> (Community or Oracle GraalVM) at <code class="text-purple-300 font-mono">graalvm.org/downloads</code> (ZIP archive for Windows/Linux) and extract it to your SSD.</li>
-                    <li>In <strong>Prism Launcher / Modrinth / CurseForge</strong>, open your instance's Java settings and browse to <code class="text-emerald-300 font-mono">bin/javaw.exe</code> inside the extracted GraalVM folder.</li>
-                    <li>In Prism Launcher, enable <strong>"Skip Java compatibility checks"</strong> (Minecraft 1.20.1 defaults to Java 17, but runs significantly better on GraalVM 21).</li>
-                    <li>The Graal JIT compiler (<code class="text-purple-300 font-mono">-XX:+UseJVMCICompiler</code>) boosts 1% low FPS by up to 25% in bases packed with machines and entities.</li>
-                `,
+                graalGuideTitle: "How to apply in your Launcher",
                 sec3Title: "3. Must-Have Optimization Mods for",
                 sec3Sub: "Mod names automatically adapt as you switch between <strong>Forge</strong>, <strong>NeoForge</strong>, or <strong>Fabric</strong> and the Minecraft version at the top.",
                 mcatAll: "All",
@@ -964,9 +995,11 @@
                 igpuVendorNone: "Video",
                 stLabel: "Single-thread",
                 stNames: { low: "Low", mid: "Mid", high: "High", top: "Top" },
-                toastEngineLow: "Modest CPU/RAM: engine switched to Temurin 21 + G1GC (lighter than ZGC + Graal).",
-                toastEngineHigh: "Robust hardware: engine set to GraalVM 21 + Generational ZGC.",
-                toastJava21Req: "Minecraft 1.20.6+ requires Java 21! Switched to Oracle GraalVM 21.",
+                toastEngineLow: "Modest CPU/RAM: engine switched to Temurin + G1GC (lighter than ZGC + Graal).",
+                toastMacCpu: "macOS only runs on Apple chips: CPU switched to Apple M2.",
+                toastNonMacCpu: "Apple chips only run macOS: CPU and GPU restored to Ryzen 5 5500 / RTX 3050.",
+                toastEngineHigh: "Robust hardware: engine set to GraalVM + ZGC.",
+                toastJava21Req: "Minecraft 1.20.6+ requires Java 21! Java version switched to 21.",
                 freqStdGroup: "Standard Frequencies",
                 freqOtherGroup: "Other Frequencies"
             }
@@ -1018,6 +1051,8 @@
         // ---- Largura de banda, notebook híbrido e recomendações no jogo ----
         // Banda teórica da RAM em GB/s: MT/s x 8 bytes x canais
         function memBandwidthGBs(channels) {
+            const cpuNow = cpuDatabase[state.cpuKey];
+            if (cpuNow && cpuNow.apple && !channels) return cpuNow.bw;
             return +(state.ramFreq * 8 * (channels || state.memChannels) / 1000).toFixed(1);
         }
         const ST_TIER_SCORE = { low: 0, mid: 1, high: 2, top: 3 };
@@ -1031,7 +1066,7 @@
             const penalty = state.modpackProfile === 'extreme' ? 2 : (state.modpackProfile === 'heavy' ? 1 : 0);
             const cpuRD = [8, 10, 14, 18][cs];
             let gpuRD = [6, 10, 12, 16, 20][gs];
-            if (gpu.igpu) {
+            if (gpu.igpu && !gpu.unified) {
                 gpuRD = Math.min(gpuRD, 8);
                 if (state.memChannels === 1) gpuRD = Math.min(gpuRD, 6);
             }
@@ -1040,15 +1075,147 @@
             if (cpu.threads <= 4) sim = Math.min(sim, 6);
             sim = Math.max(4, Math.min(sim, render));
             const entity = cs === 0 ? 50 : ((cs === 1 || gs <= 1) ? 75 : 100);
-            const shaders = (gpu.igpu || gs <= 1) ? 'off' : (gs === 2 ? 'light' : 'ok');
+            const shaders = ((gpu.igpu && !gpu.unified) || gs <= 1) ? 'off' : (gs === 2 ? 'light' : 'ok');
             return { render, sim, entity, shaders };
+        }
+
+        // ---- Versão do Java, sistema operacional e launcher ----
+        const LAUNCHERS = {
+            prism: { separateMemory: true },
+            curseforge: { separateMemory: true },
+            modrinth: { separateMemory: true },
+            atlauncher: { separateMemory: true },
+            vanilla: { separateMemory: false },
+            other: { separateMemory: null }
+        };
+
+        // Minecraft 1.20.5+ (1.20.6, 1.21.x) exige Java 21 ou superior
+        function enforceJavaForMc() {
+            const needs21 = state.mcVersion === '1.20.6' || state.mcVersion.startsWith('1.21');
+            if (needs21 && state.javaVersion === '17') {
+                state.javaVersion = '21';
+                document.getElementById('select-java-version').value = '21';
+                showToast(i18n[state.lang].toastJava21Req);
+            }
+        }
+        function onJavaChange() {
+            state.javaVersion = document.getElementById('select-java-version').value;
+            enforceJavaForMc();
+            recalculateAll();
+        }
+        function setSelectValue(id, v) { document.getElementById(id).value = v; }
+        function onOsChange() {
+            state.os = document.getElementById('select-os').value;
+            const t = i18n[state.lang];
+            const cpuSel = cpuDatabase[document.getElementById('select-cpu').value];
+            if (state.os === 'macos' && !cpuSel.apple) {
+                setSelectValue('select-cpu', 'm2');
+                showToast(t.toastMacCpu);
+            } else if (state.os !== 'macos' && cpuSel.apple) {
+                setSelectValue('select-cpu', 'r5_5500');
+                setSelectValue('select-gpu', 'rtx_3050_6_desk');
+                showToast(t.toastNonMacCpu);
+            }
+            onHardwareChange();
+        }
+        function onLauncherChange() {
+            state.launcher = document.getElementById('select-launcher').value;
+            const sep = LAUNCHERS[state.launcher].separateMemory;
+            // Launchers com campo de memória próprio: não incluir -Xms/-Xmx (evita duplicar)
+            if (sep !== null) document.getElementById('chk-include-xmx').checked = !sep;
+            recalculateAll();
+        }
+        // Rótulo/estado da opção de páginas grandes conforme o sistema operacional
+        function applyOsUi() {
+            const lp = document.getElementById('chk-large-pages');
+            const span = document.getElementById('i18n-chk-lp');
+            const pt = state.lang === 'pt';
+            if (state.os === 'linux') {
+                lp.disabled = false;
+                span.innerHTML = pt ? 'Usar <code class="text-purple-400 font-mono">Transparent Huge Pages</code>' : 'Use <code class="text-purple-400 font-mono">Transparent Huge Pages</code>';
+            } else if (state.os === 'macos') {
+                lp.checked = false;
+                lp.disabled = true;
+                span.innerHTML = pt ? 'LargePages <span class="text-gray-500">(indisponível no macOS)</span>' : 'LargePages <span class="text-gray-500">(unavailable on macOS)</span>';
+            } else {
+                lp.disabled = false;
+                span.innerHTML = i18n[state.lang].chkLp;
+            }
+            lp.parentElement.classList.toggle('opacity-50', lp.disabled);
+        }
+        // Guia dinâmico "Como aplicar no seu Launcher" (depende de launcher, SO, engine e Java)
+        function renderLauncherGuide() {
+            const pt = state.lang === 'pt';
+            const isGraal = state.jvmEngine.startsWith('graal');
+            const jv = state.javaVersion === '23' ? (pt ? '23 ou superior (ex.: 25 LTS)' : '23 or newer (e.g. 25 LTS)') : state.javaVersion;
+            const includeXmx = document.getElementById('chk-include-xmx').checked;
+            const mib = state.allocRamGB * 1024;
+            const javaBin = state.os === 'windows' ? 'bin\\javaw.exe' : (state.os === 'macos' ? 'Contents/Home/bin/java' : 'bin/java');
+            const code = (txt) => `<code class="text-emerald-300 font-mono">${txt}</code>`;
+            const L = state.launcher;
+            const sep = LAUNCHERS[L].separateMemory;
+            const steps = [];
+
+            const dl = isGraal ? `Oracle GraalVM for JDK ${jv}` : `Eclipse Temurin ${jv}`;
+            const site = isGraal ? 'graalvm.org/downloads' : 'adoptium.net';
+            const pkg = state.os === 'windows' ? 'ZIP' : (state.os === 'macos' ? (pt ? 'pacote aarch64 (ARM64), não x64' : 'aarch64 (ARM64) package, not x64') : 'tar.gz');
+            steps.push(pt
+                ? `Baixe o <strong>${dl}</strong> em ${code(site)} (${pkg}) e extraia/instale no seu SSD.`
+                : `Download <strong>${dl}</strong> from ${code(site)} (${pkg}) and extract/install it on your SSD.`);
+
+            const where = {
+                prism: pt ? `No <strong>Prism Launcher / MultiMC</strong>: clique com o botão direito na instância → <em>Editar</em> → <em>Configurações</em> → <em>Java</em>.` : `In <strong>Prism Launcher / MultiMC</strong>: right-click the instance → <em>Edit</em> → <em>Settings</em> → <em>Java</em>.`,
+                curseforge: pt ? `No <strong>CurseForge App</strong>: <em>Configurações</em> (engrenagem) → <em>Minecraft</em> → seção de Java.` : `In the <strong>CurseForge App</strong>: <em>Settings</em> (gear) → <em>Minecraft</em> → Java section.`,
+                modrinth: pt ? `No <strong>Modrinth App</strong>: abra a instância → <em>Configurações</em> → <em>Java e memória</em>.` : `In the <strong>Modrinth App</strong>: open the instance → <em>Settings</em> → <em>Java and memory</em>.`,
+                atlauncher: pt ? `No <strong>ATLauncher</strong>: <em>Configurações</em> → aba <em>Java/Minecraft</em>.` : `In <strong>ATLauncher</strong>: <em>Settings</em> → <em>Java/Minecraft</em> tab.`,
+                vanilla: pt ? `No <strong>Launcher oficial</strong>: <em>Instalações</em> → <em>Editar</em> a instalação → <em>Mais opções</em>.` : `In the <strong>Official Launcher</strong>: <em>Installations</em> → <em>Edit</em> the installation → <em>More options</em>.`,
+                other: pt ? `No <strong>seu launcher</strong>, abra as configurações de Java da instância.` : `In <strong>your launcher</strong>, open the instance's Java settings.`
+            }[L];
+            steps.push(`${where} ` + (pt ? `Aponte o Java para ${code(javaBin)} da pasta que você extraiu.` : `Point Java to ${code(javaBin)} inside the folder you extracted.`));
+
+            // Memória: evita duplicar -Xms/-Xmx entre a linha e o campo do launcher
+            if (sep === null) {
+                steps.push(includeXmx
+                    ? (pt ? `A linha já inclui ${code('-Xms/-Xmx')} (${mib} MiB). Se o seu launcher tiver um campo de memória próprio, deixe-o no padrão ou desmarque "Incluir -Xms / -Xmx" para não duplicar.` : `The line already includes ${code('-Xms/-Xmx')} (${mib} MiB). If your launcher has its own memory field, leave it at default or untick "Include -Xms / -Xmx" to avoid duplicates.`)
+                    : (pt ? `Se o launcher tem campo de memória, defina <strong>Mínima = Máxima = ${mib} MiB</strong>. Se ele só tem a caixa de argumentos, marque "Incluir -Xms / -Xmx".` : `If the launcher has a memory field, set <strong>Minimum = Maximum = ${mib} MiB</strong>. If it only has an arguments box, tick "Include -Xms / -Xmx".`));
+            } else if (includeXmx && sep) {
+                steps.push(pt ? `⚠ A linha inclui ${code('-Xms/-Xmx')}, mas este launcher tem campo próprio de memória: deixe a memória do launcher no padrão ou desmarque "Incluir -Xms / -Xmx", senão ela fica duplicada.` : `⚠ The line includes ${code('-Xms/-Xmx')}, but this launcher has its own memory field: leave the launcher memory at default or untick "Include -Xms / -Xmx", otherwise it is duplicated.`);
+            } else if (includeXmx) {
+                steps.push(pt ? `A linha já inclui ${code('-Xms/-Xmx')} (${mib} MiB): não é preciso definir a memória em outro lugar.` : `The line already includes ${code('-Xms/-Xmx')} (${mib} MiB): no need to set memory anywhere else.`);
+            } else if (sep) {
+                steps.push(pt ? `Defina a memória <strong>Mínima e Máxima = ${mib} MiB</strong> no campo de memória do launcher. A linha de argumentos não leva ${code('-Xms/-Xmx')}, então nada se duplica.` : `Set <strong>Minimum and Maximum memory = ${mib} MiB</strong> in the launcher's memory field. The arguments line has no ${code('-Xms/-Xmx')}, so nothing is duplicated.`);
+            } else {
+                steps.push(pt ? `⚠ Este launcher não tem campo de memória separado: marque "Incluir -Xms / -Xmx" para a linha levar ${mib} MiB.` : `⚠ This launcher has no separate memory field: tick "Include -Xms / -Xmx" so the line carries ${mib} MiB.`);
+            }
+
+            const argField = {
+                prism: pt ? 'Argumentos Java' : 'Java arguments',
+                curseforge: pt ? 'Argumentos Java' : 'Java arguments',
+                modrinth: pt ? 'Argumentos Java personalizados' : 'Custom Java arguments',
+                atlauncher: pt ? 'Parâmetros Java' : 'Java Parameters',
+                vanilla: pt ? 'Argumentos da JVM (apague o texto padrão, como -Xmx2G, antes de colar)' : 'JVM Arguments (delete the default text, such as -Xmx2G, before pasting)',
+                other: pt ? 'argumentos da JVM' : 'JVM arguments'
+            }[L];
+            steps.push(pt ? `Cole a linha de argumentos gerada em <strong>${argField}</strong>.` : `Paste the generated arguments line into <strong>${argField}</strong>.`);
+
+            if (L === 'prism' && state.mcVersion === '1.20.1' && state.javaVersion !== '17') {
+                steps.push(pt ? `Marque <strong>"Ignorar verificação de compatibilidade do Java"</strong> (a 1.20.1 pede Java 17 por padrão, mas costuma rodar bem no Java 21).` : `Enable <strong>"Skip Java compatibility checks"</strong> (1.20.1 asks for Java 17 by default, but it usually runs fine on Java 21).`);
+            }
+            if (state.os === 'linux') {
+                steps.push(pt ? `No Linux, as variáveis de ambiente do driver (Mesa/NVIDIA) e o Transparent Huge Pages estão na aba <strong>Driver</strong> da Seção 4.` : `On Linux, the driver environment variables (Mesa/NVIDIA) and Transparent Huge Pages are in the <strong>Driver</strong> tab of Section 4.`);
+            }
+            if (isGraal) {
+                steps.push(pt ? `O JIT Graal pode melhorar o desempenho em bases pesadas, mas o ganho varia conforme o modpack.` : `The Graal JIT can improve performance on heavy packs, but the gain varies by modpack.`);
+            }
+            steps.push(pt ? `<span class="text-gray-500">Os nomes dos menus podem variar conforme a versão do launcher.</span>` : `<span class="text-gray-500">Menu names may vary with your launcher version.</span>`);
+            document.getElementById('i18n-graal-guide-steps').innerHTML = steps.map(x => `<li>${x}</li>`).join('');
         }
 
         // Engine JVM recomendada: CPUs com poucas threads ou pouca RAM sofrem com ZGC + JIT do Graal
         // (GC concorrente e compilador disputam núcleos e memória com o jogo) -> HotSpot C2 + G1.
         function recommendedEngine() {
             const cpu = cpuDatabase[state.cpuKey];
-            return (cpu.threads <= 6 || state.sysRamGB <= 12) ? 'temurin21_g1' : 'graal21_zgc';
+            return (cpu.threads <= 6 || state.sysRamGB <= 12) ? 'temurin_g1' : 'graal_zgc';
         }
         function applyAutoEngine(announce) {
             if (state.jvmEngineManual) return;
@@ -1058,7 +1225,7 @@
             document.getElementById('select-jvm-engine').value = rec;
             if (announce) {
                 const t = i18n[state.lang];
-                showToast(rec === 'temurin21_g1' ? t.toastEngineLow : t.toastEngineHigh);
+                showToast(rec === 'temurin_g1' ? t.toastEngineLow : t.toastEngineHigh);
             }
         }
         function onEngineChange() {
@@ -1078,8 +1245,11 @@
             memChannels: 2,
             mcVersion: '1.20.1',
             loader: 'forge',
-            jvmEngine: 'graal21_zgc',
+            jvmEngine: 'graal_zgc',
             jvmEngineManual: false,
+            javaVersion: '21',
+            os: 'windows',
+            launcher: 'prism',
             modpackProfile: 'heavy',
             allocRamGB: 12,
             softMaxGB: 10,
@@ -1121,6 +1291,9 @@
             document.getElementById('i18n-lbl-mcver').textContent = t.lblMcVer;
             document.getElementById('i18n-lbl-loader').textContent = t.lblLoader;
             document.getElementById('i18n-lbl-jvm').textContent = t.lblJvm;
+            document.getElementById('i18n-lbl-java').textContent = t.lblJava;
+            document.getElementById('i18n-lbl-os').textContent = t.lblOs;
+            document.getElementById('i18n-lbl-launcher').textContent = t.lblLauncher;
 
             document.getElementById('i18n-sec2-title').textContent = t.sec2Title;
             document.getElementById('i18n-sec2-sub').innerHTML = t.sec2Sub;
@@ -1152,7 +1325,6 @@
             document.getElementById('i18n-btn-copy-jvm').textContent = t.btnCopyJvm;
             document.getElementById('i18n-exp-flags-title').textContent = t.expFlagsTitle;
             document.getElementById('i18n-graal-guide-title').textContent = t.graalGuideTitle;
-            document.getElementById('i18n-graal-guide-steps').innerHTML = t.graalGuideSteps;
 
             document.getElementById('i18n-sec3-title').textContent = t.sec3Title;
             document.getElementById('i18n-sec3-sub').innerHTML = t.sec3Sub;
@@ -1252,12 +1424,7 @@
             state.mcVersion = document.getElementById('select-mc-version').value;
             state.loader = document.getElementById('select-loader').value;
 
-            // Se escolher 1.20.6 ou 1.21+ e estiver em GraalVM 17, muda automaticamente para GraalVM 21 (pois 1.20.5+ exige Java 21 nativo)
-            if ((state.mcVersion === '1.20.6' || state.mcVersion.startsWith('1.21')) && state.jvmEngine === 'graal17_zgc') {
-                state.jvmEngine = 'graal21_zgc';
-                document.getElementById('select-jvm-engine').value = 'graal21_zgc';
-                showToast(i18n[state.lang].toastJava21Req);
-            }
+            enforceJavaForMc();
             recalculateAll();
         }
 
@@ -1278,6 +1445,24 @@
 
             state.storageKey = document.getElementById('select-storage').value;
             state.memChannels = parseInt(document.getElementById('select-mem-channels').value, 10) || 2;
+
+            // Chips Apple: macOS + memória unificada (sem DDR/canais configuráveis) + GPU detectada
+            const cpuNow = cpuDatabase[state.cpuKey];
+            if (cpuNow.apple) {
+                state.os = 'macos'; setSelectValue('select-os', 'macos');
+                state.gpuKey = 'igpu_auto'; setSelectValue('select-gpu', 'igpu_auto');
+                state.ddrType = cpuNow.memType; state.ramFreq = cpuNow.memFreq;
+                setSelectValue('select-ddr-type', cpuNow.memType);
+                populateFrequencyDropdown(cpuNow.memType, cpuNow.memFreq);
+                state.memChannels = 2; setSelectValue('select-mem-channels', '2');
+            } else if (state.os === 'macos') {
+                state.os = 'windows'; setSelectValue('select-os', 'windows');
+            }
+            ['select-ddr-type', 'select-ram-freq', 'select-mem-channels', 'select-gpu'].forEach(id => {
+                const el = document.getElementById(id);
+                el.disabled = !!cpuNow.apple;
+                el.classList.toggle('opacity-50', !!cpuNow.apple);
+            });
             if (state.jvmEngineManual) {
                 state.jvmEngine = document.getElementById('select-jvm-engine').value;
             } else {
@@ -1347,6 +1532,7 @@
         // MOTOR DE CÁLCULO CENTRAL (JVM ARGS, GRAALVM, BARRA DE RAM, DIAGNÓSTICOS)
         // ============================================================================
         function recalculateAll() {
+            applyOsUi();
             const lang = state.lang;
             const cpu = cpuDatabase[state.cpuKey];
             const gpu = getActiveGpu();
@@ -1446,8 +1632,12 @@
             const storageName = storage.name[lang];
             const includeXmx = document.getElementById('chk-include-xmx').checked;
             const useLargePages = document.getElementById('chk-large-pages').checked;
+            const javaVer = state.javaVersion;
+            const isGraalEngine = state.jvmEngine.startsWith('graal');
+            const isZgcEngine = state.jvmEngine.endsWith('_zgc');
             const xmxPart = includeXmx ? `-Xms${allocMB}M -Xmx${allocMB}M ` : "";
-            const lpPart = useLargePages ? `-XX:+UseLargePages ` : "";
+            // Páginas grandes: LargePages no Windows, Transparent Huge Pages no Linux, indisponível no macOS
+            const lpPart = !useLargePages ? "" : (state.os === 'linux' ? `-XX:+UseTransparentHugePages ` : (state.os === 'windows' ? `-XX:+UseLargePages ` : ""));
 
             // Ajuste de tolerância de spike para memórias DDR3/DDR4 lentas + NVMe
             let spikeTol = parseFloat(storage.spikeTol);
@@ -1457,33 +1647,27 @@
 
             const maxPause = state.ddrType === 'DDR5' ? 90 : (state.ddrType === 'DDR3' ? 150 : 120);
 
-            // Flags do Compilador JIT do Oracle GraalVM
-            const graalJITFlags = `-XX:+UseJVMCICompiler -XX:+EagerJVMCI -Dgraal.TuneInlinerExploration=1 -Dgraal.CompilerConfiguration=community -XX:ReservedCodeCacheSize=${state.codeCacheMB}M`;
+            // Flags do Compilador JIT do Oracle GraalVM (no Java 23+ o prefixo das opções -Dgraal.* mudou: só as -XX são emitidas)
+            const graalJITFlags = javaVer === '23'
+                ? `-XX:+UseJVMCICompiler -XX:+EagerJVMCI -XX:ReservedCodeCacheSize=${state.codeCacheMB}M`
+                : `-XX:+UseJVMCICompiler -XX:+EagerJVMCI -Dgraal.TuneInlinerExploration=1 -Dgraal.CompilerConfiguration=community -XX:ReservedCodeCacheSize=${state.codeCacheMB}M`;
 
-            let finalArgs = "";
-            let engineLabel = "";
+            // ZGC: -XX:+ZGenerational só existe (e só é necessária) no Java 21; no 17 o ZGC não é geracional e no 23+ já é o padrão
+            const zgcFlag = javaVer === '21' ? '-XX:+UseZGC -XX:+ZGenerational' : '-XX:+UseZGC';
 
-            if (state.jvmEngine === 'graal21_zgc') {
-                engineLabel = "Oracle GraalVM 21/22+ (Generational ZGC + Graal JIT)";
-                finalArgs = `${xmxPart}-XX:+UnlockExperimentalVMOptions -XX:+UnlockDiagnosticVMOptions ${graalJITFlags} -XX:+UseZGC -XX:+ZGenerational -XX:ConcGCThreads=${cpu.concGC} -XX:ParallelGCThreads=${cpu.parGC} -XX:ZAllocationSpikeTolerance=${spikeTol} -XX:SoftMaxHeapSize=${state.softMaxGB}G -XX:MetaspaceSize=${state.metaMB}M -XX:MaxMetaspaceSize=2048M ${lpPart}-XX:+AlwaysPreTouch -XX:+DisableExplicitGC -XX:+PerfDisableSharedMem -XX:+UseStringDeduplication -Dfml.readTimeout=180`;
-            } else if (state.jvmEngine === 'graal21_g1') {
-                engineLabel = "Oracle GraalVM 21 (G1GC Tuned + Graal JIT)";
-                finalArgs = `${xmxPart}-XX:+UnlockExperimentalVMOptions -XX:+UnlockDiagnosticVMOptions ${graalJITFlags} -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=${maxPause} -XX:ConcGCThreads=${cpu.concGC} -XX:ParallelGCThreads=${cpu.parGC} -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=16M -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:MaxTenuringThreshold=1 -XX:MetaspaceSize=${state.metaMB}M ${lpPart}-XX:+AlwaysPreTouch -XX:+DisableExplicitGC -XX:+PerfDisableSharedMem -XX:+UseStringDeduplication -Dfml.readTimeout=180`;
-            } else if (state.jvmEngine === 'graal17_zgc') {
-                engineLabel = "Oracle GraalVM 17 (Single-Gen ZGC + Graal JIT)";
-                finalArgs = `${xmxPart}-XX:+UnlockExperimentalVMOptions -XX:+UnlockDiagnosticVMOptions ${graalJITFlags} -XX:+UseZGC -XX:ConcGCThreads=${cpu.concGC} -XX:ParallelGCThreads=${cpu.parGC} -XX:ZAllocationSpikeTolerance=${spikeTol} -XX:SoftMaxHeapSize=${state.softMaxGB}G -XX:MetaspaceSize=${state.metaMB}M -XX:MaxMetaspaceSize=2048M ${lpPart}-XX:+AlwaysPreTouch -XX:+DisableExplicitGC -XX:+PerfDisableSharedMem -XX:+UseStringDeduplication -Dfml.readTimeout=180`;
-            } else if (state.jvmEngine === 'temurin21_g1') {
-                engineLabel = "OpenJDK / Temurin 21 (G1GC Tuned)";
-                finalArgs = `${xmxPart}-XX:+UnlockExperimentalVMOptions -XX:+UnlockDiagnosticVMOptions -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=${maxPause} -XX:ConcGCThreads=${cpu.concGC} -XX:ParallelGCThreads=${cpu.parGC} -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=16M -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:MaxTenuringThreshold=1 -XX:MetaspaceSize=${state.metaMB}M ${lpPart}-XX:+AlwaysPreTouch -XX:+DisableExplicitGC -XX:+PerfDisableSharedMem -XX:+UseStringDeduplication -Dfml.readTimeout=180`;
-            } else {
-                engineLabel = "OpenJDK / Temurin 21 (Generational ZGC)";
-                finalArgs = `${xmxPart}-XX:+UnlockExperimentalVMOptions -XX:+UnlockDiagnosticVMOptions -XX:+UseZGC -XX:+ZGenerational -XX:ConcGCThreads=${cpu.concGC} -XX:ParallelGCThreads=${cpu.parGC} -XX:ZAllocationSpikeTolerance=${spikeTol} -XX:SoftMaxHeapSize=${state.softMaxGB}G -XX:MetaspaceSize=${state.metaMB}M -XX:MaxMetaspaceSize=2048M ${lpPart}-XX:+AlwaysPreTouch -XX:+DisableExplicitGC -XX:+PerfDisableSharedMem -XX:+UseStringDeduplication -Dfml.readTimeout=180`;
-            }
+            const gcArgs = isZgcEngine
+                ? `${zgcFlag} -XX:ConcGCThreads=${cpu.concGC} -XX:ParallelGCThreads=${cpu.parGC} -XX:ZAllocationSpikeTolerance=${spikeTol} -XX:SoftMaxHeapSize=${state.softMaxGB}G -XX:MetaspaceSize=${state.metaMB}M -XX:MaxMetaspaceSize=2048M ${lpPart}-XX:+AlwaysPreTouch -XX:+DisableExplicitGC -XX:+PerfDisableSharedMem -XX:+UseStringDeduplication -Dfml.readTimeout=180`
+                : `-XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=${maxPause} -XX:ConcGCThreads=${cpu.concGC} -XX:ParallelGCThreads=${cpu.parGC} -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=16M -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:MaxTenuringThreshold=1 -XX:MetaspaceSize=${state.metaMB}M ${lpPart}-XX:+AlwaysPreTouch -XX:+DisableExplicitGC -XX:+PerfDisableSharedMem -XX:+UseStringDeduplication -Dfml.readTimeout=180`;
+            const finalArgs = `${xmxPart}-XX:+UnlockExperimentalVMOptions -XX:+UnlockDiagnosticVMOptions ${isGraalEngine ? graalJITFlags + ' ' : ''}${gcArgs}`;
+
+            const javaLabel = javaVer === '23' ? '23+' : javaVer;
+            const gcLabel = isZgcEngine ? (javaVer === '21' ? 'Generational ZGC' : 'ZGC') : 'G1GC Tuned';
+            const engineLabel = `${isGraalEngine ? 'Oracle GraalVM' : 'OpenJDK / Temurin'} ${javaLabel} (${gcLabel}${isGraalEngine ? ' + Graal JIT' : ''})`;
 
             document.getElementById('jvm-args-box').textContent = finalArgs;
             document.getElementById('jvm-command-subtitle').innerHTML = lang === 'pt'
-                ? `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>No Launcher: Alocar ${allocMB} MiB (${state.allocRamGB} GB) • ${engineLabel}`
-                : `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>In Launcher: Allocate ${allocMB} MiB (${state.allocRamGB} GB) • ${engineLabel}`;
+                ? `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>${includeXmx ? `Linha completa: já inclui -Xms/-Xmx (${allocMB} MiB)` : `No Launcher: memória mínima = máxima = ${allocMB} MiB (${state.allocRamGB} GB)`} • ${engineLabel}`
+                : `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>${includeXmx ? `Full line: already includes -Xms/-Xmx (${allocMB} MiB)` : `In Launcher: minimum = maximum memory = ${allocMB} MiB (${state.allocRamGB} GB)`} • ${engineLabel}`;
 
             // Explicação dinâmica das flags (depende da engine escolhida)
             const expList = document.getElementById('dynamic-flags-explanation');
@@ -1515,7 +1699,35 @@
                     ? `<li><strong class="text-blue-300 font-mono">-XX:+UseG1GC -XX:MaxGCPauseMillis=${maxPause}</strong>: perfil G1 voltado a pausas curtas (meta de ${maxPause} ms, mais folgada em ${state.ddrType}), com nova geração de 30–40% do heap e coleta mista antecipada. Consome menos memória extra que o ZGC.</li>`
                     : `<li><strong class="text-blue-300 font-mono">-XX:+UseG1GC -XX:MaxGCPauseMillis=${maxPause}</strong>: G1 profile aimed at short pauses (${maxPause} ms target, looser on ${state.ddrType}), with a 30–40% young generation and early mixed collections. Needs less extra memory than ZGC.</li>`);
             }
+            if (isZgc) {
+                const zgcNote = javaVer === '21'
+                    ? (pt ? `<li><strong class="text-blue-300 font-mono">-XX:+UseZGC -XX:+ZGenerational</strong>: ZGC geracional (Java 21): coleta os objetos novos com mais frequência e menos custo, ideal para o lixo temporário de chunks.</li>`
+                          : `<li><strong class="text-blue-300 font-mono">-XX:+UseZGC -XX:+ZGenerational</strong>: generational ZGC (Java 21): collects young objects more often and at lower cost, ideal for temporary chunk garbage.</li>`)
+                    : javaVer === '17'
+                    ? (pt ? `<li><strong class="text-blue-300 font-mono">-XX:+UseZGC</strong>: no Java 17 só existe o ZGC não geracional; o geracional exige Java 21 ou superior.</li>`
+                          : `<li><strong class="text-blue-300 font-mono">-XX:+UseZGC</strong>: Java 17 only has the non-generational ZGC; the generational one needs Java 21 or newer.</li>`)
+                    : (pt ? `<li><strong class="text-blue-300 font-mono">-XX:+UseZGC</strong>: no Java 23+ o ZGC já é geracional por padrão e a flag <code>-XX:+ZGenerational</code> ficou obsoleta (a JVM avisa), por isso foi omitida.</li>`
+                          : `<li><strong class="text-blue-300 font-mono">-XX:+UseZGC</strong>: on Java 23+ ZGC is generational by default and <code>-XX:+ZGenerational</code> is obsolete (the JVM warns), so it was omitted.</li>`);
+                items.push(zgcNote);
+            }
+            if (isGraal && javaVer === '23') {
+                items.push(pt ? `<li>As opções <code>-Dgraal.*</code> foram omitidas: o prefixo delas mudou nas versões novas do GraalVM e usar o errado pode gerar erro. Se quiser, adicione-as manualmente com o prefixo da sua versão.</li>`
+                              : `<li>The <code>-Dgraal.*</code> options were omitted: their prefix changed in newer GraalVM versions and using the wrong one may cause errors. Add them manually with your version's prefix if you want.</li>`);
+            }
+            if (javaVer === '23' && state.mcVersion === '1.20.1') {
+                items.push(pt ? `<li>Nem todo mod da 1.20.1 funciona em um Java muito novo. Se o jogo não abrir, volte para o Java 21 (ou 17).</li>`
+                              : `<li>Not every 1.20.1 mod works on a very new Java. If the game does not start, go back to Java 21 (or 17).</li>`);
+            }
+            if (useLargePages && state.os === 'windows') {
+                items.push(pt ? `<li><strong class="text-amber-300 font-mono">-XX:+UseLargePages</strong>: exige a política "Bloquear páginas na memória" (secpol.msc → Políticas Locais → Atribuição de direitos de usuário) e reinício; sem isso a JVM ignora a flag com um aviso.</li>`
+                              : `<li><strong class="text-amber-300 font-mono">-XX:+UseLargePages</strong>: requires the "Lock pages in memory" policy (secpol.msc → Local Policies → User Rights Assignment) and a reboot; without it the JVM ignores the flag with a warning.</li>`);
+            }
+            if (useLargePages && state.os === 'linux') {
+                items.push(pt ? `<li><strong class="text-amber-300 font-mono">-XX:+UseTransparentHugePages</strong>: confira com <code>cat /sys/kernel/mm/transparent_hugepage/enabled</code>; deve mostrar [madvise] ou [always]. Se estiver em [never], a JVM desativa a opção e avisa.</li>`
+                              : `<li><strong class="text-amber-300 font-mono">-XX:+UseTransparentHugePages</strong>: check with <code>cat /sys/kernel/mm/transparent_hugepage/enabled</code>; it should show [madvise] or [always]. If it is [never], the JVM disables the option and warns.</li>`);
+            }
             expList.innerHTML = items.join('');
+            renderLauncherGuide();
         }
 
         function renderHardwareDiagnostics(cpu, gpu, storage) {
@@ -1541,22 +1753,28 @@
                     ? `Otimização de Latência (${state.ddrType} ${state.ramFreq}MHz)`
                     : `Latency Optimization (${state.ddrType} ${state.ramFreq}MHz)`;
                 ramStatusDesc = lang === 'pt'
-                    ? `Frequências até 2666MHz limitam levemente o Infinity Fabric / Ring Bus. Usar GraalVM 21 + SoftMaxHeapSize=${state.softMaxGB}G evita varreduras longas na RAM e mantém o FPS estável.`
-                    : `Speeds up to 2666MHz slightly bottleneck Infinity Fabric / Ring Bus. Using GraalVM 21 + SoftMaxHeapSize=${state.softMaxGB}G avoids long RAM sweeps and keeps frametimes smooth.`;
+                    ? `Frequências até 2666MHz limitam levemente o Infinity Fabric / Ring Bus. O GC ajustado do painel (SoftMaxHeapSize=${state.softMaxGB}G no ZGC, ou G1 com pausas curtas) evita varreduras longas na RAM e mantém o FPS estável.`
+                    : `Speeds up to 2666MHz slightly bottleneck Infinity Fabric / Ring Bus. The panel's tuned GC (SoftMaxHeapSize=${state.softMaxGB}G on ZGC, or G1 with short pauses) avoids long RAM sweeps and keeps frametimes smooth.`;
                 ramColor = "border-emerald-500/30 bg-emerald-950/20 text-emerald-300";
             } else {
                 ramStatusTitle = lang === 'pt'
                     ? `Banda de Memória Rápida (${state.ddrType} ${state.ramFreq}MHz)`
                     : `Fast Memory Bandwidth (${state.ddrType} ${state.ramFreq}MHz)`;
                 ramStatusDesc = lang === 'pt'
-                    ? `Sua memória tem excelente taxa de transferência! O ZGC Generacional no GraalVM 21 limpará objetos temporários de chunks em sub-milissegundos.`
-                    : `Your RAM offers high throughput! Generational ZGC on GraalVM 21 will sweep temporary chunk objects in sub-milliseconds.`;
+                    ? `Sua memória tem excelente taxa de transferência! O GC ajustado (ZGC ou G1) limpará objetos temporários de chunks com pausas curtas.`
+                    : `Your RAM offers high throughput! The tuned GC (ZGC or G1) will sweep temporary chunk objects with short pauses.`;
                 ramColor = "border-cyan-500/30 bg-cyan-950/20 text-cyan-300";
             }
 
             // Canais de memória / largura de banda teórica
             const bwNow = memBandwidthGBs();
-            if (state.memChannels === 1) {
+            if (cpu.apple) {
+                ramStatusTitle = lang === 'pt' ? `Memória unificada (~${bwNow} GB/s)` : `Unified memory (~${bwNow} GB/s)`;
+                ramStatusDesc = lang === 'pt'
+                    ? `O chip Apple usa uma única memória unificada compartilhada entre CPU e GPU, com banda muito alta. Não há DDR nem dual-channel para configurar: deixe memória livre para o macOS e para a GPU ao alocar o heap.`
+                    : `The Apple chip uses a single unified memory shared by CPU and GPU, with very high bandwidth. There is no DDR or dual-channel to configure: leave memory free for macOS and the GPU when sizing the heap.`;
+                ramColor = "border-cyan-500/30 bg-cyan-950/20 text-cyan-300";
+            } else if (state.memChannels === 1) {
                 ramStatusDesc += lang === 'pt'
                     ? ` Single-channel: banda teórica de ~${bwNow} GB/s (em dual-channel seriam ~${memBandwidthGBs(2)} GB/s). ${gpu.igpu ? 'Com iGPU o impacto é grande, pois ela divide essa banda com a CPU. ' : ''}Instale um segundo pente idêntico.`
                     : ` Single-channel: theoretical bandwidth of ~${bwNow} GB/s (dual-channel would give ~${memBandwidthGBs(2)} GB/s). ${gpu.igpu ? 'With an iGPU the impact is large, since it shares that bandwidth with the CPU. ' : ''}Install a second matching stick.`;
@@ -1573,6 +1791,11 @@
                 gpuDesc = lang === 'pt'
                     ? `A ${cpu.name} não possui iGPU. Escolha uma placa de vídeo dedicada na lista ou selecione uma CPU com gráficos integrados (ex.: Ryzen 5 5600G, Core i5-12400).`
                     : `The ${cpu.name} has no iGPU. Pick a dedicated graphics card from the list or choose a CPU with integrated graphics (e.g. Ryzen 5 5600G, Core i5-12400).`;
+            } else if (gpu.unified) {
+                gpuTitle = lang === 'pt' ? `Memória unificada: ${gpu.name}` : `Unified memory: ${gpu.name}`;
+                gpuDesc = lang === 'pt'
+                    ? `Na ${gpu.name} a GPU usa a mesma memória da CPU, sem VRAM separada nem necessidade de dual-channel. Use um Java ARM64 (aarch64), mantenha o Mac na tomada e fora do Modo de baixo consumo e reserve memória para o macOS.`
+                    : `On the ${gpu.name} the GPU shares the CPU's memory, with no separate VRAM and no need for dual-channel. Use an ARM64 (aarch64) Java, keep the Mac plugged in and out of Low Power Mode, and reserve memory for macOS.`;
             } else if (gpu.igpu) {
                 gpuTitle = lang === 'pt' ? `Gráficos Integrados: ${gpu.name}` : `Integrated Graphics: ${gpu.name}`;
                 gpuDesc = lang === 'pt'
@@ -1644,7 +1867,11 @@
                 const nbTitle = hybrid
                     ? (lang === 'pt' ? 'Notebook com GPU dedicada + iGPU' : 'Notebook with dedicated GPU + iGPU')
                     : (lang === 'pt' ? 'Notebook com gráficos integrados' : 'Notebook with integrated graphics');
-                const nbDesc = hybrid
+                const nbDesc = (hybrid && state.os === 'linux')
+                    ? (lang === 'pt'
+                        ? `No Linux o Java costuma usar a GPU integrada. Nas variáveis de ambiente do launcher, use <code>DRI_PRIME=1</code> (AMD/Intel/Mesa) ou <code>__NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia</code> (NVIDIA) para usar a GPU dedicada. Mantenha o notebook na tomada.`
+                        : `On Linux, Java often uses the integrated GPU. In the launcher's environment variables, use <code>DRI_PRIME=1</code> (AMD/Intel/Mesa) or <code>__NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia</code> (NVIDIA) to use the dedicated GPU. Keep the laptop plugged in.`)
+                    : hybrid
                     ? (lang === 'pt'
                         ? `O Windows costuma abrir o Java na iGPU. Em Configurações > Sistema > Vídeo > Elementos gráficos, adicione o <code>javaw.exe</code> e marque "Alto desempenho"; sem isso o jogo pode rodar na iGPU com metade do FPS. Use o notebook na tomada, com perfil de energia de alto desempenho (e o modo GPU dedicada/MUX, se existir).`
                         : `Windows often launches Java on the iGPU. Under Settings > System > Display > Graphics, add <code>javaw.exe</code> and set "High performance"; otherwise the game may run on the iGPU at half the FPS. Keep the laptop plugged in with a high-performance power plan (and use dGPU/MUX mode if available).`)
@@ -2154,8 +2381,8 @@ defaultConfigPath = "defaultconfigs"`;
                 filePath = lang === 'pt' ? `Painel de Controle do Driver (${gpu.name})` : `GPU Driver Control Panel (${gpu.name})`;
                 hwTag = `${gpu.vendorLabel || gpu.vendor.toUpperCase()} Profile + Oculus/Iris Shaders`;
                 desc = lang === 'pt'
-                    ? "Configurações no sistema operacional e driver de vídeo para o executável javaw.exe do seu Java 21."
-                    : "OS and GPU driver settings for your Java 21 javaw.exe executable.";
+                    ? "Configurações no sistema operacional e driver de vídeo para o executável javaw.exe do seu Java."
+                    : "OS and GPU driver settings for your Java javaw.exe executable.";
 
                 if (gpu.none) {
                     filePath = lang === 'pt' ? 'Painel de Controle do Driver (sem GPU definida)' : 'GPU Driver Control Panel (no GPU selected)';
@@ -2170,7 +2397,7 @@ defaultConfigPath = "defaultconfigs"`;
                     code = lang === 'pt'
                         ? `=== PAINEL DE CONTROLE DA NVIDIA (Para ${gpu.name}) ===
 1. Abra o Painel da NVIDIA -> Gerenciar as configurações em 3D -> Aba "Configurações do Programa".
-2. Clique em "Adicionar" e selecione o javaw.exe da pasta do seu Java 21.
+2. Clique em "Adicionar" e selecione o javaw.exe da pasta do seu Java.
 3. Aplique exatamente estes valores:
    • Otimização segmentada (Threaded Optimization): LIGADO (Essencial para OpenGL!)
    • Modo de gerenciamento de energia: Preferência por desempenho máximo
@@ -2180,7 +2407,7 @@ defaultConfigPath = "defaultconfigs"`;
    • Método de apresentação Vulkan/OpenGL: Preferir camadas na cadeia de troca DXGI (Ativa Auto-HDR/G-Sync em janela)`
                         : `=== NVIDIA CONTROL PANEL (For ${gpu.name}) ===
 1. Open NVIDIA Control Panel -> Manage 3D Settings -> "Program Settings" tab.
-2. Click "Add" and select javaw.exe from your Java 21 folder.
+2. Click "Add" and select javaw.exe from your Java folder.
 3. Apply these exact settings:
    • Threaded Optimization: ON (Crucial for OpenGL multi-threading!)
    • Power Management Mode: Prefer Maximum Performance
@@ -2191,7 +2418,7 @@ defaultConfigPath = "defaultconfigs"`;
                 } else if (gpu.vendor === 'amd') {
                     code = lang === 'pt'
                         ? `=== AMD SOFTWARE: ADRENALIN EDITION (Para ${gpu.name}) ===
-1. Abra o AMD Adrenalin -> Jogos -> Adicione manualmente o javaw.exe do seu Java 21.
+1. Abra o AMD Adrenalin -> Jogos -> Adicione manualmente o javaw.exe do seu Java.
 2. Em versões recentes do driver Windows 11 (22.7.1+), o driver possui otimização nativa OpenGL.
 3. Aplique estes ajustes no perfil do Java:
    • Radeon Anti-Lag: Ativado
@@ -2200,7 +2427,7 @@ defaultConfigPath = "defaultconfigs"`;
    • Qualidade de filtragem de textura: Desempenho
    • Se usar Shaders (Oculus/Iris): Desative o "Radeon Boost" para evitar mudança brusca de resolução.`
                         : `=== AMD SOFTWARE: ADRENALIN EDITION (For ${gpu.name}) ===
-1. Open AMD Adrenalin -> Gaming -> Manually add javaw.exe from your Java 21 folder.
+1. Open AMD Adrenalin -> Gaming -> Manually add javaw.exe from your Java folder.
 2. Modern AMD drivers (22.7.1+) feature a rebuilt hardware-accelerated OpenGL pipeline.
 3. Apply these profile settings for Java:
    • Radeon Anti-Lag: Enabled
@@ -2212,19 +2439,51 @@ defaultConfigPath = "defaultconfigs"`;
                     code = lang === 'pt'
                         ? `=== INTEL ARC CONTROL / GRÁFICOS INTEL (Para ${gpu.name}) ===
 1. Nas configurações gráficas do Windows (Sistema -> Tela -> Elementos Gráficos):
-   • Adicione o javaw.exe do Java 21 e marque "Alto Desempenho (${gpu.name})".
+   • Adicione o javaw.exe do seu Java e marque "Alto Desempenho (${gpu.name})".
 2. Em placas Intel Arc dedicadas:
    • Certifique-se de que o Resizable BAR (ReBAR) esteja ATIVO na BIOS da placa-mãe.
    • No embeddium-options.json, mantivemos "use_no_error_g_l_context": false para máxima estabilidade no driver OpenGL da Intel.`
                         : `=== INTEL ARC CONTROL / INTEL GRAPHICS (For ${gpu.name}) ===
 1. In Windows Graphics Settings (System -> Display -> Graphics):
-   • Add Java 21's javaw.exe and select "High Performance (${gpu.name})".
+   • Add your Java's javaw.exe and select "High Performance (${gpu.name})".
 2. On dedicated Intel Arc GPUs:
    • Ensure Resizable BAR (ReBAR) is ENABLED in your motherboard BIOS.
    • In embeddium-options.json, we kept "use_no_error_g_l_context": false for maximum stability with Intel's OpenGL driver.`;
                 }
+                if (state.os === 'linux' && !gpu.none) {
+                    const nv = gpu.vendor === 'nvidia';
+                    const hyb = isHybridNotebook(cpu, gpu);
+                    filePath = lang === 'pt' ? 'Variáveis de ambiente do launcher (Linux)' : 'Launcher environment variables (Linux)';
+                    hwTag = nv ? 'NVIDIA proprietary driver • Linux' : `${gpu.vendorLabel || gpu.vendor.toUpperCase()} Mesa • Linux`;
+                    desc = lang === 'pt'
+                        ? 'Variáveis de ambiente para o campo de variáveis do launcher (ou como prefixo do comando de inicialização).'
+                        : "Environment variables for the launcher's variables field (or as a prefix of the launch command).";
+                    const envLines = nv
+                        ? ['__GL_THREADED_OPTIMIZATIONS=1', '__GL_SYNC_TO_VBLANK=0'].concat(hyb ? ['__NV_PRIME_RENDER_OFFLOAD=1', '__GLX_VENDOR_LIBRARY_NAME=nvidia'] : [])
+                        : ['mesa_glthread=true', 'vblank_mode=0'].concat(hyb ? ['DRI_PRIME=1'] : []);
+                    code = (lang === 'pt'
+                        ? `# Variáveis de ambiente (${nv ? 'driver proprietário NVIDIA' : 'Mesa: AMD / Intel'})\n`
+                        : `# Environment variables (${nv ? 'NVIDIA proprietary driver' : 'Mesa: AMD / Intel'})\n`) + envLines.join('\n');
+                } else if (state.os === 'macos' && !gpu.none) {
+                    filePath = lang === 'pt' ? 'Ajustes do macOS e Java ARM64' : 'macOS settings and ARM64 Java';
+                    hwTag = 'Apple Silicon • macOS';
+                    desc = lang === 'pt' ? 'O macOS gerencia o driver da GPU: não há painel para ajustar. Estes são os pontos que importam.' : 'macOS manages the GPU driver: there is no panel to tune. These are the points that matter.';
+                    code = lang === 'pt'
+                        ? `=== macOS (${gpu.name}) ===
+1. Use um Java ARM64 (aarch64): Temurin ou Oracle GraalVM para macOS aarch64.
+   Java x64 roda via Rosetta e perde bastante desempenho.
+2. Ajustes do Sistema -> Bateria: desative o "Modo de baixo consumo" e jogue na tomada.
+3. No embeddium-options.json mantivemos "use_no_error_g_l_context": false
+   para máxima estabilidade com o driver OpenGL da Apple.`
+                        : `=== macOS (${gpu.name}) ===
+1. Use an ARM64 (aarch64) Java: Temurin or Oracle GraalVM for macOS aarch64.
+   x64 Java runs through Rosetta and loses a lot of performance.
+2. System Settings -> Battery: turn off "Low Power Mode" and play plugged in.
+3. In embeddium-options.json we kept "use_no_error_g_l_context": false
+   for maximum stability with Apple's OpenGL driver.`;
+                }
                 let shaderAdvPt, shaderAdvEn;
-                if (gpu.igpu || gpu.tier === 'low' || gpu.tier === 'entry') {
+                if ((gpu.igpu && !gpu.unified) || gpu.tier === 'low' || gpu.tier === 'entry') {
                     shaderAdvPt = 'esta GPU é de nível básico: evite Shaders. Se quiser testar, use o perfil Low e <strong>Shadow Distance de 4 a 6 chunks</strong>.';
                     shaderAdvEn = 'this is an entry-level GPU: avoid Shaders. If you want to try, use the Low profile and a <strong>Shadow Distance of 4 to 6 chunks</strong>.';
                 } else if (gpu.tier === 'mid') {
@@ -2237,10 +2496,15 @@ defaultConfigPath = "defaultconfigs"`;
                 tips = gpu.none ? '' : (lang === 'pt'
                     ? `<strong>Dica para Shaders (Oculus / Iris) na ${gpu.name}:</strong> ${shaderAdvPt}`
                     : `<strong>Shader tip (Oculus / Iris) on ${gpu.name}:</strong> ${shaderAdvEn}`);
-                if (isHybridNotebook(cpu, gpu)) {
+                if (isHybridNotebook(cpu, gpu) && state.os === 'windows') {
                     tips += lang === 'pt'
                         ? `<br><br><strong>Notebook:</strong> em Configurações > Sistema > Vídeo > Elementos gráficos, adicione o <code>javaw.exe</code> como "Alto desempenho" para forçar a GPU dedicada.`
                         : `<br><br><strong>Laptop:</strong> under Settings > System > Display > Graphics, add <code>javaw.exe</code> as "High performance" to force the dedicated GPU.`;
+                }
+                if (state.os === 'linux') {
+                    tips += lang === 'pt'
+                        ? `<br><br><strong>Linux:</strong> coloque estas variáveis no campo de variáveis de ambiente do launcher (no Modrinth App fica em <em>Java e memória</em>; em outros, prefixe o comando de inicialização). Para as <em>Transparent Huge Pages</em>, marque a opção ao lado da linha de argumentos.`
+                        : `<br><br><strong>Linux:</strong> put these variables in the launcher's environment variables field (in the Modrinth App it is under <em>Java and memory</em>; in others, prefix the launch command). For <em>Transparent Huge Pages</em>, tick the option next to the arguments line.`;
                 }
             }
 
@@ -2257,8 +2521,8 @@ defaultConfigPath = "defaultconfigs"`;
         const checklistItems = [
             {
                 id: "gchk-1",
-                pt: "Baixar o Java da engine escolhida (Oracle GraalVM 21 ou Temurin 21) e selecionar o javaw.exe dele nas configurações do Launcher",
-                en: "Download the Java of the chosen engine (Oracle GraalVM 21 or Temurin 21) and select its javaw.exe in your Launcher settings"
+                pt: "Baixar o Java da engine escolhida (Oracle GraalVM ou Temurin, na versão selecionada) e apontar o Launcher para o executável dele (javaw.exe no Windows, bin/java no Linux/macOS)",
+                en: "Download the Java of the chosen engine (Oracle GraalVM or Temurin, in the selected version) and point your Launcher to its executable (javaw.exe on Windows, bin/java on Linux/macOS)"
             },
             {
                 id: "gchk-2",
@@ -2267,8 +2531,8 @@ defaultConfigPath = "defaultconfigs"`;
             },
             {
                 id: "gchk-3",
-                pt: "Definir a memória RAM Mínima e Máxima iguais no Launcher conforme calculado acima",
-                en: "Set Minimum and Maximum RAM to the exact same value in Launcher as calculated above"
+                pt: "Definir a memória RAM Mínima e Máxima iguais no Launcher conforme calculado acima (ou usar a linha com -Xms/-Xmx se o Launcher não tiver campo de memória)",
+                en: "Set Minimum and Maximum RAM to the exact same value in Launcher as calculated above (or use the line with -Xms/-Xmx if the Launcher has no memory field)"
             },
             {
                 id: "gchk-4",
@@ -2287,13 +2551,13 @@ defaultConfigPath = "defaultconfigs"`;
             },
             {
                 id: "gchk-7",
-                pt: "Travar a Distância de Simulação em 6 a 8 chunks nas opções de Vídeo do jogo",
-                en: "Lock Simulation Distance to 6–8 chunks in in-game Video Settings"
+                pt: "Ajustar a Distância de Renderização e de Simulação conforme as recomendações do painel de diagnóstico",
+                en: "Set Render and Simulation Distance according to the recommendations in the diagnostics panel"
             },
             {
                 id: "gchk-8",
-                pt: "Aplicar a otimização do Driver da placa de vídeo (aba 9 da Seção 4) para o javaw.exe",
-                en: "Apply the GPU Driver optimization profile (Tab 9 of Section 4) for javaw.exe"
+                pt: "Aplicar a otimização do Driver da placa de vídeo (aba 9 da Seção 4) para o Java",
+                en: "Apply the GPU Driver optimization profile (Tab 9 of Section 4) for Java"
             }
         ];
 
