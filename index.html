@@ -618,7 +618,7 @@
                                 <span id="ram-alloc-mb" class="text-sm font-mono text-emerald-400">(12288 MiB)</span>
                             </div>
                         </div>
-                        <input type="range" id="ram-slider" min="4" max="24" step="1" value="12" oninput="onRamSliderInput(this.value)" class="w-40 sm:w-56 accent-emerald-500 cursor-pointer">
+                        <input type="range" id="ram-slider" min="4" max="30" step="1" value="12" oninput="onRamSliderInput(this.value)" class="w-40 sm:w-56 accent-emerald-500 cursor-pointer">
                     </div>
 
                     <div class="flex flex-wrap items-center gap-3">
@@ -1398,11 +1398,15 @@
             onHardwareChange();
         }
 
+        // Máximo do slider = RAM do sistema - 2 GB (o aviso de memória livre cuida do resto)
+        function syncRamSliderBounds() {
+            document.getElementById('ram-slider').max = Math.max(6, state.sysRamGB - 2);
+        }
+
         function onSystemRamChange() {
             state.sysRamGB = parseInt(document.getElementById('select-sys-ram').value, 10);
             applyAutoEngine(true);
-            const slider = document.getElementById('ram-slider');
-            slider.max = Math.max(6, state.sysRamGB - 2);
+            syncRamSliderBounds();
 
             // Ajusta automaticamente a RAM alocada se ultrapassar o limite seguro do sistema
             if (state.sysRamGB <= 8) {
@@ -1533,6 +1537,7 @@
         // ============================================================================
         function recalculateAll() {
             applyOsUi();
+            syncRamSliderBounds();
             const lang = state.lang;
             const cpu = cpuDatabase[state.cpuKey];
             const gpu = getActiveGpu();
