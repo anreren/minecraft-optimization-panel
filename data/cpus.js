@@ -16,6 +16,8 @@
 //   igpu          Key of the integrated GPU in gpus.js (null = no iGPU)
 //   st            Single-thread tier: "low" | "mid" | "high" | "top"
 //   mobile        true for laptop / low-power chips (optional)
+//   apple         true for Apple Silicon (macOS only, unified memory) (optional)
+//   memType/memFreq/bw  Apple only: memory shown in the UI (DDR type, MT/s) and real bandwidth in GB/s
 // ============================================================================
 
 const cpuDatabase = {
@@ -107,5 +109,15 @@ const cpuDatabase = {
     xeon_gold_6130: { name: "Intel Xeon Gold 6130 / Silver 4216", cores: 16, threads: 32, arch: "Skylake/Cascade Lake-SP", avx: 3, l3: "22MB", concGC: 6, parGC: 16, chunkThreads: 8, fmlThreads: 24, igpu: null, st: "low" },
 
     // --- AMD FX (AM3+ - DDR3) ---
-    fx_8350: { name: "AMD FX-8350 / FX-6300", cores: 8, threads: 8, arch: "Piledriver", avx: 1, l3: "8MB", concGC: 2, parGC: 6, chunkThreads: 2, fmlThreads: 6, igpu: null, st: "low" }
+    fx_8350: { name: "AMD FX-8350 / FX-6300", cores: 8, threads: 8, arch: "Piledriver", avx: 1, l3: "8MB", concGC: 2, parGC: 6, chunkThreads: 2, fmlThreads: 6, igpu: null, st: "low" },
+
+    // --- Apple Silicon (macOS) ---
+    m1: { name: "Apple M1", cores: 8, threads: 8, arch: "ARM64 • 4P+4E", avx: 0, l3: "SLC", concGC: 2, parGC: 6, chunkThreads: 3, fmlThreads: 6, igpu: "igpu_apple_m1", st: "high", apple: true, memType: "DDR4", memFreq: 4400, bw: 68 },
+    m1_pro: { name: "Apple M1 Pro / M1 Max", cores: 10, threads: 10, arch: "ARM64 • 8P+2E", avx: 0, l3: "SLC", concGC: 2, parGC: 6, chunkThreads: 4, fmlThreads: 8, igpu: "igpu_apple_m1_pro", st: "high", apple: true, memType: "DDR5", memFreq: 6400, bw: 200 },
+    m2: { name: "Apple M2", cores: 8, threads: 8, arch: "ARM64 • 4P+4E", avx: 0, l3: "SLC", concGC: 2, parGC: 6, chunkThreads: 3, fmlThreads: 6, igpu: "igpu_apple_m2", st: "top", apple: true, memType: "DDR5", memFreq: 6400, bw: 100 },
+    m2_pro: { name: "Apple M2 Pro / M2 Max", cores: 12, threads: 12, arch: "ARM64 • 8P+4E", avx: 0, l3: "SLC", concGC: 3, parGC: 8, chunkThreads: 4, fmlThreads: 10, igpu: "igpu_apple_m2_pro", st: "top", apple: true, memType: "DDR5", memFreq: 6400, bw: 200 },
+    m3: { name: "Apple M3", cores: 8, threads: 8, arch: "ARM64 • 4P+4E", avx: 0, l3: "SLC", concGC: 2, parGC: 6, chunkThreads: 3, fmlThreads: 6, igpu: "igpu_apple_m3", st: "top", apple: true, memType: "DDR5", memFreq: 6400, bw: 100 },
+    m3_pro: { name: "Apple M3 Pro / M3 Max", cores: 12, threads: 12, arch: "ARM64 • 6P+6E", avx: 0, l3: "SLC", concGC: 3, parGC: 8, chunkThreads: 4, fmlThreads: 10, igpu: "igpu_apple_m3_pro", st: "top", apple: true, memType: "DDR5", memFreq: 6400, bw: 150 },
+    m4: { name: "Apple M4", cores: 10, threads: 10, arch: "ARM64 • 4P+6E", avx: 0, l3: "SLC", concGC: 2, parGC: 6, chunkThreads: 4, fmlThreads: 8, igpu: "igpu_apple_m4", st: "top", apple: true, memType: "DDR5", memFreq: 7600, bw: 120 },
+    m4_pro: { name: "Apple M4 Pro / M4 Max", cores: 14, threads: 14, arch: "ARM64 • 10P+4E", avx: 0, l3: "SLC", concGC: 3, parGC: 8, chunkThreads: 4, fmlThreads: 12, igpu: "igpu_apple_m4_pro", st: "top", apple: true, memType: "DDR5", memFreq: 7600, bw: 273 }
 };
