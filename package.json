@@ -1,0 +1,15 @@
+{
+  "name": "minecraft-optimization-panel",
+  "version": "0.0.0-dev",
+  "private": true,
+  "description": "Interactive Minecraft modded optimizer: JVM arguments, RAM budget and config generator",
+  "scripts": {
+    "test": "node tests/check-data.js && node tests/check-browser.js && python3 tests/validate-jvm.py",
+    "test:data": "node tests/check-data.js",
+    "test:browser": "node tests/check-browser.js",
+    "test:jvm": "python3 tests/validate-jvm.py"
+  },
+  "devDependencies": {
+    "puppeteer": "^24.0.0"
+  }
+}
