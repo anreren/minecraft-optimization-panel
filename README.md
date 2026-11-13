@@ -76,7 +76,7 @@ Mobile CPUs and laptop GPUs are flagged. With a dedicated GPU the tool warns tha
 * **Launcher (Prism/MultiMC, CurseForge, Modrinth, ATLauncher, official, other):** launchers with their own memory field get a line **without** `-Xms/-Xmx` (so memory is not duplicated), while the official launcher gets the full line. A step-by-step guide shows where to paste each part, and warns if the two settings conflict.
 
 ### 5. Oracle GraalVM JIT Flags (`-XX:+UseJVMCICompiler`)
-Used only by the GraalVM engines. On **Java 23+** the `-Dgraal.*` options are omitted, because their prefix changed in newer GraalVM versions:
+Used only by the **Oracle GraalVM + G1GC** engine. With ZGC the JVM disables JVMCI (OpenJDK 21 prints `Setting EnableJVMCI to false as selected GC does not support JVMCI: z gc`), so the *Oracle GraalVM (ZGC)* engine runs on the default C2 compiler and the line carries no Graal flags. This was verified on OpenJDK 21, not on Oracle GraalVM itself. On **Java 23+** the `-Dgraal.*` options are omitted, because their prefix changed in newer GraalVM versions:
 * `-XX:+UseJVMCICompiler -XX:+EagerJVMCI -Dgraal.TuneInlinerExploration=1 -Dgraal.CompilerConfiguration=community`
 * More exploratory inlining on heavy mod loops. The gain varies by modpack, and the JIT spends extra CPU and RAM while warming up, which is why weaker machines are moved to Temurin + G1.
 
@@ -91,6 +91,9 @@ Used only by the GraalVM engines. On **Java 23+** the `-Dgraal.*` options are om
 * **Dynamic Mod Catalog:** Adapts mod recommendations based on your chosen Mod Loader (**Forge**, **NeoForge**, or **Fabric**) and Minecraft version (**1.20.1** to **1.21.4+**).
 * **Config Code Generator:** Auto-generates configuration files for *ModernFix*, *Embeddium/Sodium*, *FerriteCore*, *EntityCulling*, *ImmediatelyFast*, *BadOptimizations*, *Radium/Lithium*, *C2ME* (Fabric), *Forge/NeoForge* (`fml.toml`, plus `forge-client.toml` on Forge) and GPU driver control panels. Only some files depend on your hardware (Embeddium/Sodium, EntityCulling, ModernFix, loader tab); the others are universal profiles.
 * **Interactive Checklist:** Tracks your setup progress across instances with `localStorage` persistence.
+* **Saved & Shareable Configuration:** Your whole setup (hardware, Java, OS, launcher, RAM profile, language) is saved in `localStorage` and mirrored in the page URL hash. The **Share** button copies a link that reopens the exact same configuration, and the reset button restores the defaults. Only values that exist in the dropdowns are accepted, so a tampered link falls back to the defaults.
+* **Accessibility:** skip link, visible keyboard focus, labelled controls, ARIA tabs (arrow keys), `aria-pressed` toggles, a live region for notifications and `role="alert"` for the RAM warning, decorative icons hidden from screen readers and support for *reduced motion*.
+* **Remembered RAM Profile:** If a low-RAM machine temporarily forces the *light* profile (8 GB or less), your previous profile is restored when you go back to more RAM.
 
 ---
 
@@ -99,20 +102,47 @@ Used only by the GraalVM engines. On **Java 23+** the `-Dgraal.*` options are om
 * The generated option names follow **Sodium 0.5/0.6** and **Embeddium 0.3**. Mods ignore unknown keys silently, so if the config file created by your own mod version uses different names, trust its names.
 * Thread counts, GC values and tiers are heuristics. Minecraft is mostly bound by single-thread speed, so a many-thread, low-clock CPU (such as an older Xeon) gains chunk-builder threads but will not match a modern desktop CPU.
 * Java 21 or newer is required from Minecraft 1.20.5. Some 1.20.1 packs with older mods still need Java 17, which is why Java 17 can be selected for them.
-* The generated JVM flags were checked against a real OpenJDK 21 for every engine, Java version and OS combination. The Graal-specific flags could not be tested without GraalVM, and Java 17 and 23+ were only validated through the flag logic, not on those JVMs.
+* The generated JVM flags are validated on a real JVM by the test suite (see *Testing*). The CI runs them on Java 17, 21 and 25, but the Graal-specific flags are only exercised by the experimental GraalVM job.
 * Menu names in the launcher guide may differ between launcher versions.
+* The accessibility *structure* (names, roles, keyboard, live regions) is tested in CI. Colour contrast and the 375 px layout were audited by hand against a local Tailwind render, so they are not covered by CI.
 
 ---
 
 ## 📁 Project Structure
 
 ```
-├── index.html        # UI, i18n, calculation logic and config generators
+├── index.html        # Page markup and styles (no inline logic)
+├── js/               # Classic scripts, loaded in this order by index.html
+│   ├── i18n.js           # PT-BR / EN-US translations
+│   ├── config-data.js    # DDR frequencies, storage profiles, launchers, checklist
+│   ├── state.js          # Application state
+│   ├── hardware.js       # Active GPU, memory budget, notebook detection, recommendations
+│   ├── handlers.js       # Selector event handlers (hardware, Java, OS, launcher, RAM)
+│   ├── persistence.js    # localStorage and shareable links
+│   ├── generator.js      # RAM bar, JVM arguments, flag explanations, launcher guide
+│   ├── diagnostics.js    # Diagnostic cards
+│   ├── mods.js           # Mod catalog
+│   ├── configs.js        # Generated config files (Section 4 tabs)
+│   └── ui.js             # Language switch, checklist, clipboard, start-up
 ├── data/
 │   ├── cpus.js       # CPU database (threads, GC values, single-thread tier, iGPU link)
-│   └── gpus.js       # GPU database (dedicated, notebook and integrated GPUs)
+│   └── gpus.js       # GPU database (dedicated, notebook, integrated and Apple GPUs)
+├── tests/
+│   ├── check-data.js     # database consistency (dropdowns, iGPU links, schema, duplicates)
+│   ├── check-browser.js  # translations, generated configs, JVM flag logic, persistence
+│   └── validate-jvm.py   # runs the generated JVM arguments on the installed JVM
+├── .github/workflows/ci.yml  # runs the tests on Java 17, 21 and 25
+├── package.json
+├── CHANGELOG.md
 └── README.md
 ```
+
+### Testing
+```bash
+npm install     # installs puppeteer
+npm test        # data checks + browser checks + JVM flag validation (needs Java and Python 3)
+```
+`check-browser.js` opens the page headless and checks that every translation key exists in both languages, that every generated config file is valid (JSON, TOML-like or properties) for a matrix of hardware, loaders and operating systems, that the JVM flag rules hold (for example `-XX:+ZGenerational` only on Java 21), and that saving and restoring a configuration is lossless. It also guards bugs fixed before, such as the RAM slider limit. `validate-jvm.py` then runs the generated arguments on the installed JVM and fails on any warning. Set `CHROME_PATH` to use a specific Chrome binary.
 
 ### Adding hardware
 1. Add an entry to `data/cpus.js` or `data/gpus.js` (the field list is documented at the top of each file).
@@ -126,7 +156,7 @@ The data files are plain scripts (no modules or build step), so the site works o
 ## 🛠️ Tech Stack
 
 * **Frontend:** Pure HTML5, Tailwind CSS (via CDN), and FontAwesome.
-* **Logic:** Vanilla JavaScript (ES6+), real-time reactive recalculations.
+* **Logic:** Vanilla JavaScript (ES6+), real-time reactive recalculations, split into classic scripts under `js/` (no bundler).
 * **Data:** Hardware databases kept in separate plain-script files under `data/`.
 * **Deployment:** Hosted statically via **GitHub Pages**.
 
