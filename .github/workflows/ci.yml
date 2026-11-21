@@ -17,11 +17,18 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: ${{ matrix.java }}
       - run: npm install
+      - name: Enable shmem THP for ZGC tests
+        run: |
+          if [ -w /sys/kernel/mm/transparent_hugepage/shmem_enabled ]; then
+            echo advise > /sys/kernel/mm/transparent_hugepage/shmem_enabled || true
+          elif command -v sudo >/dev/null 2>&1; then
+            echo advise | sudo tee /sys/kernel/mm/transparent_hugepage/shmem_enabled >/dev/null || true
+          fi
       - run: npm test
 
   graalvm:
@@ -44,4 +51,11 @@ jobs:
           distribution: 'graalvm'
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - run: npm install
+      - name: Enable shmem THP for ZGC tests
+        run: |
+          if [ -w /sys/kernel/mm/transparent_hugepage/shmem_enabled ]; then
+            echo advise > /sys/kernel/mm/transparent_hugepage/shmem_enabled || true
+          elif command -v sudo >/dev/null 2>&1; then
+            echo advise | sudo tee /sys/kernel/mm/transparent_hugepage/shmem_enabled >/dev/null || true
+          fi
       - run: npm run test:browser && npm run test:jvm

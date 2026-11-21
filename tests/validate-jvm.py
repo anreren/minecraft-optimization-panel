@@ -46,6 +46,26 @@ def host_os():
     return sys.platform
 
 
+def linux_thp_supported(is_zgc):
+    """Check whether Linux transparent huge pages are enabled for the selected GC."""
+    try:
+        with open("/sys/kernel/mm/transparent_hugepage/enabled", encoding="utf-8") as fh:
+            enabled = fh.read()
+    except OSError:
+        return False
+    if "[never]" in enabled:
+        return False
+    if is_zgc:
+        try:
+            with open("/sys/kernel/mm/transparent_hugepage/shmem_enabled", encoding="utf-8") as fh:
+                shmem = fh.read()
+            if "[never]" in shmem or ("[advise]" not in shmem and "[always]" not in shmem):
+                return False
+        except OSError:
+            pass
+    return True
+
+
 def main():
     if not os.path.exists(ARGS_FILE):
         sys.exit(f"{ARGS_FILE} not found: run node tests/check-browser.js first")
@@ -54,14 +74,24 @@ def main():
     graal = is_graalvm()
     current_os = host_os()
     run_all = os.environ.get("MCOPT_ALL") == "1"
-    problems, ran, skipped_os = [], 0, 0
+    problems, ran = [], 0
+    skipped_os, skipped_thp, skipped_graal_zgc = 0, 0, 0
     for c in combos:
         jv = int(c["jv"])
+        is_zgc = c["eng"].endswith("_zgc")
         matches = (jv == 23 and major >= 23) or jv == major
         if not (matches or run_all):
             continue
-        if c.get("lp") and c.get("os") != current_os:
-            skipped_os += 1
+        if c.get("lp"):
+            if c.get("os") != current_os:
+                skipped_os += 1
+                continue
+            if current_os == "linux" and not linux_thp_supported(is_zgc):
+                skipped_thp += 1
+                continue
+        # ZGC targets OpenJDK/Temurin on Java 21; Oracle GraalVM 21 enables JVMCI by default and warns on ZGC
+        if graal and major < 23 and is_zgc:
+            skipped_graal_zgc += 1
             continue
         args = c["args"].strip()
         args = re.sub(r"-XX:SoftMaxHeapSize=\d+G", "-XX:SoftMaxHeapSize=1G", args)
@@ -78,7 +108,14 @@ def main():
         for p in problems:
             print(" - " + p)
         sys.exit(1)
-    extra = f", skipped {skipped_os} non-{current_os} large-pages set(s)" if skipped_os else ""
+    skips = []
+    if skipped_os:
+        skips.append(f"{skipped_os} non-{current_os} large-pages set(s)")
+    if skipped_thp:
+        skips.append(f"{skipped_thp} unconfigured Linux THP set(s)")
+    if skipped_graal_zgc:
+        skips.append(f"{skipped_graal_zgc} ZGC set(s) on GraalVM <23")
+    extra = f", skipped {'; '.join(skips)}" if skips else ""
     print(f"validate-jvm: OK ({ran} argument sets on Java {major}{', Graal JIT flags kept' if graal else ', Graal flags stripped (not GraalVM)'}{extra})")
 
 

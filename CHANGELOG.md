@@ -13,7 +13,7 @@ All notable changes to this project are documented here. The format follows
 - Legacy URL hash fallback mapping `#e=graal_zgc` to `temurin_zgc` in `js/persistence.js`.
 
 ### Changed
-- **GitHub Actions CI:** moved `.github/ci.yml` to `.github/workflows/ci.yml` so workflows actually execute on pushes and PRs.
+- **GitHub Actions CI:** moved `.github/ci.yml` to `.github/workflows/ci.yml` so workflows actually execute on pushes and PRs, upgraded `actions/setup-java` to `v5`, and enabled `/sys/kernel/mm/transparent_hugepage/shmem_enabled=advise` on Linux runners so Java 25 ZGC + THP checks run cleanly.
 - **Default JVM engine:** changed default and auto-recommended engine for capable systems from `graal_zgc` to `temurin_zgc`, and auto-selected `temurin_g1` when Java 17 is chosen.
 - **JVM flags cleanup & client tuning:**
   - Removed `-XX:+UseStringDeduplication` from ZGC profiles (caused a startup warning on Java 17 and young-gen weak-handle retention on Java 21–24) while keeping it on G1GC.
@@ -38,6 +38,8 @@ All notable changes to this project are documented here. The format follows
 ### Fixed
 - `onRamSliderInput()` now clears `aria-pressed` on all modpack profile cards when the user drags the slider away from a preset.
 - Dynamic Graal flag explanation no longer contradicts Java 23+ arguments.
+- Updated Linux `-XX:+UseTransparentHugePages` guidance in `js/generator.js` to include `/sys/kernel/mm/transparent_hugepage/shmem_enabled=advise` for ZGC on Java 24/25+.
+- `tests/validate-jvm.py` now checks Linux THP/`shmem_enabled` support before running THP combinations and skips OpenJDK-only ZGC profiles on GraalVM <23 (where `EnableJVMCI` is enabled by default).
 
 ### Removed
 - Contradictory `graal_zgc` engine option (ZGC disables JVMCI on Java 21).
