@@ -185,11 +185,11 @@ const gpuDatabase = {
     igpu_irisxe: { name: "Intel Iris Xe Graphics (iGPU)", vendor: "intel", vram: 4, arch: "Intel Xe-LP • 80-96 EU", noErrorCtx: false, tier: "entry", igpu: true, short: "Iris Xe" },
     igpu_arc4xe: { name: "Intel Graphics Arc 4 Xe-cores (iGPU)", vendor: "intel", vram: 4, arch: "Intel Xe-LPG • Arrow Lake", noErrorCtx: false, tier: "low", igpu: true, short: "Arc 4 Xe" },
     igpu_apple_m1: { name: "Apple M1 GPU (iGPU)", vendor: "apple", vram: 4, arch: "Apple GPU • 7-8 cores", noErrorCtx: false, tier: "mid", igpu: true, unified: true, short: "M1 GPU" },
-    igpu_apple_m1_pro: { name: "Apple M1 Pro/Max GPU (iGPU)", vendor: "apple", vram: 8, arch: "Apple GPU • 14-32 cores", noErrorCtx: false, tier: "high", igpu: true, unified: true, short: "M1 Pro/Max GPU" },
+    igpu_apple_m1_pro: { name: "Apple M1 Pro GPU (iGPU)", vendor: "apple", vram: 8, arch: "Apple GPU • 14-16 cores", noErrorCtx: false, tier: "high", igpu: true, unified: true, short: "M1 Pro GPU" },
     igpu_apple_m2: { name: "Apple M2 GPU (iGPU)", vendor: "apple", vram: 4, arch: "Apple GPU • 8-10 cores", noErrorCtx: false, tier: "mid", igpu: true, unified: true, short: "M2 GPU" },
-    igpu_apple_m2_pro: { name: "Apple M2 Pro/Max GPU (iGPU)", vendor: "apple", vram: 8, arch: "Apple GPU • 16-38 cores", noErrorCtx: false, tier: "high", igpu: true, unified: true, short: "M2 Pro/Max GPU" },
+    igpu_apple_m2_pro: { name: "Apple M2 Pro GPU (iGPU)", vendor: "apple", vram: 8, arch: "Apple GPU • 16-19 cores", noErrorCtx: false, tier: "high", igpu: true, unified: true, short: "M2 Pro GPU" },
     igpu_apple_m3: { name: "Apple M3 GPU (iGPU)", vendor: "apple", vram: 4, arch: "Apple GPU • 8-10 cores", noErrorCtx: false, tier: "high", igpu: true, unified: true, short: "M3 GPU" },
-    igpu_apple_m3_pro: { name: "Apple M3 Pro/Max GPU (iGPU)", vendor: "apple", vram: 8, arch: "Apple GPU • 14-40 cores", noErrorCtx: false, tier: "high", igpu: true, unified: true, short: "M3 Pro/Max GPU" },
+    igpu_apple_m3_pro: { name: "Apple M3 Pro GPU (iGPU)", vendor: "apple", vram: 8, arch: "Apple GPU • 14-18 cores", noErrorCtx: false, tier: "high", igpu: true, unified: true, short: "M3 Pro GPU" },
     igpu_apple_m4: { name: "Apple M4 GPU (iGPU)", vendor: "apple", vram: 4, arch: "Apple GPU • 8-10 cores", noErrorCtx: false, tier: "high", igpu: true, unified: true, short: "M4 GPU" },
-    igpu_apple_m4_pro: { name: "Apple M4 Pro/Max GPU (iGPU)", vendor: "apple", vram: 8, arch: "Apple GPU • 16-40 cores", noErrorCtx: false, tier: "high", igpu: true, unified: true, short: "M4 Pro/Max GPU" }
+    igpu_apple_m4_pro: { name: "Apple M4 Pro GPU (iGPU)", vendor: "apple", vram: 8, arch: "Apple GPU • 16-20 cores", noErrorCtx: false, tier: "high", igpu: true, unified: true, short: "M4 Pro GPU" }
 };

@@ -25,10 +25,14 @@ jobs:
       - run: npm test
 
   graalvm:
-    name: JVM flags on Oracle GraalVM
+    name: JVM flags on Oracle GraalVM (${{ matrix.java }})
     runs-on: ubuntu-latest
     # Experimental: checks the Graal-specific flags on a real GraalVM.
     continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        java: ['21', '25']
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -36,7 +40,7 @@ jobs:
           node-version: 20
       - uses: graalvm/setup-graalvm@v1
         with:
-          java-version: '21'
+          java-version: ${{ matrix.java }}
           distribution: 'graalvm'
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - run: npm install

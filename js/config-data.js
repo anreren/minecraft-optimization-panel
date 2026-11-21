@@ -10,19 +10,16 @@ const ddrFrequencies = {
 const storageDatabase = {
     nvme: {
         name: { pt: "SSD NVMe M.2 PCIe", en: "NVMe M.2 PCIe SSD" },
-        spikeTol: "5.0",
         dynResRecommended: true,
         ioDesc: { pt: "I/O Ultra Rápido • Dynamic Resources: Ideal", en: "Ultra-Fast I/O • Dynamic Resources: Ideal" }
     },
     sata: {
         name: { pt: "SSD SATA III", en: "SATA III SSD" },
-        spikeTol: "3.5",
         dynResRecommended: true,
         ioDesc: { pt: "I/O Sólido (~550MB/s) • Dynamic Resources: Ativo", en: "Solid I/O (~550MB/s) • Dynamic Resources: Active" }
     },
     hdd: {
         name: { pt: "HD Mecânico (HDD)", en: "Mechanical Hard Drive (HDD)" },
-        spikeTol: "2.0",
         dynResRecommended: false,
         ioDesc: { pt: "Alta Latência de Busca • Pré-carregar Texturas na RAM", en: "High Seek Latency • Preload Textures in RAM" }
     }
@@ -30,12 +27,12 @@ const storageDatabase = {
 
 // ---- Versão do Java, sistema operacional e launcher ----
 const LAUNCHERS = {
-    prism: { separateMemory: true },
-    curseforge: { separateMemory: true },
-    modrinth: { separateMemory: true },
-    atlauncher: { separateMemory: true },
-    vanilla: { separateMemory: false },
-    other: { separateMemory: null }
+    prism: { separateMemory: true, hasMinRam: true },
+    curseforge: { separateMemory: true, hasMinRam: false },
+    modrinth: { separateMemory: true, hasMinRam: false },
+    atlauncher: { separateMemory: true, hasMinRam: true },
+    vanilla: { separateMemory: false, hasMinRam: false },
+    other: { separateMemory: null, hasMinRam: null }
 };
 
 const ST_TIER_SCORE = { low: 0, mid: 1, high: 2, top: 3 };
@@ -58,8 +55,8 @@ const checklistItems = [
     },
     {
         id: "gchk-3",
-        pt: "Definir a memória RAM Mínima e Máxima iguais no Launcher conforme calculado acima (ou usar a linha com -Xms/-Xmx se o Launcher não tiver campo de memória)",
-        en: "Set Minimum and Maximum RAM to the exact same value in Launcher as calculated above (or use the line with -Xms/-Xmx if the Launcher has no memory field)"
+        pt: "Definir a memória RAM no Launcher conforme calculado acima (Mínima = Máxima no Prism/ATLauncher, slider máximo no CurseForge/Modrinth, ou usar -Xms/-Xmx nos argumentos)",
+        en: "Set RAM in your Launcher as calculated above (Minimum = Maximum in Prism/ATLauncher, maximum slider in CurseForge/Modrinth, or keep -Xms/-Xmx in the arguments)"
     },
     {
         id: "gchk-4",

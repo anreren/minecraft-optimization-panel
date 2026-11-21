@@ -45,9 +45,9 @@ function recommendedVideoSettings(cpu, gpu) {
 }
 
 // RAM: overhead de Metaspace + code cache e reserva da iGPU (memória compartilhada)
-function overheadGB(allocGB) {
+function overheadGB(allocGB, engine = state.jvmEngine) {
     const meta = allocGB <= 7 ? 384 : (allocGB >= 13 ? 768 : 512);
-    const code = allocGB <= 7 ? 384 : 512;
+    const code = engine === 'graal_g1' ? (allocGB <= 7 ? 384 : 512) : 240;
     return +((meta + code) / 1024).toFixed(1);
 }
 
@@ -64,11 +64,10 @@ function maxSafeAllocGB() {
     return 4;
 }
 
-// Engine JVM recomendada: CPUs com poucas threads ou pouca RAM sofrem com ZGC + JIT do Graal
-// (GC concorrente e compilador disputam núcleos e memória com o jogo) -> HotSpot C2 + G1.
+// Engine JVM recomendada: CPUs com poucas threads, pouca RAM ou Java 17 usam G1GC (ZGC não-geracional do Java 17 sofre muito no Minecraft)
 function recommendedEngine() {
     const cpu = cpuDatabase[state.cpuKey];
-    return (cpu.threads <= 6 || state.sysRamGB <= 12) ? 'temurin_g1' : 'graal_zgc';
+    return (cpu.threads <= 6 || state.sysRamGB <= 12 || state.javaVersion === '17') ? 'temurin_g1' : 'temurin_zgc';
 }
 
 function applyAutoEngine(announce) {

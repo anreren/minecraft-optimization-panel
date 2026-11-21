@@ -81,7 +81,7 @@
                     <div>
                         <div class="flex flex-wrap items-center gap-2">
                             <h1 id="i18n-app-title" class="text-lg sm:text-xl font-extrabold tracking-tight text-white">Simulador & Otimizador Universal Minecraft</h1>
-                            <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/40" id="header-engine-badge">Oracle GraalVM 21 (Generational ZGC)</span>
+                            <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/40" id="header-engine-badge">OpenJDK / Temurin 21 (Generational ZGC)</span>
                             <span id="header-loader-badge" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">Forge 1.20.1</span>
                         </div>
                         <p id="header-hw-summary" class="text-xs text-gray-400 mt-0.5">Ryzen 5 5500 (6C/12T) • RTX 3050 6GB (Desktop) • 32GB DDR4 2666MHz • SSD NVMe</p>
@@ -152,8 +152,10 @@
                             <option value="r5_5600">AMD Ryzen 5 5600 / 5600X (6C/12T - Zen 3)</option>
                             <option value="r7_5700x">AMD Ryzen 7 5700X / 5800X (8C/16T - Zen 3)</option>
                             <option value="r7_5700x3d">AMD Ryzen 7 5700X3D / 5800X3D (8C/16T - Zen 3 V-Cache)</option>
-                            <option value="r9_5900x">AMD Ryzen 9 5900X / 5950X (12C/24T - Zen 3)</option>
-                            <option value="r5_3600">AMD Ryzen 5 3600 / 4500 (6C/12T - Zen 2)</option>
+                            <option value="r9_5900x">AMD Ryzen 9 5900X (12C/24T - Zen 3)</option>
+                            <option value="r9_5950x">AMD Ryzen 9 5950X (16C/32T - Zen 3)</option>
+                            <option value="r5_3600">AMD Ryzen 5 3600 / 3600X (6C/12T - Zen 2)</option>
+                            <option value="r5_4500">AMD Ryzen 5 4500 (6C/12T - Zen 2)</option>
                         </optgroup>
                         <optgroup label="AMD Ryzen 7000 / 9000 (AM5 - AVX-512)">
                             <option value="r5_7500f">AMD Ryzen 5 7500F (6C/12T - Zen 4)</option>
@@ -188,11 +190,13 @@
                         <optgroup label="Intel Core 12th - 14th Gen (LGA1700)">
                             <option value="i3_12100f">Intel Core i3-12100F / 13100F / 14100F (4C/8T - Alder/Raptor Lake - sem iGPU)</option>
                             <option value="i3_12100">Intel Core i3-12100 / 13100 / 14100 (4C/8T - Alder/Raptor Lake • iGPU)</option>
-                            <option value="i5_12400f">Intel Core i5-12400F / 13400F (6C/12T - Alder/Raptor Lake - sem iGPU)</option>
+                            <option value="i5_12400f">Intel Core i5-12400F (6C/12T - Alder Lake - sem iGPU)</option>
+                            <option value="i5_13400f">Intel Core i5-13400F / 14400F (10C/16T - Raptor Lake Hybrid - sem iGPU)</option>
                             <option value="i5_12400">Intel Core i5-12400 (6C/12T - Alder Lake • iGPU)</option>
                             <option value="i5_13400">Intel Core i5-13400 / 14400 (10C/16T - Raptor Lake Hybrid • iGPU)</option>
                             <option value="i5_13600k">Intel Core i5-13600K / 14600K (14C/20T - Raptor Lake Hybrid • iGPU)</option>
-                            <option value="i7_13700k">Intel Core i7-13700K / 14700K (16C/24T - Raptor Lake Hybrid • iGPU)</option>
+                            <option value="i7_13700k">Intel Core i7-13700K (16C/24T - Raptor Lake Hybrid • iGPU)</option>
+                            <option value="i7_14700k">Intel Core i7-14700K (20C/28T - Raptor Lake Hybrid • iGPU)</option>
                             <option value="i9_14900k">Intel Core i9-13900K / 14900K (24C/32T - Raptor Lake Hybrid • iGPU)</option>
                         </optgroup>
                         <optgroup label="Intel Core 8th - 11th Gen & Pentium (LGA1151 / LGA1200)">
@@ -235,17 +239,17 @@
                             <option value="xeon_gold_6130">Intel Xeon Gold 6130 / Silver 4216 (16C/32T - Skylake/Cascade Lake-SP)</option>
                         </optgroup>
                         <optgroup label="AMD FX (AM3+ - DDR3)">
-                            <option value="fx_8350">AMD FX-8350 / FX-6300 (8C/8T - Piledriver)</option>
+                            <option value="fx_8350">AMD FX-8350 / FX-8320 (8C/8T - Piledriver)</option>
                         </optgroup>
                         <optgroup label="Apple Silicon (macOS)">
                             <option value="m1">Apple M1 (8C/8T - ARM64 • 4P+4E • iGPU)</option>
-                            <option value="m1_pro">Apple M1 Pro / M1 Max (10C/10T - ARM64 • 8P+2E • iGPU)</option>
+                            <option value="m1_pro">Apple M1 Pro (10C/10T - ARM64 • 8P+2E • iGPU)</option>
                             <option value="m2">Apple M2 (8C/8T - ARM64 • 4P+4E • iGPU)</option>
-                            <option value="m2_pro">Apple M2 Pro / M2 Max (12C/12T - ARM64 • 8P+4E • iGPU)</option>
+                            <option value="m2_pro">Apple M2 Pro (12C/12T - ARM64 • 8P+4E • iGPU)</option>
                             <option value="m3">Apple M3 (8C/8T - ARM64 • 4P+4E • iGPU)</option>
-                            <option value="m3_pro">Apple M3 Pro / M3 Max (12C/12T - ARM64 • 6P+6E • iGPU)</option>
+                            <option value="m3_pro">Apple M3 Pro (12C/12T - ARM64 • 6P+6E • iGPU)</option>
                             <option value="m4">Apple M4 (10C/10T - ARM64 • 4P+6E • iGPU)</option>
-                            <option value="m4_pro">Apple M4 Pro / M4 Max (14C/14T - ARM64 • 10P+4E • iGPU)</option>
+                            <option value="m4_pro">Apple M4 Pro (14C/14T - ARM64 • 10P+4E • iGPU)</option>
                         </optgroup>
                     </select>
                     <p id="cpu-meta-desc" class="text-[11px] text-gray-400 font-mono">Zen 3 • Thread única: Alta • L3 16MB • ConcGC: 3 / ParGC: 8</p>
@@ -449,7 +453,7 @@
                 <div class="bg-gray-950/80 border border-gray-800 rounded-xl p-3.5 space-y-2">
                     <label for="select-storage" class="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-purple-400">
                         <span><i aria-hidden="true" class="fa-solid fa-hard-drive mr-1.5"></i><span id="i18n-lbl-storage">Armazenamento</span></span>
-                        <span id="storage-badge-io" class="font-mono text-[11px] bg-purple-500/15 px-2 py-0.5 rounded border border-purple-500/30">SpikeTol: 5.0</span>
+                        <span id="storage-badge-io" class="font-mono text-[11px] bg-purple-500/15 px-2 py-0.5 rounded border border-purple-500/30">DynRes: ON</span>
                     </label>
                     <select id="select-storage" onchange="onHardwareChange()" class="w-full bg-gray-900 border border-gray-700/80 rounded-lg px-3 py-2 text-xs sm:text-sm text-white font-medium focus:outline-none focus:border-purple-500">
                         <option value="nvme" data-pt="SSD NVMe M.2 PCIe (3500+ MB/s)" data-en="NVMe M.2 PCIe SSD (3500+ MB/s)" selected>SSD NVMe M.2 PCIe (3500+ MB/s)</option>
@@ -499,10 +503,9 @@
                             <i aria-hidden="true" class="fa-solid fa-fire-flame-curved mr-1.5"></i><span id="i18n-lbl-jvm">Distribuição Java e GC</span>
                         </label>
                         <select id="select-jvm-engine" onchange="onEngineChange()" class="w-full bg-gray-900 border border-purple-500/50 rounded-lg px-3 py-2 text-xs sm:text-sm text-white font-semibold focus:outline-none focus:border-purple-400">
-                            <option value="graal_zgc" data-pt="Oracle GraalVM (ZGC, JIT padrão) ★" data-en="Oracle GraalVM (ZGC, default JIT) ★" selected>Oracle GraalVM (ZGC, JIT padrão) ★</option>
+                            <option value="temurin_zgc" data-pt="OpenJDK / Adoptium Temurin (ZGC) ★" data-en="OpenJDK / Adoptium Temurin (ZGC) ★" selected>OpenJDK / Adoptium Temurin (ZGC) ★</option>
+                            <option value="temurin_g1" data-pt="OpenJDK / Adoptium Temurin (G1GC Tuned — PCs modestos / Java 17)" data-en="OpenJDK / Adoptium Temurin (G1GC Tuned — modest PCs / Java 17)">OpenJDK / Adoptium Temurin (G1GC Tuned — PCs modestos / Java 17)</option>
                             <option value="graal_g1" data-pt="Oracle GraalVM (G1GC Tuned + JIT Graal)" data-en="Oracle GraalVM (G1GC Tuned + Graal JIT)">Oracle GraalVM (G1GC Tuned + JIT Graal)</option>
-                            <option value="temurin_zgc" data-pt="OpenJDK / Adoptium Temurin (ZGC)" data-en="OpenJDK / Adoptium Temurin (ZGC)">OpenJDK / Adoptium Temurin (ZGC)</option>
-                            <option value="temurin_g1" data-pt="OpenJDK / Adoptium Temurin (G1GC Tuned — PCs modestos / poucas threads)" data-en="OpenJDK / Adoptium Temurin (G1GC Tuned — modest PCs / few threads)">OpenJDK / Adoptium Temurin (G1GC Tuned — PCs modestos / poucas threads)</option>
                         </select>
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-2.5">
                             <div>
@@ -672,7 +675,7 @@
                             <span class="w-2.5 h-2.5 rounded-sm bg-emerald-500 inline-block"></span>
                             <span class="text-gray-300"><span id="i18n-leg-soft-lbl">Alvo SoftMax</span> (<code id="leg-soft" class="font-mono text-emerald-400">10 GB</code>)</span>
                         </div>
-                        <div class="flex items-center gap-2">
+                        <div id="leg-buf-wrap" class="flex items-center gap-2">
                             <span class="w-2.5 h-2.5 rounded-sm bg-amber-500 inline-block"></span>
                             <span class="text-gray-300"><span id="i18n-leg-buf-lbl">Buffer Picos</span> (<code id="leg-buf" class="font-mono text-amber-400">2 GB</code>)</span>
                         </div>

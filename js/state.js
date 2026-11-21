@@ -13,7 +13,7 @@ let state = {
     memChannels: 2,
     mcVersion: '1.20.1',
     loader: 'forge',
-    jvmEngine: 'graal_zgc',
+    jvmEngine: 'temurin_zgc',
     jvmEngineManual: false,
     javaVersion: '21',
     os: 'windows',
@@ -24,7 +24,7 @@ let state = {
     allocRamGB: 12,
     softMaxGB: 10,
     metaMB: 512,
-    codeCacheMB: 512,
+    codeCacheMB: 240,
     activeModCat: 'all',
     activeConfigTab: 'modernfix'
 };

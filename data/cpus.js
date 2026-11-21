@@ -26,8 +26,10 @@ const cpuDatabase = {
     r5_5600: { name: "AMD Ryzen 5 5600 / 5600X", cores: 6, threads: 12, arch: "Zen 3", avx: 2, l3: "32MB", concGC: 3, parGC: 8, chunkThreads: 4, fmlThreads: 10, igpu: null, st: "high" },
     r7_5700x: { name: "AMD Ryzen 7 5700X / 5800X", cores: 8, threads: 16, arch: "Zen 3", avx: 2, l3: "32MB", concGC: 4, parGC: 10, chunkThreads: 6, fmlThreads: 14, igpu: null, st: "high" },
     r7_5700x3d: { name: "AMD Ryzen 7 5700X3D / 5800X3D", cores: 8, threads: 16, arch: "Zen 3 V-Cache", avx: 2, l3: "96MB", concGC: 4, parGC: 10, chunkThreads: 6, fmlThreads: 14, igpu: null, st: "high" },
-    r9_5900x: { name: "AMD Ryzen 9 5900X / 5950X", cores: 12, threads: 24, arch: "Zen 3", avx: 2, l3: "64MB", concGC: 6, parGC: 14, chunkThreads: 8, fmlThreads: 20, igpu: null, st: "high" },
-    r5_3600: { name: "AMD Ryzen 5 3600 / 4500", cores: 6, threads: 12, arch: "Zen 2", avx: 2, l3: "32MB/8MB", concGC: 3, parGC: 8, chunkThreads: 3, fmlThreads: 10, igpu: null, st: "mid" },
+    r9_5900x: { name: "AMD Ryzen 9 5900X", cores: 12, threads: 24, arch: "Zen 3", avx: 2, l3: "64MB", concGC: 6, parGC: 14, chunkThreads: 8, fmlThreads: 20, igpu: null, st: "high" },
+    r9_5950x: { name: "AMD Ryzen 9 5950X", cores: 16, threads: 32, arch: "Zen 3", avx: 2, l3: "64MB", concGC: 6, parGC: 16, chunkThreads: 8, fmlThreads: 24, igpu: null, st: "high" },
+    r5_3600: { name: "AMD Ryzen 5 3600 / 3600X", cores: 6, threads: 12, arch: "Zen 2", avx: 2, l3: "32MB", concGC: 3, parGC: 8, chunkThreads: 3, fmlThreads: 10, igpu: null, st: "mid" },
+    r5_4500: { name: "AMD Ryzen 5 4500", cores: 6, threads: 12, arch: "Zen 2 (Renoir)", avx: 2, l3: "8MB", concGC: 3, parGC: 8, chunkThreads: 3, fmlThreads: 10, igpu: null, st: "mid" },
 
     // --- AMD Ryzen 7000 / 9000 (AM5 - AVX-512) ---
     r5_7500f: { name: "AMD Ryzen 5 7500F", cores: 6, threads: 12, arch: "Zen 4", avx: 3, l3: "32MB", concGC: 3, parGC: 8, chunkThreads: 4, fmlThreads: 10, igpu: null, st: "top" },
@@ -62,11 +64,13 @@ const cpuDatabase = {
     // --- Intel Core 12th - 14th Gen (LGA1700) ---
     i3_12100f: { name: "Intel Core i3-12100F / 13100F / 14100F", cores: 4, threads: 8, arch: "Alder/Raptor Lake", avx: 2, l3: "12MB", concGC: 2, parGC: 6, chunkThreads: 3, fmlThreads: 6, igpu: null, st: "high" },
     i3_12100: { name: "Intel Core i3-12100 / 13100 / 14100", cores: 4, threads: 8, arch: "Alder/Raptor Lake", avx: 2, l3: "12MB", concGC: 2, parGC: 6, chunkThreads: 3, fmlThreads: 6, igpu: "igpu_uhd730", st: "high" },
-    i5_12400f: { name: "Intel Core i5-12400F / 13400F", cores: 6, threads: 12, arch: "Alder/Raptor Lake", avx: 2, l3: "18MB", concGC: 3, parGC: 8, chunkThreads: 4, fmlThreads: 10, igpu: null, st: "high" },
+    i5_12400f: { name: "Intel Core i5-12400F", cores: 6, threads: 12, arch: "Alder Lake", avx: 2, l3: "18MB", concGC: 3, parGC: 8, chunkThreads: 4, fmlThreads: 10, igpu: null, st: "high" },
+    i5_13400f: { name: "Intel Core i5-13400F / 14400F", cores: 10, threads: 16, arch: "Raptor Lake Hybrid", avx: 2, l3: "20MB", concGC: 4, parGC: 10, chunkThreads: 6, fmlThreads: 14, igpu: null, st: "high" },
     i5_12400: { name: "Intel Core i5-12400", cores: 6, threads: 12, arch: "Alder Lake", avx: 2, l3: "18MB", concGC: 3, parGC: 8, chunkThreads: 4, fmlThreads: 10, igpu: "igpu_uhd730", st: "high" },
     i5_13400: { name: "Intel Core i5-13400 / 14400", cores: 10, threads: 16, arch: "Raptor Lake Hybrid", avx: 2, l3: "20MB", concGC: 4, parGC: 10, chunkThreads: 6, fmlThreads: 14, igpu: "igpu_uhd730", st: "high" },
     i5_13600k: { name: "Intel Core i5-13600K / 14600K", cores: 14, threads: 20, arch: "Raptor Lake Hybrid", avx: 2, l3: "24MB", concGC: 4, parGC: 12, chunkThreads: 6, fmlThreads: 16, igpu: "igpu_uhd770", st: "top" },
-    i7_13700k: { name: "Intel Core i7-13700K / 14700K", cores: 16, threads: 24, arch: "Raptor Lake Hybrid", avx: 2, l3: "30MB", concGC: 5, parGC: 14, chunkThreads: 6, fmlThreads: 18, igpu: "igpu_uhd770", st: "top" },
+    i7_13700k: { name: "Intel Core i7-13700K", cores: 16, threads: 24, arch: "Raptor Lake Hybrid", avx: 2, l3: "30MB", concGC: 5, parGC: 14, chunkThreads: 6, fmlThreads: 18, igpu: "igpu_uhd770", st: "top" },
+    i7_14700k: { name: "Intel Core i7-14700K", cores: 20, threads: 28, arch: "Raptor Lake Hybrid", avx: 2, l3: "33MB", concGC: 5, parGC: 16, chunkThreads: 8, fmlThreads: 22, igpu: "igpu_uhd770", st: "top" },
     i9_14900k: { name: "Intel Core i9-13900K / 14900K", cores: 24, threads: 32, arch: "Raptor Lake Hybrid", avx: 2, l3: "36MB", concGC: 6, parGC: 16, chunkThreads: 8, fmlThreads: 24, igpu: "igpu_uhd770", st: "top" },
 
     // --- Intel Core 8th - 11th Gen & Pentium (LGA1151 / LGA1200) ---
@@ -109,15 +113,15 @@ const cpuDatabase = {
     xeon_gold_6130: { name: "Intel Xeon Gold 6130 / Silver 4216", cores: 16, threads: 32, arch: "Skylake/Cascade Lake-SP", avx: 3, l3: "22MB", concGC: 6, parGC: 16, chunkThreads: 8, fmlThreads: 24, igpu: null, st: "low" },
 
     // --- AMD FX (AM3+ - DDR3) ---
-    fx_8350: { name: "AMD FX-8350 / FX-6300", cores: 8, threads: 8, arch: "Piledriver", avx: 1, l3: "8MB", concGC: 2, parGC: 6, chunkThreads: 2, fmlThreads: 6, igpu: null, st: "low" },
+    fx_8350: { name: "AMD FX-8350 / FX-8320", cores: 8, threads: 8, arch: "Piledriver", avx: 1, l3: "8MB", concGC: 2, parGC: 6, chunkThreads: 2, fmlThreads: 6, igpu: null, st: "low" },
 
     // --- Apple Silicon (macOS) ---
     m1: { name: "Apple M1", cores: 8, threads: 8, arch: "ARM64 • 4P+4E", avx: 0, l3: "SLC", concGC: 2, parGC: 6, chunkThreads: 3, fmlThreads: 6, igpu: "igpu_apple_m1", st: "high", apple: true, memType: "DDR4", memFreq: 4400, bw: 68 },
-    m1_pro: { name: "Apple M1 Pro / M1 Max", cores: 10, threads: 10, arch: "ARM64 • 8P+2E", avx: 0, l3: "SLC", concGC: 2, parGC: 6, chunkThreads: 4, fmlThreads: 8, igpu: "igpu_apple_m1_pro", st: "high", apple: true, memType: "DDR5", memFreq: 6400, bw: 200 },
+    m1_pro: { name: "Apple M1 Pro", cores: 10, threads: 10, arch: "ARM64 • 8P+2E", avx: 0, l3: "SLC", concGC: 2, parGC: 6, chunkThreads: 4, fmlThreads: 8, igpu: "igpu_apple_m1_pro", st: "high", apple: true, memType: "DDR5", memFreq: 6400, bw: 200 },
     m2: { name: "Apple M2", cores: 8, threads: 8, arch: "ARM64 • 4P+4E", avx: 0, l3: "SLC", concGC: 2, parGC: 6, chunkThreads: 3, fmlThreads: 6, igpu: "igpu_apple_m2", st: "top", apple: true, memType: "DDR5", memFreq: 6400, bw: 100 },
-    m2_pro: { name: "Apple M2 Pro / M2 Max", cores: 12, threads: 12, arch: "ARM64 • 8P+4E", avx: 0, l3: "SLC", concGC: 3, parGC: 8, chunkThreads: 4, fmlThreads: 10, igpu: "igpu_apple_m2_pro", st: "top", apple: true, memType: "DDR5", memFreq: 6400, bw: 200 },
+    m2_pro: { name: "Apple M2 Pro", cores: 12, threads: 12, arch: "ARM64 • 8P+4E", avx: 0, l3: "SLC", concGC: 3, parGC: 8, chunkThreads: 4, fmlThreads: 10, igpu: "igpu_apple_m2_pro", st: "top", apple: true, memType: "DDR5", memFreq: 6400, bw: 200 },
     m3: { name: "Apple M3", cores: 8, threads: 8, arch: "ARM64 • 4P+4E", avx: 0, l3: "SLC", concGC: 2, parGC: 6, chunkThreads: 3, fmlThreads: 6, igpu: "igpu_apple_m3", st: "top", apple: true, memType: "DDR5", memFreq: 6400, bw: 100 },
-    m3_pro: { name: "Apple M3 Pro / M3 Max", cores: 12, threads: 12, arch: "ARM64 • 6P+6E", avx: 0, l3: "SLC", concGC: 3, parGC: 8, chunkThreads: 4, fmlThreads: 10, igpu: "igpu_apple_m3_pro", st: "top", apple: true, memType: "DDR5", memFreq: 6400, bw: 150 },
+    m3_pro: { name: "Apple M3 Pro", cores: 12, threads: 12, arch: "ARM64 • 6P+6E", avx: 0, l3: "SLC", concGC: 3, parGC: 8, chunkThreads: 4, fmlThreads: 10, igpu: "igpu_apple_m3_pro", st: "top", apple: true, memType: "DDR5", memFreq: 6400, bw: 150 },
     m4: { name: "Apple M4", cores: 10, threads: 10, arch: "ARM64 • 4P+6E", avx: 0, l3: "SLC", concGC: 2, parGC: 6, chunkThreads: 4, fmlThreads: 8, igpu: "igpu_apple_m4", st: "top", apple: true, memType: "DDR5", memFreq: 7600, bw: 120 },
-    m4_pro: { name: "Apple M4 Pro / M4 Max", cores: 14, threads: 14, arch: "ARM64 • 10P+4E", avx: 0, l3: "SLC", concGC: 3, parGC: 8, chunkThreads: 4, fmlThreads: 12, igpu: "igpu_apple_m4_pro", st: "top", apple: true, memType: "DDR5", memFreq: 7600, bw: 273 }
+    m4_pro: { name: "Apple M4 Pro", cores: 14, threads: 14, arch: "ARM64 • 10P+4E", avx: 0, l3: "SLC", concGC: 3, parGC: 8, chunkThreads: 4, fmlThreads: 12, igpu: "igpu_apple_m4_pro", st: "top", apple: true, memType: "DDR5", memFreq: 7600, bw: 273 }
 };

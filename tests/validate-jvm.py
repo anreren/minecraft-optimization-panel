@@ -14,6 +14,7 @@ import sys
 import tempfile
 
 ARGS_FILE = os.path.join(tempfile.gettempdir(), "mcopt-args.json")
+JAVA_BIN = os.environ.get("JAVA_BIN", "java")
 BAD = re.compile(r"error|unrecognized|warning|ignored|deprecated|obsolete|not supported|invalid|could not|must be", re.I)
 
 
@@ -22,7 +23,7 @@ def run(cmd):
 
 
 def java_major():
-    out = run(["java", "-version"]).stderr
+    out = run([JAVA_BIN, "-version"]).stderr
     m = re.search(r'version "(\d+)(?:\.(\d+))?', out)
     if not m:
         sys.exit("could not detect the Java version")
@@ -32,7 +33,17 @@ def java_major():
 
 def is_graalvm():
     # OpenJDK also accepts the JVMCI flags but has no Graal compiler, so look for GraalVM itself
-    return "graalvm" in (run(["java", "-version"]).stderr).lower()
+    return "graalvm" in (run([JAVA_BIN, "-version"]).stderr).lower()
+
+
+def host_os():
+    if sys.platform.startswith("linux"):
+        return "linux"
+    if sys.platform.startswith("win"):
+        return "windows"
+    if sys.platform == "darwin":
+        return "macos"
+    return sys.platform
 
 
 def main():
@@ -41,19 +52,23 @@ def main():
     combos = json.load(open(ARGS_FILE))
     major = java_major()
     graal = is_graalvm()
+    current_os = host_os()
     run_all = os.environ.get("MCOPT_ALL") == "1"
-    problems, ran = [], 0
+    problems, ran, skipped_os = [], 0, 0
     for c in combos:
         jv = int(c["jv"])
         matches = (jv == 23 and major >= 23) or jv == major
         if not (matches or run_all):
             continue
+        if c.get("lp") and c.get("os") != current_os:
+            skipped_os += 1
+            continue
         args = c["args"].strip()
         args = re.sub(r"-XX:SoftMaxHeapSize=\d+G", "-XX:SoftMaxHeapSize=1G", args)
         args = args.replace("-XX:+AlwaysPreTouch", "")
         if not graal:
-            args = re.sub(r"-XX:\+UseJVMCICompiler|-XX:\+EagerJVMCI|-Dgraal\.\S+", "", args)
-        res = run(["java", "-Xms2G", "-Xmx2G"] + args.split() + ["-version"])
+            args = re.sub(r"-XX:\+UseJVMCICompiler|-XX:\+EagerJVMCI|-D(?:jdk\.)?graal\.\S+", "", args)
+        res = run([JAVA_BIN, "-Xms2G", "-Xmx2G"] + args.split() + ["-version"])
         ran += 1
         bad = [l.strip() for l in (res.stderr + res.stdout).splitlines() if BAD.search(l)]
         if res.returncode != 0 or bad:
@@ -63,7 +78,8 @@ def main():
         for p in problems:
             print(" - " + p)
         sys.exit(1)
-    print(f"validate-jvm: OK ({ran} argument sets on Java {major}{', Graal JIT flags kept' if graal else ', Graal flags stripped (not GraalVM)'})")
+    extra = f", skipped {skipped_os} non-{current_os} large-pages set(s)" if skipped_os else ""
+    print(f"validate-jvm: OK ({ran} argument sets on Java {major}{', Graal JIT flags kept' if graal else ', Graal flags stripped (not GraalVM)'}{extra})")
 
 
 if __name__ == "__main__":

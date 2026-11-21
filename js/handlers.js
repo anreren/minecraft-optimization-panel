@@ -14,6 +14,7 @@ function enforceJavaForMc() {
 function onJavaChange() {
     state.javaVersion = document.getElementById('select-java-version').value;
     enforceJavaForMc();
+    applyAutoEngine(true);
     recalculateAll();
 }
 
@@ -230,6 +231,7 @@ function onRamSliderInput(val) {
     state.modpackProfile = null;
     document.getElementById('ram-slider').value = state.allocRamGB;
     document.querySelectorAll('.profile-card').forEach(btn => {
+        btn.setAttribute('aria-pressed', 'false');
         btn.className = "profile-card text-left p-4 rounded-xl border border-gray-800 bg-gray-950/60 hover:border-gray-700 transition flex flex-col justify-between";
     });
     recalculateAll();

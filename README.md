@@ -32,16 +32,17 @@ The **Universal Minecraft Modded Optimizer** solves this by acting as a dynamic 
 
 The core JavaScript engine turns your hardware choices into JVM flags, memory budgets and config files. Most values are **heuristics**, not benchmarks: treat them as a solid starting point and tune from there.
 
-### 1. JVM Engine Auto-Selection (GraalVM + ZGC vs. Temurin + G1)
+### 1. JVM Engine Auto-Selection (Temurin + ZGC vs. Temurin + G1)
 Concurrent GC threads and the Graal JIT compiler both compete with the game for cores and memory, so the best engine depends on your machine:
-* **6 threads or fewer, or 12 GB of RAM or less:** switches to **OpenJDK / Temurin 21 + G1GC** (HotSpot C2 JIT, no Graal flags, lower memory overhead).
-* **More than 6 threads and more than 12 GB:** uses **Oracle GraalVM + ZGC**.
+* **6 threads or fewer, 12 GB of RAM or less, or Java 17:** switches to **OpenJDK / Temurin + G1GC** (HotSpot C2 JIT, no Graal flags, lower memory overhead). Java 17 only has non-generational ZGC, which performs poorly on modded Minecraft.
+* **More than 6 threads, more than 12 GB, and Java 21+:** uses **OpenJDK / Adoptium Temurin + ZGC** (Generational ZGC on Java 21+).
+* **Oracle GraalVM + G1GC** remains available manually if you specifically want the Graal JIT compiler (`-XX:+UseJVMCICompiler`); the contradictory *Oracle GraalVM + ZGC* option was removed because ZGC disables JVMCI on Java 21.
 * The engine (vendor + GC) is independent from the **Java version** selector (17, 21 or 23+). The engine can always be overridden manually, and your choice is kept when you change other hardware.
 * `-XX:UseAVX` is intentionally **not** set: the JVM detects the supported vector level on its own.
 
 ### 2. CPU Thread Allocation (`ConcGCThreads` & `ParallelGCThreads`)
-Each CPU in the database carries its own values, roughly **25% of its threads** for concurrent GC and **60%** for parallel GC, leaving cores free for the main/render thread and the integrated server:
-* **Chunk builder threads** (Sodium/Embeddium) and **C2ME threads** are also taken from the CPU entry. APUs and low-power chips get one thread less, since their iGPU shares memory bandwidth.
+For CPUs with **more than 16 threads** (e.g. Xeons, Ryzen 9, Core i9), each database entry provides capped values (roughly **25% of threads** for concurrent GC and **60%** for parallel GC) so the collector does not grab too many cores away from the main/render thread and integrated server. Up to 16 threads, HotSpot's automatic GC thread ergonomics are left enabled:
+* **Chunk builder threads** (Sodium/Embeddium) and **C2ME threads** are always taken from the CPU entry. APUs and low-power chips get one thread less, since their iGPU shares memory bandwidth.
 * **EntityCulling `tracingDistance`** follows the CPU (128 with 12+ threads, 96 with 8+, otherwise 64), because the visibility raytracing runs on the CPU.
 * **Leaves quality and shader advice** follow a per-GPU performance tier (low / entry / mid / high / ultra), not VRAM size.
 * **Single-thread tier (low / mid / high / top):** every CPU also carries a rough single-thread speed rating, because Minecraft is mostly bound by its main thread. Low-clock chips (older Xeons, Athlon, N100...) get a dedicated warning instead of benefiting from "more cores", and the tier feeds the recommended in-game settings below.
@@ -49,36 +50,38 @@ Each CPU in the database carries its own values, roughly **25% of its threads** 
 ### 2b. Recommended In-Game Settings
 Render distance, simulation distance, entity distance and a shader verdict are derived from the CPU single-thread tier, the GPU tier (iGPUs are capped), the modpack profile (heavy / extreme lower the values) and the RAM channels. They are starting points, not guarantees.
 
-### 3. Storage I/O & ZGC Spike Tolerance (`-XX:ZAllocationSpikeTolerance`)
-ZGC engines only. A higher value makes the collector start a cycle earlier ahead of an allocation spike:
-* **NVMe M.2 SSD (`5.0`)**, **SATA SSD (`3.5`)**, **Mechanical HDD (`2.0`, the JVM default)**.
-* `+0.5` (capped at `5.0`) on slow memory (**DDR3** or **DDR4 ≤ 2666 MHz**), where a cycle takes longer to finish.
-* This is a heuristic: if the GC uses too much CPU, go back to `2.0`.
-* `-Dfml.readTimeout=180` is added to every profile to avoid singleplayer watchdog timeouts. `dynamic_resources` is turned off by default on HDDs.
+### 3. ZGC Spike Tolerance (`-XX:ZAllocationSpikeTolerance`) & Storage I/O
+ZGC engines only:
+* By default, ZGC keeps the JVM's **`2.0`** spike tolerance (flag omitted) on fast dual-channel RAM so it does not waste CPU on extra concurrent cycles.
+* On slower or single-channel memory (**DDR3**, **DDR4 ≤ 2666 MHz**, or **single-channel**), it raises `-XX:ZAllocationSpikeTolerance=3.0` so ZGC triggers collection earlier before a spike fills the buffer.
+* `dynamic_resources` in ModernFix is enabled on SSDs and turned off by default on mechanical HDDs. Dead legacy Forge flags like `-Dfml.readTimeout=180` are no longer emitted.
 
 ### 3b. Memory Channels
-A *Dual-channel or more / Single-channel* selector estimates the theoretical bandwidth (`MT/s × 8 bytes × channels`). Single-channel raises the ZGC spike tolerance by `0.5`, turns on the low-bandwidth profile for FerriteCore, shows a warning (stronger when an iGPU shares that bandwidth) and lowers the recommended render distance for iGPUs.
+A *Dual-channel or more / Single-channel* selector estimates the theoretical bandwidth (`MT/s × 8 bytes × channels`). Single-channel raises the ZGC spike tolerance to `3.0`, turns on the low-bandwidth profile for FerriteCore, shows a warning (stronger when an iGPU shares that bandwidth) and lowers the recommended render distance for iGPUs.
 
-### 4. RAM Budget & SoftMax Caching (`-XX:SoftMaxHeapSize`)
-* The optimizer reserves a fixed heap (e.g. `-Xms12G -Xmx12G`) and, on ZGC, sets a **SoftMaxHeapSize** (e.g. `10G`) so the collector tries to stay below it and keeps the rest as headroom for allocation spikes. The cushion is **2 GB** for allocations of 9 GB or more, otherwise **1 GB**.
-* Modpack profiles (light / medium / heavy / extreme) are capped so that at least **2.5 GB stay free** for the OS after the JVM overhead (Metaspace + code cache) and, when using integrated graphics, up to **2 GB reserved for the iGPU**. A warning appears if you push the slider past that.
+### 4. RAM Budget, SoftMax Caching & G1GC Client Tuning
+* The optimizer reserves a fixed heap (`-Xms` = `-Xmx` when included) and, on ZGC, sets `-XX:SoftMaxHeapSize` (with a **2 GB** cushion for ≥ 9 GB allocations, or **1 GB** below that). When G1GC is active, the RAM bar displays the full allocated heap without a SoftMax cushion.
+* On G1GC, region size scales with heap (`4M` ≤ 5 GB, `8M` for 6–11 GB, `16M` ≥ 12 GB), `MaxGCPauseMillis` targets **50 ms** (**75 ms** on DDR3) for smooth client frametimes, and young-gen sizing adapts below/above 6 GB.
+* `-XX:+ExplicitGCInvokesConcurrent` is used instead of `-XX:+DisableExplicitGC` so stray `System.gc()` calls run concurrently without blocking `DirectByteBuffer` native cleanup.
+* Modpack profiles (light / medium / heavy / extreme) are capped so that at least **2.5 GB stay free** for the OS after the JVM native overhead (Metaspace + CodeCache: 240 MB for C2, 384–512 MB for Graal JIT) and, when using integrated graphics, up to **2 GB reserved for the iGPU**. A warning appears if you push the slider past that.
 * On slow memory the tool does not change any flag: it recommends keeping FerriteCore and ModernFix installed and enabling XMP/DOCP in the BIOS.
 
 ### 4b. Notebooks (iGPU + dedicated GPU)
 Mobile CPUs and laptop GPUs are flagged. With a dedicated GPU the tool warns that Windows often launches Java on the iGPU and shows how to force `javaw.exe` to *High performance*. On integrated graphics only it reminds you to use the charger and a high-performance power plan.
 
 ### 4c. Java Version, Operating System & Launcher
-* **Java version (17 / 21 / 23+):** `-XX:+ZGenerational` is only emitted on **Java 21**. Java 17 only has the non-generational ZGC, and on Java 23+ the generational mode is the default and the flag is obsolete (the JVM warns), so it is omitted. Minecraft 1.20.6+ forces Java 21 or newer.
+* **Java version (17 / 21 / 23+):** `-XX:+ZGenerational` is only emitted on **Java 21**. Java 17 only has the non-generational ZGC (and defaults to G1GC instead), and on Java 23+ the generational mode is the default and the flag is deprecated/obsolete, so it is omitted. Minecraft 1.20.6+ forces Java 21 or newer.
 * **Operating system (Windows / Linux / macOS):**
-  * *Windows:* `-XX:+UseLargePages` option (needs the "Lock pages in memory" policy), `javaw.exe` and Windows Graphics settings.
-  * *Linux:* the same option becomes `-XX:+UseTransparentHugePages`, and the Driver tab lists the launcher environment variables (Mesa: `mesa_glthread`, `vblank_mode`, `DRI_PRIME`; NVIDIA: `__GL_THREADED_OPTIMIZATIONS`, `__NV_PRIME_RENDER_OFFLOAD`).
+  * *Windows:* `-XX:+UseLargePages` option (requires the "Lock pages in memory" policy via `secpol.msc`, not available on Windows Home), `javaw.exe` and Windows Graphics settings.
+  * *Linux:* the same option becomes `-XX:+UseTransparentHugePages` (recommends kernel THP `[madvise]`, warns against `[always]` with aggressive defrag), and the Driver tab lists launcher environment variables (Mesa: `mesa_glthread`, `vblank_mode`, `DRI_PRIME`; NVIDIA: `__GL_THREADED_OPTIMIZATIONS`, `__NV_PRIME_RENDER_OFFLOAD`).
   * *macOS (Apple Silicon, M1 to M4):* picking an Apple chip switches to macOS, locks the DDR/channel/GPU selectors (unified memory, real bandwidth shown) and recommends an ARM64 Java.
-* **Launcher (Prism/MultiMC, CurseForge, Modrinth, ATLauncher, official, other):** launchers with their own memory field get a line **without** `-Xms/-Xmx` (so memory is not duplicated), while the official launcher gets the full line. A step-by-step guide shows where to paste each part, and warns if the two settings conflict.
+* **Launcher (Prism/MultiMC, CurseForge, Modrinth, ATLauncher, official, other):** launchers with their own memory control get a line **without** `-Xms/-Xmx` (avoiding duplicated `-Xmx`), distinguishing Prism/ATLauncher (separate Minimum and Maximum memory fields) from CurseForge/Modrinth (single Maximum/Allocated RAM slider). A step-by-step guide shows the current menu paths for each launcher.
 
 ### 5. Oracle GraalVM JIT Flags (`-XX:+UseJVMCICompiler`)
-Used only by the **Oracle GraalVM + G1GC** engine. With ZGC the JVM disables JVMCI (OpenJDK 21 prints `Setting EnableJVMCI to false as selected GC does not support JVMCI: z gc`), so the *Oracle GraalVM (ZGC)* engine runs on the default C2 compiler and the line carries no Graal flags. This was verified on OpenJDK 21, not on Oracle GraalVM itself. On **Java 23+** the `-Dgraal.*` options are omitted, because their prefix changed in newer GraalVM versions:
-* `-XX:+UseJVMCICompiler -XX:+EagerJVMCI -Dgraal.TuneInlinerExploration=1 -Dgraal.CompilerConfiguration=community`
-* More exploratory inlining on heavy mod loops. The gain varies by modpack, and the JIT spends extra CPU and RAM while warming up, which is why weaker machines are moved to Temurin + G1.
+Used only by the **Oracle GraalVM + G1GC** engine. The panel keeps Oracle GraalVM's default `enterprise` compiler configuration (without downgrading to `community`) and uses the modern `-Djdk.graal.*` property prefix on Java 23+ (or `-Dgraal.*` on Java 17/21):
+* Java 17 / 21: `-XX:+UseJVMCICompiler -XX:+EagerJVMCI -Dgraal.TuneInlinerExploration=1`
+* Java 23+: `-XX:+UseJVMCICompiler -XX:+EagerJVMCI -Djdk.graal.TuneInlinerExploration=1`
+* More exploratory inlining on heavy mod loops. The gain varies by modpack, and the JIT spends extra CPU and RAM while warming up.
 
 ---
 
@@ -99,7 +102,7 @@ Used only by the **Oracle GraalVM + G1GC** engine. With ZGC the JVM disables JVM
 
 ## ⚠️ Notes & Limitations
 
-* The generated option names follow **Sodium 0.5/0.6** and **Embeddium 0.3**. Mods ignore unknown keys silently, so if the config file created by your own mod version uses different names, trust its names.
+* The generated mod configs follow verified upstream schemas (**Sodium 0.5/0.6**, **Embeddium 0.3**, **EntityCulling v9**, **BadOptimizations v6**, **ImmediatelyFast**, **FerriteCore**, **ModernFix**, **C2ME 0.2/0.3+**, and **Forge/NeoForge**). Most mods ignore unknown keys silently, though BadOptimizations enforces all 18 keys; if a future mod update renames a key, trust the file generated by that version.
 * Thread counts, GC values and tiers are heuristics. Minecraft is mostly bound by single-thread speed, so a many-thread, low-clock CPU (such as an older Xeon) gains chunk-builder threads but will not match a modern desktop CPU.
 * Java 21 or newer is required from Minecraft 1.20.5. Some 1.20.1 packs with older mods still need Java 17, which is why Java 17 can be selected for them.
 * The generated JVM flags are validated on a real JVM by the test suite (see *Testing*). The CI runs them on Java 17, 21 and 25, but the Graal-specific flags are only exercised by the experimental GraalVM job.
@@ -142,7 +145,7 @@ Used only by the **Oracle GraalVM + G1GC** engine. With ZGC the JVM disables JVM
 npm install     # installs puppeteer
 npm test        # data checks + browser checks + JVM flag validation (needs Java and Python 3)
 ```
-`check-browser.js` opens the page headless and checks that every translation key exists in both languages, that every generated config file is valid (JSON, TOML-like or properties) for a matrix of hardware, loaders and operating systems, that the JVM flag rules hold (for example `-XX:+ZGenerational` only on Java 21), and that saving and restoring a configuration is lossless. It also guards bugs fixed before, such as the RAM slider limit. `validate-jvm.py` then runs the generated arguments on the installed JVM and fails on any warning. Set `CHROME_PATH` to use a specific Chrome binary.
+`check-browser.js` opens the page headless and checks that every translation key exists in both languages, that every generated config file passes per-mod schema validation (exact keys, types, TOML sections, and loader/version variants) across a matrix of hardware, Minecraft versions, loaders, and operating systems, that the JVM flag and responsive/a11y rules hold (for example `-XX:+ZGenerational` only on Java 21, no overflow at 375 px), and that saving and restoring a configuration is lossless. It also guards bugs fixed before, such as the RAM slider limit. `validate-jvm.py` then runs the generated arguments on the installed JVM and fails on any warning. Set `CHROME_PATH` to use a specific Chrome binary.
 
 ### Adding hardware
 1. Add an entry to `data/cpus.js` or `data/gpus.js` (the field list is documented at the top of each file).

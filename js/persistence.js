@@ -69,7 +69,8 @@ function applyConfigParams(p) {
         state.os = document.getElementById('select-os').value;
         setSel('select-launcher', p.get('l'));
         state.launcher = document.getElementById('select-launcher').value;
-        setSel('select-jvm-engine', p.get('e'));
+        const engParam = p.get('e') === 'graal_zgc' ? 'temurin_zgc' : p.get('e');
+        setSel('select-jvm-engine', engParam);
         state.jvmEngineManual = p.get('em') === '1';
         CONFIG_CHECKS.forEach(([k, id]) => { if (p.has(k)) document.getElementById(id).checked = p.get(k) === '1'; });
 
