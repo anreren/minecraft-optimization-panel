@@ -57,7 +57,7 @@ ZGC engines only:
 * `dynamic_resources` in ModernFix is enabled on SSDs and turned off by default on mechanical HDDs. Dead legacy Forge flags like `-Dfml.readTimeout=180` are no longer emitted.
 
 ### 3b. Memory Channels
-A *Dual-channel or more / Single-channel* selector estimates the theoretical bandwidth (`MT/s × 8 bytes × channels`). Single-channel raises the ZGC spike tolerance to `3.0`, turns on the low-bandwidth profile for FerriteCore, shows a warning (stronger when an iGPU shares that bandwidth) and lowers the recommended render distance for iGPUs.
+A *Dual-channel or more / Single-channel* selector estimates the theoretical bandwidth (`MT/s × 8 bytes × channels`). Single-channel raises the ZGC spike tolerance to `3.0`, highlights memory-latency impact in the FerriteCore tip, shows a warning (stronger when an iGPU shares that bandwidth) and lowers the recommended render distance for iGPUs.
 
 ### 4. RAM Budget, SoftMax Caching & G1GC Client Tuning
 * The optimizer reserves a fixed heap (`-Xms` = `-Xmx` when included) and, on ZGC, sets `-XX:SoftMaxHeapSize` (with a **2 GB** cushion for ≥ 9 GB allocations, or **1 GB** below that). When G1GC is active, the RAM bar displays the full allocated heap without a SoftMax cushion.
@@ -88,7 +88,7 @@ Used only by the **Oracle GraalVM + G1GC** engine. The panel keeps Oracle GraalV
 ## 🎛️ Interactive Features
 
 * **Hardware Customizer:** Pick your CPU (AMD Ryzen / APUs / Athlon / FX, Intel Core / Core Ultra / Pentium, popular **Xeon** E3, E5 and Gold models, plus laptop H/U-series and mini-PC chips), GPU (NVIDIA GTX 10/16 and RTX 20/30/40/50, AMD RX 400 to RX 9000 and Vega, Intel Arc, plus popular notebook GPUs), RAM generation (DDR3 to DDR5, 1066 to 8000 MHz), memory channels and storage type. Every GPU model and VRAM variant is listed separately.
-* **Apple Silicon:** M1, M2, M3 and M4 families (base and Pro/Max) with their GPU, unified memory and macOS-specific advice.
+* **Apple Silicon:** M1, M2, M3 and M4 families (base and Pro) with their GPU, unified memory and macOS-specific advice.
 * **Integrated Graphics Detection:** Choose *Integrated Graphics (iGPU)* in the GPU list and the iGPU is detected from the selected CPU (e.g. Ryzen 3 3200G → Radeon Vega 8, Core i5-12400 → UHD 730). CPUs without video output (F/KF models, FX, Xeon) trigger a warning, and shared-memory advice replaces the VRAM alerts.
 * **Bilingual Support (PT-BR / EN-US):** Instant interface switching between Portuguese and English.
 * **Dynamic Mod Catalog (Section 3):** Adapts mod recommendations based on your chosen Mod Loader (**Forge**, **NeoForge**, or **Fabric**) and Minecraft version (**1.20.1** to **1.21.4+**), including *Sodium/Embeddium*, *ModernFix*, *FerriteCore*, *Lithium/Radium*, *ImmediatelyFast*, *EntityCulling*, *BadOptimizations*, *C2ME/Noisium*, *ScalableLux/Starlight*, *Alternate Current*, *Clumps*, *ServerCore*, *FastSuite*, *Particle Core*, *ThreadTweak*, *AllTheLeaks/MemoryLeakFix*, *Krypton* and *Dynamic FPS*.
@@ -107,7 +107,7 @@ Used only by the **Oracle GraalVM + G1GC** engine. The panel keeps Oracle GraalV
 * Java 21 or newer is required from Minecraft 1.20.5. Some 1.20.1 packs with older mods still need Java 17, which is why Java 17 can be selected for them.
 * The generated JVM flags are validated on a real JVM by the test suite (see *Testing*). The CI runs them on Java 17, 21 and 25, but the Graal-specific flags are only exercised by the experimental GraalVM job.
 * Menu names in the launcher guide may differ between launcher versions.
-* The accessibility *structure* (names, roles, keyboard, live regions) is tested in CI. Colour contrast and the 375 px layout were audited by hand against a local Tailwind render, so they are not covered by CI.
+* The accessibility *structure* (names, roles, keyboard, live regions) and 375 px horizontal overflow are tested in CI. Colour contrast is audited by hand against the live Tailwind render.
 
 ---
 
@@ -117,7 +117,7 @@ Used only by the **Oracle GraalVM + G1GC** engine. The panel keeps Oracle GraalV
 ├── index.html        # Page markup and styles (no inline logic)
 ├── js/               # Classic scripts, loaded in this order by index.html
 │   ├── i18n.js           # PT-BR / EN-US translations
-│   ├── config-data.js    # DDR frequencies, storage profiles, launchers, checklist
+│   ├── config-data.js    # DDR frequencies, storage profiles, launchers, tier scores
 │   ├── state.js          # Application state
 │   ├── hardware.js       # Active GPU, memory budget, notebook detection, recommendations
 │   ├── handlers.js       # Selector event handlers (hardware, Java, OS, launcher, RAM)
@@ -133,9 +133,9 @@ Used only by the **Oracle GraalVM + G1GC** engine. The panel keeps Oracle GraalV
 │   └── gpus.js       # GPU database (dedicated, notebook, integrated and Apple GPUs)
 ├── tests/
 │   ├── check-data.js     # database consistency (dropdowns, iGPU links, schema, duplicates)
-│   ├── check-browser.js  # translations, generated configs, JVM flag logic, persistence
+│   ├── check-browser.js  # translations, mod config schemas, /config scanner, JVM logic, persistence, a11y, 375 px layout
 │   └── validate-jvm.py   # runs the generated JVM arguments on the installed JVM
-├── .github/workflows/ci.yml  # runs the tests on Java 17, 21 and 25
+├── .github/workflows/ci.yml  # runs the tests on Java 17, 21, 25 and Oracle GraalVM 21/25
 ├── package.json
 ├── CHANGELOG.md
 └── README.md
@@ -146,7 +146,7 @@ Used only by the **Oracle GraalVM + G1GC** engine. The panel keeps Oracle GraalV
 npm install     # installs puppeteer
 npm test        # data checks + browser checks + JVM flag validation (needs Java and Python 3)
 ```
-`check-browser.js` opens the page headless and checks that every translation key exists in both languages, that every generated config file passes per-mod schema validation (exact keys, types, TOML sections, and loader/version variants) across a matrix of hardware, Minecraft versions, loaders, and operating systems, that the JVM flag and responsive/a11y rules hold (for example `-XX:+ZGenerational` only on Java 21, no overflow at 375 px), and that saving and restoring a configuration is lossless. It also guards bugs fixed before, such as the RAM slider limit. `validate-jvm.py` then runs the generated arguments on the installed JVM and fails on any warning. Set `CHROME_PATH` to use a specific Chrome binary.
+`check-browser.js` opens the page headless and checks that every translation key exists in both languages, that every generated config file (Sections 4 & 5) passes per-mod schema validation (exact keys, types, TOML sections, and loader/version variants) across a matrix of hardware, Minecraft versions, loaders, and operating systems, that the Section 4 `/config` folder scanner & auto-adjuster locates files directly in `/config` and in subfolders while preserving untouched user options, that the JVM flag and responsive/a11y rules hold (for example `-XX:+ZGenerational` only on Java 21, no overflow at 375 px), and that saving and restoring a configuration is lossless. It also guards bugs fixed before, such as the RAM slider limit. `validate-jvm.py` then runs the generated arguments on the installed JVM and fails on any warning. Set `CHROME_PATH` to use a specific Chrome binary.
 
 ### Adding hardware
 1. Add an entry to `data/cpus.js` or `data/gpus.js` (the field list is documented at the top of each file).
