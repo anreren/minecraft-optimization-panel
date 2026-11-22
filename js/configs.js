@@ -1,18 +1,19 @@
-// Generated configuration files (tabs of Section 4).
+// Generated configuration files (Section 4 tabs) and GPU Driver & Shaders (Section 5).
 // Classic script: loaded by index.html in order, shares the global scope with the other js/ files.
 
 // ============================================================================
-// GERADOR DE CONFIGURAÇÕES RECOMENDADAS PARA TODOS OS 9 MODS / DRIVERS
+// GERADOR DE CONFIGURAÇÕES RECOMENDADAS PARA OS 8 MODS (SEÇÃO 4) + DRIVER (SEÇÃO 5)
 // ============================================================================
 function selectConfigTab(tabKey) {
+    const activeTab = document.getElementById(`ctab-${tabKey}`);
+    if (!activeTab) return;
     state.activeConfigTab = tabKey;
     document.querySelectorAll('.ctab-btn').forEach(btn => {
-        btn.className = "ctab-btn px-3 py-2 rounded-lg text-xs font-semibold text-gray-400 hover:text-white transition flex items-center gap-1.5";
+        btn.className = "ctab-btn px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900 transition flex items-center gap-1.5";
         btn.setAttribute('aria-selected', 'false');
         btn.setAttribute('tabindex', '-1');
     });
-    document.getElementById(`ctab-${tabKey}`).className = "ctab-btn px-3 py-2 rounded-lg text-xs font-bold bg-blue-600 text-white transition flex items-center gap-1.5";
-    const activeTab = document.getElementById(`ctab-${tabKey}`);
+    activeTab.className = "ctab-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-zinc-100 text-zinc-950 transition flex items-center gap-1.5";
     activeTab.setAttribute('aria-selected', 'true');
     activeTab.setAttribute('tabindex', '0');
     document.getElementById('cfg-tabpanel').setAttribute('aria-labelledby', `ctab-${tabKey}`);
@@ -362,28 +363,46 @@ defaultConfigPath = "defaultconfigs"`;
             }
         }
     }
-    else if (tab === 'driver') {
-        const optFile = (state.loader === 'fabric' || (state.loader === 'neoforge' && state.mcVersion.startsWith('1.21')))
-            ? 'sodium-options.json'
-            : 'embeddium-options.json';
-        filePath = lang === 'pt' ? `Painel de Controle do Driver (${gpu.name})` : `GPU Driver Control Panel (${gpu.name})`;
-        hwTag = `${gpu.vendorLabel || gpu.vendor.toUpperCase()} Profile + Oculus/Iris Shaders`;
-        desc = lang === 'pt'
-            ? "Configurações no sistema operacional e driver de vídeo para o executável javaw.exe do seu Java."
-            : "OS and GPU driver settings for your Java javaw.exe executable.";
 
-        if (gpu.none) {
-            filePath = lang === 'pt' ? 'Painel de Controle do Driver (sem GPU definida)' : 'GPU Driver Control Panel (no GPU selected)';
-            hwTag = lang === 'pt' ? 'Aguardando uma GPU' : 'Waiting for a GPU';
-            desc = lang === 'pt'
-                ? 'A CPU selecionada não tem vídeo integrado, então não há driver de vídeo para configurar.'
-                : 'The selected CPU has no integrated graphics, so there is no video driver to configure.';
-            code = lang === 'pt'
-                ? 'Selecione uma placa de vídeo dedicada na lista de GPU ou uma CPU com gráficos integrados (ex.: Ryzen 5 5600G, Core i5-12400) para ver as configurações do driver.'
-                : 'Pick a dedicated graphics card from the GPU list or a CPU with integrated graphics (e.g. Ryzen 5 5600G, Core i5-12400) to see the driver settings.';
-        } else if (gpu.vendor === 'nvidia') {
-            code = lang === 'pt'
-                ? `=== PAINEL DE CONTROLE DA NVIDIA (Para ${gpu.name}) ===
+    document.getElementById('cfg-file-path').textContent = filePath;
+    document.getElementById('cfg-hw-tag').textContent = hwTag;
+    document.getElementById('cfg-file-desc').textContent = desc;
+    document.getElementById('cfg-code-output').textContent = code;
+    document.getElementById('cfg-tips-box').innerHTML = tips;
+
+    if (typeof refreshConfigScanReport === 'function') refreshConfigScanReport();
+}
+
+// ============================================================================
+// SEÇÃO 5: DRIVER GPU & SHADERS (PROMOVIDA DA ANTIGA ABA 9)
+// ============================================================================
+function renderDriverSection() {
+    const lang = state.lang;
+    const cpu = cpuDatabase[state.cpuKey];
+    const gpu = getActiveGpu();
+    const optFile = (state.loader === 'fabric' || (state.loader === 'neoforge' && state.mcVersion.startsWith('1.21')))
+        ? 'sodium-options.json'
+        : 'embeddium-options.json';
+
+    let filePath = lang === 'pt' ? `Painel de Controle do Driver (${gpu.name})` : `GPU Driver Control Panel (${gpu.name})`;
+    let hwTag = `${gpu.vendorLabel || gpu.vendor.toUpperCase()} • Oculus / Iris Shaders`;
+    let desc = lang === 'pt'
+        ? "Configurações no sistema operacional e driver de vídeo para o executável javaw.exe do seu Java."
+        : "OS and GPU driver settings for your Java javaw.exe executable.";
+    let code = "";
+
+    if (gpu.none) {
+        filePath = lang === 'pt' ? 'Painel de Controle do Driver (sem GPU definida)' : 'GPU Driver Control Panel (no GPU selected)';
+        hwTag = lang === 'pt' ? 'Aguardando uma GPU' : 'Waiting for a GPU';
+        desc = lang === 'pt'
+            ? 'A CPU selecionada não tem vídeo integrado, então não há driver de vídeo para configurar.'
+            : 'The selected CPU has no integrated graphics, so there is no video driver to configure.';
+        code = lang === 'pt'
+            ? 'Selecione uma placa de vídeo dedicada na lista de GPU ou uma CPU com gráficos integrados (ex.: Ryzen 5 5600G, Core i5-12400) para ver as configurações do driver.'
+            : 'Pick a dedicated graphics card from the GPU list or a CPU with integrated graphics (e.g. Ryzen 5 5600G, Core i5-12400) to see the driver settings.';
+    } else if (gpu.vendor === 'nvidia') {
+        code = lang === 'pt'
+            ? `=== PAINEL DE CONTROLE DA NVIDIA (Para ${gpu.name}) ===
 1. Abra o Painel da NVIDIA -> Gerenciar as configurações em 3D -> Aba "Configurações do Programa".
 2. Clique em "Adicionar" e selecione o javaw.exe da pasta do seu Java.
 3. Aplique exatamente estes valores:
@@ -393,7 +412,7 @@ defaultConfigPath = "defaultconfigs"`;
    • Filtragem da textura - Qualidade: Alto desempenho
    • Sincronização Vertical (V-Sync): Usar a configuração do aplicativo 3D (Desligue no jogo)
    • Método de apresentação Vulkan/OpenGL: Preferir camadas na cadeia de troca DXGI (Ativa Auto-HDR/G-Sync em janela)`
-                : `=== NVIDIA CONTROL PANEL (For ${gpu.name}) ===
+            : `=== NVIDIA CONTROL PANEL (For ${gpu.name}) ===
 1. Open NVIDIA Control Panel -> Manage 3D Settings -> "Program Settings" tab.
 2. Click "Add" and select javaw.exe from your Java folder.
 3. Apply these exact settings:
@@ -403,9 +422,9 @@ defaultConfigPath = "defaultconfigs"`;
    • Texture Filtering - Quality: High Performance
    • Vertical Sync (V-Sync): Use the 3D application setting (Turn OFF in-game)
    • Vulkan/OpenGL present method: Prefer layered on DXGI Swapchain (Enables G-Sync/FreeSync in windowed mode)`;
-        } else if (gpu.vendor === 'amd') {
-            code = lang === 'pt'
-                ? `=== AMD SOFTWARE: ADRENALIN EDITION (Para ${gpu.name}) ===
+    } else if (gpu.vendor === 'amd') {
+        code = lang === 'pt'
+            ? `=== AMD SOFTWARE: ADRENALIN EDITION (Para ${gpu.name}) ===
 1. Abra o AMD Adrenalin -> Jogos -> Adicione manualmente o javaw.exe do seu Java.
 2. Em versões recentes do driver Windows 11 (22.7.1+), o driver possui otimização nativa OpenGL.
 3. Aplique estes ajustes no perfil do Java:
@@ -414,7 +433,7 @@ defaultConfigPath = "defaultconfigs"`;
    • Otimização de formato de superfície: Ativado (Economiza VRAM nos ${gpu.vram}GB)
    • Qualidade de filtragem de textura: Desempenho
    • Se usar Shaders (Oculus/Iris): Desative o "Radeon Boost" para evitar mudança brusca de resolução.`
-                : `=== AMD SOFTWARE: ADRENALIN EDITION (For ${gpu.name}) ===
+            : `=== AMD SOFTWARE: ADRENALIN EDITION (For ${gpu.name}) ===
 1. Open AMD Adrenalin -> Gaming -> Manually add javaw.exe from your Java folder.
 2. Modern AMD drivers (22.7.1+) feature a rebuilt hardware-accelerated OpenGL pipeline.
 3. Apply these profile settings for Java:
@@ -423,82 +442,86 @@ defaultConfigPath = "defaultconfigs"`;
    • Surface Format Optimization: Enabled (Saves VRAM on your ${gpu.vram}GB card)
    • Texture Filtering Quality: Performance
    • When using Shaders (Oculus/Iris): Disable "Radeon Boost" to avoid dynamic resolution artifacts.`;
-        } else {
-            code = lang === 'pt'
-                ? `=== INTEL ARC CONTROL / GRÁFICOS INTEL (Para ${gpu.name}) ===
+    } else {
+        code = lang === 'pt'
+            ? `=== INTEL ARC CONTROL / GRÁFICOS INTEL (Para ${gpu.name}) ===
 1. Nas configurações gráficas do Windows (Sistema -> Tela -> Elementos Gráficos):
    • Adicione o javaw.exe do seu Java e marque "Alto Desempenho (${gpu.name})".
 2. Em placas Intel Arc dedicadas:
    • Certifique-se de que o Resizable BAR (ReBAR) esteja ATIVO na BIOS da placa-mãe.
    • No ${optFile}, mantivemos "use_no_error_g_l_context": false para máxima estabilidade no driver OpenGL da Intel.`
-                : `=== INTEL ARC CONTROL / INTEL GRAPHICS (For ${gpu.name}) ===
+            : `=== INTEL ARC CONTROL / INTEL GRAPHICS (For ${gpu.name}) ===
 1. In Windows Graphics Settings (System -> Display -> Graphics):
    • Add your Java's javaw.exe and select "High Performance (${gpu.name})".
 2. On dedicated Intel Arc GPUs:
    • Ensure Resizable BAR (ReBAR) is ENABLED in your motherboard BIOS.
    • In ${optFile}, we kept "use_no_error_g_l_context": false for maximum stability with Intel's OpenGL driver.`;
-        }
-        if (state.os === 'linux' && !gpu.none) {
-            const nv = gpu.vendor === 'nvidia';
-            const hyb = isHybridNotebook(cpu, gpu);
-            filePath = lang === 'pt' ? 'Variáveis de ambiente do launcher (Linux)' : 'Launcher environment variables (Linux)';
-            hwTag = nv ? 'NVIDIA proprietary driver • Linux' : `${gpu.vendorLabel || gpu.vendor.toUpperCase()} Mesa • Linux`;
-            desc = lang === 'pt'
-                ? 'Variáveis de ambiente para o campo de variáveis do launcher (ou como prefixo do comando de inicialização).'
-                : "Environment variables for the launcher's variables field (or as a prefix of the launch command).";
-            const envLines = nv
-                ? ['__GL_THREADED_OPTIMIZATIONS=1', '__GL_SYNC_TO_VBLANK=0'].concat(hyb ? ['__NV_PRIME_RENDER_OFFLOAD=1', '__GLX_VENDOR_LIBRARY_NAME=nvidia'] : [])
-                : ['mesa_glthread=true', 'vblank_mode=0'].concat(hyb ? ['DRI_PRIME=1'] : []);
-            code = (lang === 'pt'
-                ? `# Variáveis de ambiente (${nv ? 'driver proprietário NVIDIA' : 'Mesa: AMD / Intel'})\n`
-                : `# Environment variables (${nv ? 'NVIDIA proprietary driver' : 'Mesa: AMD / Intel'})\n`) + envLines.join('\n');
-        } else if (state.os === 'macos' && !gpu.none) {
-            filePath = lang === 'pt' ? 'Ajustes do macOS e Java ARM64' : 'macOS settings and ARM64 Java';
-            hwTag = 'Apple Silicon • macOS';
-            desc = lang === 'pt' ? 'O macOS gerencia o driver da GPU: não há painel para ajustar. Estes são os pontos que importam.' : 'macOS manages the GPU driver: there is no panel to tune. These are the points that matter.';
-            code = lang === 'pt'
-                ? `=== macOS (${gpu.name}) ===
+    }
+
+    if (state.os === 'linux' && !gpu.none) {
+        const nv = gpu.vendor === 'nvidia';
+        const hyb = isHybridNotebook(cpu, gpu);
+        filePath = lang === 'pt' ? 'Variáveis de ambiente do launcher (Linux)' : 'Launcher environment variables (Linux)';
+        hwTag = nv ? 'NVIDIA proprietary driver • Linux' : `${gpu.vendorLabel || gpu.vendor.toUpperCase()} Mesa • Linux`;
+        desc = lang === 'pt'
+            ? 'Variáveis de ambiente para o campo de variáveis do launcher (ou como prefixo do comando de inicialização).'
+            : "Environment variables for the launcher's variables field (or as a prefix of the launch command).";
+        const envLines = nv
+            ? ['__GL_THREADED_OPTIMIZATIONS=1', '__GL_SYNC_TO_VBLANK=0'].concat(hyb ? ['__NV_PRIME_RENDER_OFFLOAD=1', '__GLX_VENDOR_LIBRARY_NAME=nvidia'] : [])
+            : ['mesa_glthread=true', 'vblank_mode=0'].concat(hyb ? ['DRI_PRIME=1'] : []);
+        code = (lang === 'pt'
+            ? `# Variáveis de ambiente (${nv ? 'driver proprietário NVIDIA' : 'Mesa: AMD / Intel'})\n`
+            : `# Environment variables (${nv ? 'NVIDIA proprietary driver' : 'Mesa: AMD / Intel'})\n`) + envLines.join('\n');
+    } else if (state.os === 'macos' && !gpu.none) {
+        filePath = lang === 'pt' ? 'Ajustes do macOS e Java ARM64' : 'macOS settings and ARM64 Java';
+        hwTag = 'Apple Silicon • macOS';
+        desc = lang === 'pt' ? 'O macOS gerencia o driver da GPU: não há painel para ajustar. Estes são os pontos que importam.' : 'macOS manages the GPU driver: there is no panel to tune. These are the points that matter.';
+        code = lang === 'pt'
+            ? `=== macOS (${gpu.name}) ===
 1. Use um Java ARM64 (aarch64): Temurin ou Oracle GraalVM para macOS aarch64.
    Java x64 roda via Rosetta e perde bastante desempenho.
 2. Ajustes do Sistema -> Bateria: desative o "Modo de baixo consumo" e jogue na tomada.
 3. No ${optFile} mantivemos "use_no_error_g_l_context": false
    para máxima estabilidade com o driver OpenGL da Apple.`
-                : `=== macOS (${gpu.name}) ===
+            : `=== macOS (${gpu.name}) ===
 1. Use an ARM64 (aarch64) Java: Temurin or Oracle GraalVM for macOS aarch64.
    x64 Java runs through Rosetta and loses a lot of performance.
 2. System Settings -> Battery: turn off "Low Power Mode" and play plugged in.
 3. In ${optFile} we kept "use_no_error_g_l_context": false
    for maximum stability with Apple's OpenGL driver.`;
-        }
-        let shaderAdvPt, shaderAdvEn;
-        if ((gpu.igpu && !gpu.unified) || gpu.tier === 'low' || gpu.tier === 'entry') {
-            shaderAdvPt = 'esta GPU é de nível básico: evite Shaders. Se quiser testar, use o perfil Low e <strong>Shadow Distance de 4 a 6 chunks</strong>.';
-            shaderAdvEn = 'this is an entry-level GPU: avoid Shaders. If you want to try, use the Low profile and a <strong>Shadow Distance of 4 to 6 chunks</strong>.';
-        } else if (gpu.tier === 'mid') {
-            shaderAdvPt = 'prefira Shaders leves (ex.: Complementary Reimagined em Low/Medium) e reduza a <em>Shadow Distance</em> para <strong>6 a 8 chunks</strong>.';
-            shaderAdvEn = 'prefer light Shaders (e.g. Complementary Reimagined on Low/Medium) and lower the <em>Shadow Distance</em> to <strong>6 to 8 chunks</strong>.';
-        } else {
-            shaderAdvPt = 'reduza a <em>Shadow Distance</em> para <strong>8 a 10 chunks</strong> (mesmo com visão de 16 chunks): alivia bastante a GPU com pouca perda visual.';
-            shaderAdvEn = 'lower the <em>Shadow Distance</em> to <strong>8 to 10 chunks</strong> (even with a 16-chunk render distance): it relieves the GPU a lot with little visual loss.';
-        }
-        tips = gpu.none ? '' : (lang === 'pt'
-            ? `<strong>Dica para Shaders (Oculus / Iris) na ${gpu.name}:</strong> ${shaderAdvPt}`
-            : `<strong>Shader tip (Oculus / Iris) on ${gpu.name}:</strong> ${shaderAdvEn}`);
-        if (isHybridNotebook(cpu, gpu) && state.os === 'windows') {
-            tips += lang === 'pt'
-                ? `<br><br><strong>Notebook:</strong> em Configurações > Sistema > Vídeo > Elementos gráficos, adicione o <code>javaw.exe</code> como "Alto desempenho" para forçar a GPU dedicada.`
-                : `<br><br><strong>Laptop:</strong> under Settings > System > Display > Graphics, add <code>javaw.exe</code> as "High performance" to force the dedicated GPU.`;
-        }
-        if (state.os === 'linux') {
-            tips += lang === 'pt'
-                ? `<br><br><strong>Linux:</strong> coloque estas variáveis no campo de variáveis de ambiente do launcher (no Modrinth App fica em <em>Java e memória</em>; em outros, prefixe o comando de inicialização). Para as <em>Transparent Huge Pages</em>, marque a opção ao lado da linha de argumentos.`
-                : `<br><br><strong>Linux:</strong> put these variables in the launcher's environment variables field (in the Modrinth App it is under <em>Java and memory</em>; in others, prefix the launch command). For <em>Transparent Huge Pages</em>, tick the option next to the arguments line.`;
-        }
     }
 
-    document.getElementById('cfg-file-path').textContent = filePath;
-    document.getElementById('cfg-hw-tag').textContent = hwTag;
-    document.getElementById('cfg-file-desc').textContent = desc;
-    document.getElementById('cfg-code-output').textContent = code;
-    document.getElementById('cfg-tips-box').innerHTML = tips;
+    let shaderAdvPt, shaderAdvEn;
+    if ((gpu.igpu && !gpu.unified) || gpu.tier === 'low' || gpu.tier === 'entry') {
+        shaderAdvPt = 'esta GPU é de nível básico: evite Shaders. Se quiser testar, use o perfil Low e <strong>Shadow Distance de 4 a 6 chunks</strong>.';
+        shaderAdvEn = 'this is an entry-level GPU: avoid Shaders. If you want to try, use the Low profile and a <strong>Shadow Distance of 4 to 6 chunks</strong>.';
+    } else if (gpu.tier === 'mid') {
+        shaderAdvPt = 'prefira Shaders leves (ex.: Complementary Reimagined em Low/Medium) e reduza a <em>Shadow Distance</em> para <strong>6 a 8 chunks</strong>.';
+        shaderAdvEn = 'prefer light Shaders (e.g. Complementary Reimagined on Low/Medium) and lower the <em>Shadow Distance</em> to <strong>6 to 8 chunks</strong>.';
+    } else {
+        shaderAdvPt = 'reduza a <em>Shadow Distance</em> para <strong>8 a 10 chunks</strong> (mesmo com visão de 16 chunks): alivia bastante a GPU com pouca perda visual.';
+        shaderAdvEn = 'lower the <em>Shadow Distance</em> to <strong>8 to 10 chunks</strong> (even with a 16-chunk render distance): it relieves the GPU a lot with little visual loss.';
+    }
+
+    let tips = gpu.none ? '' : (lang === 'pt'
+        ? `<strong>Dica para Shaders (Oculus / Iris) na ${gpu.name}:</strong> ${shaderAdvPt}`
+        : `<strong>Shader tip (Oculus / Iris) on ${gpu.name}:</strong> ${shaderAdvEn}`);
+    if (isHybridNotebook(cpu, gpu) && state.os === 'windows') {
+        tips += lang === 'pt'
+            ? `<br><br><strong>Notebook:</strong> em Configurações > Sistema > Vídeo > Elementos gráficos, adicione o <code>javaw.exe</code> como "Alto desempenho" para forçar a GPU dedicada.`
+            : `<br><br><strong>Laptop:</strong> under Settings > System > Display > Graphics, add <code>javaw.exe</code> as "High performance" to force the dedicated GPU.`;
+    }
+    if (state.os === 'linux') {
+        tips += lang === 'pt'
+            ? `<br><br><strong>Linux:</strong> coloque estas variáveis no campo de variáveis de ambiente do launcher (no Modrinth App fica em <em>Java e memória</em>; em outros, prefixe o comando de inicialização). Para as <em>Transparent Huge Pages</em>, marque a opção ao lado da linha de argumentos.`
+            : `<br><br><strong>Linux:</strong> put these variables in the launcher's environment variables field (in the Modrinth App it is under <em>Java and memory</em>; in others, prefix the launch command). For <em>Transparent Huge Pages</em>, tick the option next to the arguments line.`;
+    }
+
+    document.getElementById('driver-file-path').textContent = filePath;
+    document.getElementById('driver-hw-tag').textContent = hwTag;
+    document.getElementById('driver-file-desc').textContent = desc;
+    document.getElementById('driver-code-output').textContent = code;
+    const tipsEl = document.getElementById('driver-tips-box');
+    tipsEl.innerHTML = tips;
+    tipsEl.classList.toggle('hidden', !tips);
 }

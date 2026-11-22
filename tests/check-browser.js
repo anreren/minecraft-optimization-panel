@@ -338,7 +338,7 @@ function validateConfig(tab, filePath, code, { loader, mcVersion }) {
   ];
   const loaders = await ev(() => [...document.getElementById('select-loader').options].map((o) => o.value));
   const mcVersions = await ev(() => [...document.getElementById('select-mc-version').options].map((o) => o.value));
-  const tabs = ['modernfix', 'embeddium', 'ferrite', 'entityculling', 'immediatelyfast', 'badopt', 'radium', 'loader', 'driver'];
+  const tabs = ['modernfix', 'embeddium', 'ferrite', 'entityculling', 'immediatelyfast', 'badopt', 'radium', 'loader'];
   let configChecks = 0;
   for (const [cpu, gpu] of hardware) {
     for (const os_ of ['windows', 'linux']) {
@@ -356,6 +356,11 @@ function validateConfig(tab, filePath, code, { loader, mcVersion }) {
             validateConfig(tab, res.p, res.c, { loader: res.l, mcVersion: res.m })
               .forEach((m) => fail(`config "${tab}" (${cpu}/${gpu}/${res.l}/${res.m}/${os_}): ${m}`));
           }
+          // Validate Section 5 (GPU Driver & Shaders) for the same setup
+          const drv = await ev(() => ({ p: document.getElementById('driver-file-path').textContent, c: document.getElementById('driver-code-output').textContent, l: state.loader, m: state.mcVersion }));
+          configChecks++;
+          validateConfig('driver', drv.p, drv.c, { loader: drv.l, mcVersion: drv.m })
+            .forEach((m) => fail(`section 5 driver (${cpu}/${gpu}/${drv.l}/${drv.m}/${os_}): ${m}`));
         }
       }
     }
@@ -378,6 +383,87 @@ function validateConfig(tab, filePath, code, { loader, mcVersion }) {
   });
   check(mfRestored.includes('mixin.perf.dynamic_resources=true') && mfRestored.includes('mixin.perf.remove_spawn_chunks=true'),
     'ModernFix restored toggles must emit dynamic_resources=true and remove_spawn_chunks=true');
+
+  // ---- 3b. Section 3 expanded mod catalog (loader/version accuracy) -----------
+  await sel('select-mc-version', '1.21.1');
+  await sel('select-loader', 'fabric');
+  const fabric121Mods = await ev(() => getModsForCurrentSetup().map((m) => m.name));
+  check(fabric121Mods.some((n) => n.includes('ScalableLux')), 'Section 3 (Fabric 1.21.1): must include ScalableLux');
+  check(fabric121Mods.some((n) => n.includes('Alternate Current')) && fabric121Mods.some((n) => n.includes('Clumps')), 'Section 3: must include Alternate Current & Clumps');
+  check(fabric121Mods.some((n) => n.includes('Particle Core')) && fabric121Mods.some((n) => n.includes('ThreadTweak')) && fabric121Mods.some((n) => n.includes('ServerCore')),
+    'Section 3 (Fabric 1.21.1): must include Particle Core, ThreadTweak & ServerCore');
+  check(!fabric121Mods.some((n) => n.includes('FastSuite')), 'Section 3 (Fabric): must not recommend Forge-only FastSuite');
+
+  await sel('select-mc-version', '1.20.1');
+  await sel('select-loader', 'forge');
+  const forge120Mods = await ev(() => getModsForCurrentSetup().map((m) => m.name));
+  check(forge120Mods.some((n) => n.includes('Starlight')) && forge120Mods.some((n) => n.includes('FastSuite')),
+    'Section 3 (Forge 1.20.1): must include Starlight & FastSuite');
+  check(!forge120Mods.some((n) => n.includes('Particle Core')) && !forge120Mods.some((n) => n.includes('ScalableLux')),
+    'Section 3 (Forge 1.20.1): must not recommend Fabric/1.21-only mods');
+
+  // ---- 3c. Section 4 /config folder scanner & auto-adjuster -------------------
+  await sel('select-os', 'windows'); await sel('select-cpu', 'r5_5500'); await sel('select-gpu', 'rtx_3050_6_desk');
+  await sel('select-mc-version', '1.20.1'); await sel('select-loader', 'forge');
+  const scanForge = await ev(() => {
+    const sample = {
+      'config/modernfix/modernfix-mixins.properties': 'mixin.perf.dynamic_resources=false\nmixin.bugfix.packet_leak=true\n',
+      'config/embeddium-options.json': JSON.stringify({ quality: { leaves_quality: 'FANCY' }, performance: { chunk_builder_threads: 1 }, customUserOption: 42 }),
+      'config/ferritecore-mixin.toml': 'compactFastMap = false\nuseSmallThreadingDetector = true\ndataComponentPatch = true\n',
+      'config/entityculling/entityculling.json': JSON.stringify({ configVersion: 6, tracingDistance: 32, skipHiddenEntityRendering: true, blockEntityWhitelist: ['custom:machine'] }),
+      'config/badoptimizations.txt': 'enable_lightmap_caching = false\nsky_color_time_change_needed_for_update = 3\n',
+      'config/radium.properties': 'mixin.ai.pathing=true\nmixin.block.hopper=false\n',
+      'config/forge-client.toml': '[client]\nalwaysSetupTerrainOffThread = false\nforgeLightPipelineEnabled = true\n',
+      'config/fml.toml': 'earlyWindowControl = true\nmaxThreads = 2\nversionCheck = true\n'
+    };
+    const r1 = analyzeConfigMap(sample);
+    const updatedMap = Object.create(null);
+    for (const item of r1.results) if (item.found) updatedMap[item.path] = item.newContent;
+    const r2 = analyzeConfigMap(updatedMap);
+    return { r1, r2, updatedMap };
+  });
+  check(scanForge.r1.summary.foundCount === 8 && scanForge.r1.summary.fixCount === 8,
+    `scanner (Forge 1.20.1): expected 8 found & 8 needing fixes (got ${scanForge.r1.summary.foundCount}/${scanForge.r1.summary.fixCount})`);
+  check(scanForge.r1.results.find((x) => x.id === 'modernfix').location === 'subfolder' &&
+        scanForge.r1.results.find((x) => x.id === 'entityculling').location === 'subfolder',
+    'scanner (Forge 1.20.1): must detect mod configs placed inside subfolders');
+  check(JSON.parse(scanForge.updatedMap['embeddium-options.json']).customUserOption === 42,
+    'scanner: JSON auto-adjust must preserve untouched user keys');
+  check(JSON.parse(scanForge.updatedMap['entityculling/entityculling.json']).blockEntityWhitelist.includes('custom:machine'),
+    'scanner: EntityCulling auto-adjust must preserve custom whitelist entries');
+  check(scanForge.updatedMap['radium.properties'].includes('mixin.block.hopper=false') &&
+        !scanForge.updatedMap['radium.properties'].split('\n').some((l) => /^mixin\.ai\.pathing=true/.test(l.trim())),
+    'scanner: Radium audit must comment out =true overrides while keeping =false workarounds');
+  check(scanForge.r2.summary.fixCount === 0 && scanForge.r2.summary.okCount === 8,
+    `scanner (Forge 1.20.1): re-scanning adjusted configs must yield 0 pending fixes (got fix=${scanForge.r2.summary.fixCount}, ok=${scanForge.r2.summary.okCount})`);
+
+  await sel('select-mc-version', '1.21.1'); await sel('select-loader', 'fabric');
+  const scanFabric = await ev(() => {
+    const sample = {
+      'myinstance/config/embeddium-options.json': JSON.stringify({ quality: { leaves_quality: 'DEFAULT' } }),
+      'myinstance/config/ferritecore.mixin.properties': 'compactFastMap=true\nuseSmallThreadingDetector=false\n',
+      'myinstance/config/c2me.toml': 'version = 3\nmaxConcurrentTasks = 2\n[ioSystem]\nasync = true\ngcFreeChunkSerializer = true\n[threadedWorldGen]\nenabled = true\n',
+      'myinstance/config/lithium.properties': 'mixin.ai.nearby_entity_tracking=true\n',
+      'myinstance/config/servercore/config.toml': '[dynamic]\nenabled = false\n'
+    };
+    const r1 = analyzeConfigMap(sample);
+    const updatedMap = Object.create(null);
+    for (const item of r1.results) if (item.found) updatedMap[item.path] = item.newContent;
+    const r2 = analyzeConfigMap(updatedMap);
+    return { r1, r2, updatedMap };
+  });
+  check(scanFabric.r1.results.find((x) => x.id === 'embeddium').mismatch === true,
+    'scanner (Fabric 1.21.1): must flag embeddium-options.json as loader mismatch');
+  check(scanFabric.r1.results.find((x) => x.id === 'servercore').location === 'subfolder',
+    'scanner (Fabric 1.21.1): must detect optional ServerCore config in subfolder');
+  check(scanFabric.updatedMap['ferritecore.mixin.properties'].includes('dataComponentPatch=true'),
+    'scanner (Fabric 1.21.1): FerriteCore must add dataComponentPatch=true on 1.21+');
+  check(scanFabric.updatedMap['c2me.toml'].includes('globalExecutorParallelism =') &&
+        scanFabric.updatedMap['c2me.toml'].includes('[chunkSystem]') &&
+        scanFabric.updatedMap['c2me.toml'].includes('useDensityFunctionCompiler = true'),
+    'scanner (Fabric 1.21.1): C2ME must migrate to globalExecutorParallelism, [chunkSystem] and DFC');
+  check(scanFabric.r2.summary.fixCount === 0,
+    `scanner (Fabric 1.21.1): re-scanning adjusted configs must yield 0 pending fixes (got ${scanFabric.r2.summary.fixCount})`);
 
   await sel('select-mc-version', '1.20.1');
   await sel('select-os', 'windows'); await sel('select-cpu', 'r5_5500'); await sel('select-gpu', 'rtx_3050_6_desk'); await sel('select-loader', 'forge');
@@ -570,7 +656,9 @@ function validateConfig(tab, filePath, code, { loader, mcVersion }) {
   check(a11y.skip, 'a11y: skip link and #main-content must exist');
   check(a11y.toast === 'polite', 'a11y: the toast must be an aria-live region');
   check(a11y.alert === 'alert', 'a11y: the RAM warning must have role="alert"');
-  check(a11y.tabs === 9 && a11y.tabsSelected === 1, `a11y: config tabs need role=tab and exactly one selected (got ${a11y.tabs}/${a11y.tabsSelected})`);
+  check(a11y.tabs === 8 && a11y.tabsSelected === 1, `a11y: config tabs need role=tab and exactly one selected (got ${a11y.tabs}/${a11y.tabsSelected})`);
+  const sec5Ok = await a11yPage.evaluate(() => !!document.getElementById('section-driver') && !document.getElementById('checklist-container'));
+  check(sec5Ok, 'layout: Section 5 must be GPU Driver & Shaders and the checklist must be removed');
   check(a11y.tabAfter === 'true/ctab-embeddium', `a11y: selecting a tab must update aria-selected and the panel label (got ${a11y.tabAfter})`);
   check(a11y.tabArrow === 'ctab-ferrite', `a11y: ArrowRight should move to the next tab (got ${a11y.tabArrow})`);
   check(a11y.profilesPressed === '1/true', `a11y: exactly one RAM profile should be aria-pressed (got ${a11y.profilesPressed})`);

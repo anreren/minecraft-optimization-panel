@@ -9,7 +9,7 @@ function renderHardwareDiagnostics(cpu, gpu, storage) {
     // Diagnóstico de RAM
     let ramStatusTitle = "";
     let ramStatusDesc = "";
-    let ramColor = "border-blue-500/30 bg-blue-950/20 text-blue-300";
+    let ramColor = "border-zinc-800/80 bg-zinc-950/60 text-zinc-100";
 
     if (state.ddrType === 'DDR3') {
         ramStatusTitle = lang === 'pt'
@@ -18,7 +18,7 @@ function renderHardwareDiagnostics(cpu, gpu, storage) {
         ramStatusDesc = lang === 'pt'
             ? `Em DDR3, a largura de banda com a CPU é limitada. Mantenha FerriteCore e ModernFix instalados (reduzem o volume de dados na RAM) e ative o XMP na BIOS, se disponível.`
             : `On DDR3, memory bandwidth to the CPU is constrained. Keep FerriteCore and ModernFix installed (they reduce the amount of data held in RAM) and enable XMP in the BIOS if available.`;
-        ramColor = "border-amber-500/40 bg-amber-950/20 text-amber-300";
+        ramColor = "border-amber-500/30 bg-amber-950/10 text-amber-300";
     } else if (state.ddrType === 'DDR4' && state.ramFreq <= 2666) {
         ramStatusTitle = lang === 'pt'
             ? `Otimização de Latência (${state.ddrType} ${state.ramFreq}MHz)`
@@ -26,7 +26,7 @@ function renderHardwareDiagnostics(cpu, gpu, storage) {
         ramStatusDesc = lang === 'pt'
             ? `Frequências até 2666MHz limitam levemente o Infinity Fabric / Ring Bus. O GC ajustado do painel (SoftMaxHeapSize=${state.softMaxGB}G no ZGC, ou G1 com pausas curtas) evita varreduras longas na RAM e mantém o FPS estável.`
             : `Speeds up to 2666MHz slightly bottleneck Infinity Fabric / Ring Bus. The panel's tuned GC (SoftMaxHeapSize=${state.softMaxGB}G on ZGC, or G1 with short pauses) avoids long RAM sweeps and keeps frametimes smooth.`;
-        ramColor = "border-emerald-500/30 bg-emerald-950/20 text-emerald-300";
+        ramColor = "border-zinc-800/80 bg-zinc-950/60 text-zinc-100";
     } else {
         ramStatusTitle = lang === 'pt'
             ? `Banda de Memória Rápida (${state.ddrType} ${state.ramFreq}MHz)`
@@ -34,7 +34,7 @@ function renderHardwareDiagnostics(cpu, gpu, storage) {
         ramStatusDesc = lang === 'pt'
             ? `Sua memória tem excelente taxa de transferência! O GC ajustado (ZGC ou G1) limpará objetos temporários de chunks com pausas curtas.`
             : `Your RAM offers high throughput! The tuned GC (ZGC or G1) will sweep temporary chunk objects with short pauses.`;
-        ramColor = "border-cyan-500/30 bg-cyan-950/20 text-cyan-300";
+        ramColor = "border-zinc-800/80 bg-zinc-950/60 text-zinc-100";
     }
 
     // Canais de memória / largura de banda teórica
@@ -44,12 +44,12 @@ function renderHardwareDiagnostics(cpu, gpu, storage) {
         ramStatusDesc = lang === 'pt'
             ? `O chip Apple usa uma única memória unificada compartilhada entre CPU e GPU, com banda muito alta. Não há DDR nem dual-channel para configurar: deixe memória livre para o macOS e para a GPU ao alocar o heap.`
             : `The Apple chip uses a single unified memory shared by CPU and GPU, with very high bandwidth. There is no DDR or dual-channel to configure: leave memory free for macOS and the GPU when sizing the heap.`;
-        ramColor = "border-cyan-500/30 bg-cyan-950/20 text-cyan-300";
+        ramColor = "border-zinc-800/80 bg-zinc-950/60 text-zinc-100";
     } else if (state.memChannels === 1) {
         ramStatusDesc += lang === 'pt'
             ? ` Single-channel: banda teórica de ~${bwNow} GB/s (em dual-channel seriam ~${memBandwidthGBs(2)} GB/s). ${gpu.igpu ? 'Com iGPU o impacto é grande, pois ela divide essa banda com a CPU. ' : ''}Instale um segundo pente idêntico.`
             : ` Single-channel: theoretical bandwidth of ~${bwNow} GB/s (dual-channel would give ~${memBandwidthGBs(2)} GB/s). ${gpu.igpu ? 'With an iGPU the impact is large, since it shares that bandwidth with the CPU. ' : ''}Install a second matching stick.`;
-        ramColor = "border-amber-500/40 bg-amber-950/20 text-amber-300";
+        ramColor = "border-amber-500/30 bg-amber-950/10 text-amber-300";
     } else {
         ramStatusDesc += lang === 'pt' ? ` Banda teórica: ~${bwNow} GB/s.` : ` Theoretical bandwidth: ~${bwNow} GB/s.`;
     }
@@ -106,7 +106,7 @@ function renderHardwareDiagnostics(cpu, gpu, storage) {
     const isXeon = cpu.name.includes('Xeon');
     let cpuTitle, cpuDesc, cpuColor;
     if (cpu.st === 'low') {
-        cpuColor = 'border-amber-500/40 bg-amber-950/20 text-amber-300';
+        cpuColor = 'border-amber-500/30 bg-amber-950/10 text-amber-300';
         if (isXeon) {
             cpuTitle = lang === 'pt' ? `Clock baixo: gargalo na thread principal (${cpu.name})` : `Low clock: main-thread bottleneck (${cpu.name})`;
             cpuDesc = lang === 'pt'
@@ -119,13 +119,13 @@ function renderHardwareDiagnostics(cpu, gpu, storage) {
                 : `Minecraft depends on single-thread speed (main + integrated server), so extra cores help little. Keep simulation distance at 4–5, avoid very heavy packs and prefer ModernFix, FerriteCore and Lithium/Radium.`;
         }
     } else if (cpu.st === 'mid') {
-        cpuColor = 'border-blue-500/30 bg-blue-950/20 text-blue-300';
+        cpuColor = 'border-zinc-800/80 bg-zinc-950/60 text-zinc-100';
         cpuTitle = lang === 'pt' ? `Thread principal moderada (${cpu.name})` : `Moderate main thread (${cpu.name})`;
         cpuDesc = lang === 'pt'
             ? `Velocidade de thread única moderada: dá conta de modpacks médios. Em packs pesados, reduza a simulation distance (5–8) e use Radium/Lithium.`
             : `Moderate single-thread speed: fine for medium modpacks. On heavy packs, lower simulation distance (5–8) and use Radium/Lithium.`;
     } else {
-        cpuColor = cpu.st === 'top' ? 'border-cyan-500/30 bg-cyan-950/20 text-cyan-300' : 'border-emerald-500/30 bg-emerald-950/20 text-emerald-300';
+        cpuColor = 'border-zinc-800/80 bg-zinc-950/60 text-zinc-100';
         cpuTitle = lang === 'pt' ? `Thread principal forte (${cpu.name})` : `Strong main thread (${cpu.name})`;
         cpuDesc = lang === 'pt'
             ? `Boa velocidade de thread única: aguenta packs pesados e distâncias maiores, e as ${cpu.threads} threads são bem aproveitadas pelos chunk builders e pelo servidor integrado.`
@@ -150,44 +150,44 @@ function renderHardwareDiagnostics(cpu, gpu, storage) {
                 ? `Na bateria o clock cai muito: use o notebook na tomada, com perfil de energia de alto desempenho, e mantenha as saídas de ar livres para evitar thermal throttling. Memória em dual-channel faz grande diferença na iGPU.`
                 : `On battery the clocks drop a lot: keep the laptop plugged in with a high-performance power plan and keep the vents clear to avoid thermal throttling. Dual-channel memory makes a big difference on the iGPU.`);
         nbCard = `
-        <div class="md:col-span-2 p-3.5 rounded-xl border border-amber-500/40 bg-amber-950/20 text-amber-300">
-            <div class="text-xs font-bold flex items-center gap-1.5"><i aria-hidden="true" class="fa-solid fa-laptop"></i> ${nbTitle}</div>
-            <p class="text-[11px] text-gray-300 mt-1 leading-relaxed">${nbDesc}</p>
+        <div class="md:col-span-2 p-3.5 rounded-xl border border-amber-500/30 bg-amber-950/10 text-amber-300">
+            <div class="text-xs font-semibold flex items-center gap-1.5"><i aria-hidden="true" class="fa-solid fa-laptop"></i> ${nbTitle}</div>
+            <p class="text-[11px] text-zinc-400 mt-1.5 leading-relaxed">${nbDesc}</p>
         </div>`;
     }
     const rv = recommendedVideoSettings(cpu, gpu);
     const shaderTxt = { off: lang === 'pt' ? 'Evite' : 'Avoid', light: lang === 'pt' ? 'Leves' : 'Light', ok: 'OK' }[rv.shaders];
-    const tile = (label, value) => `<div class="rounded-lg bg-gray-900/70 border border-gray-800 p-2 text-center"><div class="text-[10px] uppercase tracking-wider text-gray-400">${label}</div><div class="text-sm font-bold text-white font-mono">${value}</div></div>`;
+    const tile = (label, value) => `<div class="rounded-lg bg-zinc-900/70 border border-zinc-800/80 p-2.5 text-center"><div class="text-[10px] uppercase tracking-wider text-zinc-500">${label}</div><div class="text-sm font-semibold text-zinc-100 font-mono mt-0.5">${value}</div></div>`;
     const settingsCard = `
-        <div class="md:col-span-3 p-3.5 rounded-xl border border-gray-700/60 bg-gray-950/60 text-gray-200">
-            <div class="text-xs font-bold flex items-center gap-1.5"><i aria-hidden="true" class="fa-solid fa-sliders"></i> ${lang === 'pt' ? 'Configurações recomendadas no jogo' : 'Recommended in-game settings'}</div>
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-2">
+        <div class="md:col-span-3 p-4 rounded-xl border border-zinc-800/80 bg-zinc-950/60 text-zinc-100">
+            <div class="text-xs font-semibold flex items-center gap-1.5 text-zinc-200"><i aria-hidden="true" class="fa-solid fa-sliders text-emerald-400"></i> ${lang === 'pt' ? 'Configurações recomendadas no jogo' : 'Recommended in-game settings'}</div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-2.5">
                 ${tile('Render Distance', `${rv.render} chunks`)}
                 ${tile('Simulation Distance', `${rv.sim} chunks`)}
                 ${tile('Entity Distance', `${rv.entity}%`)}
                 ${tile('Shaders', shaderTxt)}
             </div>
-            <p class="text-[11px] text-gray-400 mt-2 leading-relaxed">${lang === 'pt'
+            <p class="text-[11px] text-zinc-500 mt-2.5 leading-relaxed">${lang === 'pt'
                 ? `Calculado a partir da thread única da CPU (${stName}), do tier da GPU, do perfil de modpack e dos canais de RAM. São pontos de partida: ajuste conforme o FPS e o MSPT do seu pack.`
                 : `Based on CPU single-thread speed (${stName}), GPU tier, modpack profile and RAM channels. They are starting points: adjust according to your pack's FPS and MSPT.`}</p>
         </div>`;
 
     container.innerHTML = `
         <div class="p-3.5 rounded-xl border ${ramColor}">
-            <div class="text-xs font-bold flex items-center gap-1.5"><i aria-hidden="true" class="fa-solid fa-memory"></i> ${ramStatusTitle}</div>
-            <p class="text-[11px] text-gray-300 mt-1 leading-relaxed">${ramStatusDesc}</p>
+            <div class="text-xs font-semibold flex items-center gap-1.5"><i aria-hidden="true" class="fa-solid fa-memory text-zinc-400"></i> ${ramStatusTitle}</div>
+            <p class="text-[11px] text-zinc-400 mt-1.5 leading-relaxed">${ramStatusDesc}</p>
         </div>
-        <div class="p-3.5 rounded-xl border border-purple-500/30 bg-purple-950/20 text-purple-300">
-            <div class="text-xs font-bold flex items-center gap-1.5"><i aria-hidden="true" class="fa-solid fa-display"></i> ${gpuTitle}</div>
-            <p class="text-[11px] text-gray-300 mt-1 leading-relaxed">${gpuDesc}</p>
+        <div class="p-3.5 rounded-xl border border-zinc-800/80 bg-zinc-950/60 text-zinc-100">
+            <div class="text-xs font-semibold flex items-center gap-1.5"><i aria-hidden="true" class="fa-solid fa-display text-zinc-400"></i> ${gpuTitle}</div>
+            <p class="text-[11px] text-zinc-400 mt-1.5 leading-relaxed">${gpuDesc}</p>
         </div>
-        <div class="p-3.5 rounded-xl border ${state.storageKey === 'hdd' ? 'border-red-500/40 bg-red-950/20 text-red-300' : 'border-emerald-500/30 bg-emerald-950/20 text-emerald-300'}">
-            <div class="text-xs font-bold flex items-center gap-1.5"><i aria-hidden="true" class="fa-solid fa-hard-drive"></i> ${diskTitle}</div>
-            <p class="text-[11px] text-gray-300 mt-1 leading-relaxed">${diskDesc}</p>
+        <div class="p-3.5 rounded-xl border ${state.storageKey === 'hdd' ? 'border-red-500/30 bg-red-950/10 text-red-300' : 'border-zinc-800/80 bg-zinc-950/60 text-zinc-100'}">
+            <div class="text-xs font-semibold flex items-center gap-1.5"><i aria-hidden="true" class="fa-solid fa-hard-drive text-zinc-400"></i> ${diskTitle}</div>
+            <p class="text-[11px] text-zinc-400 mt-1.5 leading-relaxed">${diskDesc}</p>
         </div>
         <div class="${nb ? 'md:col-span-1' : 'md:col-span-3'} p-3.5 rounded-xl border ${cpuColor}">
-            <div class="text-xs font-bold flex items-center gap-1.5"><i aria-hidden="true" class="fa-solid fa-microchip"></i> ${cpuTitle}</div>
-            <p class="text-[11px] text-gray-300 mt-1 leading-relaxed">${cpuDesc}</p>
+            <div class="text-xs font-semibold flex items-center gap-1.5"><i aria-hidden="true" class="fa-solid fa-microchip text-zinc-400"></i> ${cpuTitle}</div>
+            <p class="text-[11px] text-zinc-400 mt-1.5 leading-relaxed">${cpuDesc}</p>
         </div>${nbCard}${settingsCard}
     `;
 }

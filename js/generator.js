@@ -109,8 +109,9 @@ function recalculateAll() {
     // 5. Renderiza Catálogo de Mods para o Loader e Versão escolhidos
     renderDynamicMods();
 
-    // 6. Renderiza a Config Ativa da Seção 4
+    // 6. Renderiza a Config Ativa da Seção 4 e o Driver da Seção 5
     renderActiveConfigTab();
+    renderDriverSection();
 
     // 7. Salva a configuração (localStorage + hash da URL) para recarregar ou compartilhar
     persistConfig();
@@ -306,7 +307,7 @@ function renderLauncherGuide() {
         steps.push(pt ? `Marque <strong>"Ignorar verificação de compatibilidade do Java"</strong> (a 1.20.1 pede Java 17 por padrão, mas costuma rodar bem no Java 21).` : `Enable <strong>"Skip Java compatibility checks"</strong> (1.20.1 asks for Java 17 by default, but it usually runs fine on Java 21).`);
     }
     if (state.os === 'linux') {
-        steps.push(pt ? `No Linux, as variáveis de ambiente do driver (Mesa/NVIDIA) e o Transparent Huge Pages estão na aba <strong>Driver</strong> da Seção 4.` : `On Linux, the driver environment variables (Mesa/NVIDIA) and Transparent Huge Pages are in the <strong>Driver</strong> tab of Section 4.`);
+        steps.push(pt ? `No Linux, as variáveis de ambiente do driver (Mesa/NVIDIA) e o Transparent Huge Pages estão na <strong>Seção 5 (Driver GPU & Shaders)</strong>.` : `On Linux, the driver environment variables (Mesa/NVIDIA) and Transparent Huge Pages are in <strong>Section 5 (GPU Driver & Shaders)</strong>.`);
     }
     if (state.jvmEngine === 'graal_g1') {
         steps.push(pt ? `O JIT Graal pode melhorar o desempenho em bases pesadas, mas o ganho varia conforme o modpack.` : `The Graal JIT can improve performance on heavy packs, but the gain varies by modpack.`);

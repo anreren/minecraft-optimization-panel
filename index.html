@@ -26,127 +26,111 @@
     </script>
     <style>
         /* Acessibilidade: foco visível em todos os controles e respeito a "reduzir movimento" */
-        :focus-visible { outline: 2px solid #34d399 !important; outline-offset: 2px !important; }
+        :focus-visible { outline: 2px solid #10b981 !important; outline-offset: 2px !important; }
         main:focus-visible { outline: none !important; }
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
         }
         body {
-            background-color: #070a12;
-            color: #f3f4f6;
-            background-image: 
-                radial-gradient(circle at 10% 8%, rgba(16, 185, 129, 0.09) 0%, transparent 35%),
-                radial-gradient(circle at 90% 12%, rgba(139, 92, 246, 0.09) 0%, transparent 35%),
-                radial-gradient(circle at 50% 90%, rgba(6, 182, 212, 0.07) 0%, transparent 45%);
+            background-color: #09090b;
+            color: #f4f4f5;
         }
         .code-scroll::-webkit-scrollbar {
-            height: 8px;
-            width: 8px;
+            height: 6px;
+            width: 6px;
         }
         .code-scroll::-webkit-scrollbar-track {
-            background: #05070c;
+            background: #09090b;
             border-radius: 6px;
         }
         .code-scroll::-webkit-scrollbar-thumb {
-            background: #1f2937;
+            background: #27272a;
             border-radius: 6px;
         }
         .code-scroll::-webkit-scrollbar-thumb:hover {
-            background: #374151;
+            background: #3f3f46;
         }
         select option, select optgroup {
-            background-color: #0f172a;
-            color: #f8fafc;
+            background-color: #18181b;
+            color: #f4f4f5;
         }
     </style>
 </head>
-<body class="min-h-screen antialiased selection:bg-emerald-500 selection:text-white pb-20">
+<body class="min-h-screen antialiased selection:bg-emerald-500/30 selection:text-emerald-200 pb-20">
 
-    <a href="#main-content" id="skip-link" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] focus:bg-emerald-700 focus:text-white focus:px-4 focus:py-2 focus:rounded-lg focus:font-semibold"><span id="i18n-skip">Pular para o conteúdo</span></a>
+    <a href="#main-content" id="skip-link" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] focus:bg-zinc-100 focus:text-zinc-950 focus:px-4 focus:py-2 focus:rounded-lg focus:font-semibold"><span id="i18n-skip">Pular para o conteúdo</span></a>
 
     <!-- Toast Notification -->
-    <div id="toast" role="status" aria-live="polite" aria-atomic="true" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none bg-emerald-700 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 font-medium border border-emerald-400/40">
-        <i aria-hidden="true" class="fa-solid fa-circle-check text-lg"></i>
-        <span id="toast-msg">Copiado para a área de transferência!</span>
+    <div id="toast" role="status" aria-live="polite" aria-atomic="true" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none bg-zinc-900 text-zinc-100 px-4 py-2.5 rounded-xl shadow-2xl flex items-center gap-2.5 text-xs font-medium border border-emerald-500/40">
+        <i aria-hidden="true" class="fa-solid fa-circle-check text-emerald-400 text-sm"></i>
+        <span id="toast-msg">Copiado!</span>
     </div>
 
-    <!-- Header -->
-    <header class="border-b border-gray-800/80 bg-gray-900/80 backdrop-blur-md sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
-            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
-                <div class="flex items-center gap-3.5">
-                    <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-500 via-teal-500 to-purple-600 flex items-center justify-center shadow-lg shadow-emerald-500/20 border border-white/10">
-                        <i aria-hidden="true" class="fa-solid fa-microchip text-white text-xl"></i>
+    <!-- Header Minimalista -->
+    <header class="border-b border-zinc-800/80 bg-[#09090b]/85 backdrop-blur-md sticky top-0 z-40">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3.5">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-9 h-9 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center shrink-0">
+                        <i aria-hidden="true" class="fa-solid fa-microchip text-emerald-400 text-sm"></i>
                     </div>
-                    <div>
+                    <div class="min-w-0">
                         <div class="flex flex-wrap items-center gap-2">
-                            <h1 id="i18n-app-title" class="text-lg sm:text-xl font-extrabold tracking-tight text-white">Simulador & Otimizador Universal Minecraft</h1>
-                            <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/40" id="header-engine-badge">OpenJDK / Temurin 21 (Generational ZGC)</span>
-                            <span id="header-loader-badge" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">Forge 1.20.1</span>
+                            <h1 id="i18n-app-title" class="text-base sm:text-lg font-semibold tracking-tight text-zinc-100">Otimizador Universal Minecraft</h1>
+                            <span id="header-loader-badge" class="text-[11px] font-mono px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Forge 1.20.1</span>
+                            <span id="header-engine-badge" class="text-[11px] font-mono px-2 py-0.5 rounded-md bg-zinc-900 text-zinc-300 border border-zinc-800">OpenJDK / Temurin 21 (Generational ZGC)</span>
                         </div>
-                        <p id="header-hw-summary" class="text-xs text-gray-400 mt-0.5">Ryzen 5 5500 (6C/12T) • RTX 3050 6GB (Desktop) • 32GB DDR4 2666MHz • SSD NVMe</p>
+                        <p id="header-hw-summary" class="text-xs text-zinc-500 mt-0.5 truncate">Ryzen 5 5500 (6C/12T) • RTX 3050 6GB (Desktop) • 32GB DDR4 2666MHz • SSD NVMe</p>
                     </div>
                 </div>
 
-                <!-- Seletor de Idioma (PT-BR / EN-US) & Progresso -->
-                <div class="flex flex-wrap items-center gap-3">
-                    <div class="flex items-center bg-gray-950/90 p-1 rounded-xl border border-gray-800">
-                        <button onclick="setLanguage('pt')" id="lang-btn-pt" aria-pressed="true" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-700 text-white transition flex items-center gap-1.5">
-                            <span>🇧🇷</span> Português (BR)
-                        </button>
-                        <button onclick="setLanguage('en')" id="lang-btn-en" aria-pressed="false" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-400 hover:text-white transition flex items-center gap-1.5">
-                            <span>🇺🇸</span> English (US)
-                        </button>
+                <!-- Controles: Idioma, Compartilhar & Reset -->
+                <div class="flex flex-wrap items-center gap-2 shrink-0">
+                    <div class="flex items-center bg-zinc-900/90 p-1 rounded-lg border border-zinc-800">
+                        <button onclick="setLanguage('pt')" id="lang-btn-pt" aria-pressed="true" class="px-2.5 py-1 rounded-md text-xs font-semibold bg-zinc-100 text-zinc-950 transition">PT</button>
+                        <button onclick="setLanguage('en')" id="lang-btn-en" aria-pressed="false" class="px-2.5 py-1 rounded-md text-xs font-medium text-zinc-400 hover:text-zinc-100 transition">EN</button>
                     </div>
-                    <div class="flex items-center bg-gray-950/90 p-1 rounded-xl border border-gray-800">
-                        <button onclick="shareConfig()" id="share-btn" title="Copiar link desta configuração" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-300 hover:text-white transition flex items-center gap-1.5">
-                            <i aria-hidden="true" class="fa-solid fa-link"></i> <span id="i18n-share">Compartilhar</span>
+                    <div class="flex items-center bg-zinc-900/90 p-1 rounded-lg border border-zinc-800">
+                        <button onclick="shareConfig()" id="share-btn" title="Copiar link desta configuração" class="px-2.5 py-1 rounded-md text-xs font-medium text-zinc-300 hover:text-white transition flex items-center gap-1.5">
+                            <i aria-hidden="true" class="fa-solid fa-link text-[11px]"></i> <span id="i18n-share">Compartilhar</span>
                         </button>
-                        <button onclick="resetConfig()" id="reset-btn" title="Restaurar a configuração padrão" aria-label="Reset" class="px-3 py-2 rounded-lg text-xs text-gray-400 hover:text-white transition">
+                        <button onclick="resetConfig()" id="reset-btn" title="Restaurar a configuração padrão" aria-label="Restaurar a configuração padrão" class="px-2 py-1 rounded-md text-xs text-zinc-400 hover:text-white transition">
                             <i aria-hidden="true" class="fa-solid fa-rotate-left"></i>
                         </button>
-                    </div>
-                    <div class="flex items-center gap-3 bg-gray-950/90 px-3.5 py-2 rounded-xl border border-gray-800">
-                        <div class="text-right">
-                            <div id="i18n-checklist-top" class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Checklist</div>
-                            <div id="progress-text" class="text-xs font-bold text-emerald-400">0/8 (0%)</div>
-                        </div>
-                        <div class="w-20 h-2 bg-gray-800 rounded-full overflow-hidden">
-                            <div id="progress-bar" class="h-full bg-gradient-to-r from-emerald-500 to-cyan-400 w-0 transition-all duration-500"></div>
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </header>
 
-    <main id="main-content" tabindex="-1" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-8">
+    <main id="main-content" tabindex="-1" class="max-w-6xl mx-auto px-4 sm:px-6 pt-8 space-y-8">
 
-        <!-- SEÇÃO 1: CONFIGURADOR DE HARDWARE, MEMÓRIA, DISCO E VERSÃO DO JOGO -->
-        <section class="bg-gray-900/95 border border-gray-800 rounded-2xl p-5 sm:p-6 shadow-2xl space-y-6">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-gray-800">
+        <!-- SEÇÃO 1: HARDWARE, MEMÓRIA, DISCO E VERSÃO DO JOGO -->
+        <section class="bg-[#111114] border border-zinc-800/80 rounded-2xl p-5 sm:p-7 space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-zinc-800/70">
                 <div>
-                    <h2 class="text-lg sm:text-xl font-bold text-white flex items-center gap-2.5">
-                        <i aria-hidden="true" class="fa-solid fa-sliders text-emerald-400"></i>
-                        <span id="i18n-sec1-title">1. Configurador Dinâmico de Hardware, Memória & Jogo</span>
-                    </h2>
-                    <p id="i18n-sec1-sub" class="text-xs sm:text-sm text-gray-400 mt-0.5">Altere qualquer peça abaixo para recalcular instantaneamente os threads do GC, a memória, a engine Java e os arquivos de configuração.</p>
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-xs font-mono text-emerald-400">01</span>
+                        <h2 id="i18n-sec1-title" class="text-base sm:text-lg font-semibold tracking-tight text-zinc-100">Hardware, Memória & Jogo</h2>
+                    </div>
+                    <p id="i18n-sec1-sub" class="text-xs text-zinc-400 mt-1">Ajuste suas peças para recalcular threads do GC, alocação de RAM, engine Java e arquivos de configuração.</p>
                 </div>
-                <span class="text-xs font-mono text-cyan-400 bg-cyan-950/50 border border-cyan-500/30 px-3 py-1.5 rounded-xl self-start sm:self-auto">
-                    <i aria-hidden="true" class="fa-solid fa-bolt mr-1"></i> <span id="i18n-live-telemetry">Telemetria em Tempo Real</span>
+                <span class="text-[11px] font-mono text-zinc-400 bg-zinc-900/80 border border-zinc-800 px-2.5 py-1 rounded-md self-start sm:self-auto flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                    <span id="i18n-live-telemetry">Tempo Real</span>
                 </span>
             </div>
 
             <!-- Grid de Seletores de Hardware -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3.5">
+
                 <!-- 1. Processador (CPU) -->
-                <div class="bg-gray-950/80 border border-gray-800 rounded-xl p-3.5 space-y-2">
-                    <label for="select-cpu" class="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-orange-400">
-                        <span><i aria-hidden="true" class="fa-solid fa-microchip mr-1.5"></i><span id="i18n-lbl-cpu">Processador (CPU)</span></span>
-                        <span id="cpu-badge-threads" class="font-mono text-[11px] bg-orange-500/15 px-2 py-0.5 rounded border border-orange-500/30">6C / 12T</span>
+                <div class="bg-zinc-950/70 border border-zinc-800/80 rounded-xl p-3.5 space-y-2">
+                    <label for="select-cpu" class="flex items-center justify-between text-[11px] font-medium text-zinc-400">
+                        <span id="i18n-lbl-cpu">Processador (CPU)</span>
+                        <span id="cpu-badge-threads" class="font-mono text-[11px] text-zinc-300">6C / 12T</span>
                     </label>
-                    <select id="select-cpu" onchange="onHardwareChange()" class="w-full bg-gray-900 border border-gray-700/80 rounded-lg px-3 py-2 text-xs sm:text-sm text-white font-medium focus:outline-none focus:border-emerald-500">
+                    <select id="select-cpu" onchange="onHardwareChange()" class="w-full bg-zinc-900/90 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-100 font-medium focus:outline-none focus:border-emerald-500">
                         <optgroup label="AMD Ryzen 5000 / 4000 / 3000 (AM4)">
                             <option value="r5_5500" selected>AMD Ryzen 5 5500 (6C/12T - Zen 3)</option>
                             <option value="r5_5600">AMD Ryzen 5 5600 / 5600X (6C/12T - Zen 3)</option>
@@ -252,16 +236,16 @@
                             <option value="m4_pro">Apple M4 Pro (14C/14T - ARM64 • 10P+4E • iGPU)</option>
                         </optgroup>
                     </select>
-                    <p id="cpu-meta-desc" class="text-[11px] text-gray-400 font-mono">Zen 3 • Thread única: Alta • L3 16MB • ConcGC: 3 / ParGC: 8</p>
+                    <p id="cpu-meta-desc" class="text-[11px] text-zinc-500 font-mono">Zen 3 • Thread única: Alta • L3 16MB • GC Threads: Auto</p>
                 </div>
 
                 <!-- 2. Placa de Vídeo (GPU) -->
-                <div class="bg-gray-950/80 border border-gray-800 rounded-xl p-3.5 space-y-2">
-                    <label for="select-gpu" class="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-emerald-400">
-                        <span><i aria-hidden="true" class="fa-solid fa-display mr-1.5"></i><span id="i18n-lbl-gpu">Placa de Vídeo (GPU)</span></span>
-                        <span id="gpu-badge-vram" class="font-mono text-[11px] bg-emerald-500/15 px-2 py-0.5 rounded border border-emerald-500/30">6GB VRAM</span>
+                <div class="bg-zinc-950/70 border border-zinc-800/80 rounded-xl p-3.5 space-y-2">
+                    <label for="select-gpu" class="flex items-center justify-between text-[11px] font-medium text-zinc-400">
+                        <span id="i18n-lbl-gpu">Placa de Vídeo (GPU)</span>
+                        <span id="gpu-badge-vram" class="font-mono text-[11px] text-zinc-300">6GB VRAM</span>
                     </label>
-                    <select id="select-gpu" onchange="onHardwareChange()" class="w-full bg-gray-900 border border-gray-700/80 rounded-lg px-3 py-2 text-xs sm:text-sm text-white font-medium focus:outline-none focus:border-emerald-500">
+                    <select id="select-gpu" onchange="onHardwareChange()" class="w-full bg-zinc-900/90 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-100 font-medium focus:outline-none focus:border-emerald-500">
                         <optgroup id="grp-gpu-igpu" label="Gráficos Integrados (iGPU)">
                             <option id="opt-gpu-igpu" value="igpu_auto">Gráficos Integrados (iGPU) — detectado pela CPU</option>
                         </optgroup>
@@ -409,456 +393,472 @@
                             <option value="arc_b580">Intel Arc B580 (12GB - Xe2-HPG)</option>
                         </optgroup>
                     </select>
-                    <p id="gpu-meta-desc" class="text-[11px] text-gray-400 font-mono">NVIDIA Ampere • Threaded Optimization: ON</p>
+                    <p id="gpu-meta-desc" class="text-[11px] text-zinc-500 font-mono">NVIDIA Ampere • NoErrorCtx: ON</p>
                 </div>
 
-                <!-- 3. Memória RAM (Geração DDR3-DDR5, Frequência e Capacidade) -->
-                <div class="bg-gray-950/80 border border-gray-800 rounded-xl p-3.5 space-y-2">
-                    <label class="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-blue-400">
-                        <span><i aria-hidden="true" class="fa-solid fa-memory mr-1.5"></i><span id="i18n-lbl-ram">Memória RAM</span></span>
-                        <span id="ram-badge-bw" class="font-mono text-[11px] bg-blue-500/15 px-2 py-0.5 rounded border border-blue-500/30">DDR4 2666</span>
-                    </label>
+                <!-- 3. Memória RAM -->
+                <div class="bg-zinc-950/70 border border-zinc-800/80 rounded-xl p-3.5 space-y-2">
+                    <div class="flex items-center justify-between text-[11px] font-medium text-zinc-400">
+                        <span id="i18n-lbl-ram">Memória RAM</span>
+                        <span id="ram-badge-bw" class="font-mono text-[11px] text-zinc-300">DDR4 2666</span>
+                    </div>
                     <div class="grid grid-cols-3 gap-1.5">
-                        <!-- Tipo DDR -->
-                        <select id="select-ddr-type" onchange="onDDRTypeChange()" aria-label="Geração DDR" class="bg-gray-900 border border-gray-700/80 rounded-lg px-2 py-2 text-xs text-white font-bold focus:outline-none focus:border-blue-500">
+                        <select id="select-ddr-type" onchange="onDDRTypeChange()" aria-label="Geração DDR" class="bg-zinc-900/90 border border-zinc-800 rounded-lg px-2 py-2 text-xs text-zinc-100 font-semibold focus:outline-none focus:border-emerald-500">
                             <option value="DDR3">DDR3</option>
                             <option value="DDR4" selected>DDR4</option>
                             <option value="DDR5">DDR5</option>
                         </select>
-                        <!-- Frequência -->
-                        <select id="select-ram-freq" onchange="onHardwareChange()" aria-label="Frequência da RAM" class="col-span-2 bg-gray-900 border border-gray-700/80 rounded-lg px-2 py-2 text-xs text-white font-medium focus:outline-none focus:border-blue-500">
-                            <!-- Populado via JS com todas as frequências -->
+                        <select id="select-ram-freq" onchange="onHardwareChange()" aria-label="Frequência da RAM" class="col-span-2 bg-zinc-900/90 border border-zinc-800 rounded-lg px-2 py-2 text-xs text-zinc-100 font-medium focus:outline-none focus:border-emerald-500">
+                            <!-- Populado via JS -->
                         </select>
                     </div>
-                    <div class="pt-0.5">
-                        <select id="select-sys-ram" onchange="onSystemRamChange()" aria-label="Capacidade Total de RAM" class="w-full bg-gray-900 border border-gray-700/80 rounded-lg px-2.5 py-1.5 text-xs text-gray-200 font-medium focus:outline-none focus:border-blue-500">
-                            <option value="8" data-pt="8 GB de RAM Total no PC" data-en="8 GB Total System RAM">8 GB de RAM Total no PC</option>
-                            <option value="12" data-pt="12 GB de RAM Total no PC" data-en="12 GB Total System RAM">12 GB de RAM Total no PC</option>
-                            <option value="16" data-pt="16 GB de RAM Total no PC" data-en="16 GB Total System RAM">16 GB de RAM Total no PC</option>
-                            <option value="24" data-pt="24 GB de RAM Total no PC" data-en="24 GB Total System RAM">24 GB de RAM Total no PC</option>
-                            <option value="32" data-pt="32 GB de RAM Total no PC" data-en="32 GB Total System RAM" selected>32 GB de RAM Total no PC</option>
-                            <option value="48" data-pt="48 GB de RAM Total no PC" data-en="48 GB Total System RAM">48 GB de RAM Total no PC</option>
-                            <option value="64" data-pt="64 GB de RAM Total no PC" data-en="64 GB Total System RAM">64 GB de RAM Total no PC</option>
-                        </select>
-                    </div>
-                    <div class="pt-0.5">
-                        <select id="select-mem-channels" onchange="onHardwareChange()" aria-label="Canais de memória" class="w-full bg-gray-900 border border-gray-700/80 rounded-lg px-2.5 py-1.5 text-xs text-gray-200 font-medium focus:outline-none focus:border-blue-500">
-                            <option value="2" data-pt="Dual-channel ou mais (2+ pentes iguais)" data-en="Dual-channel or more (2+ matching sticks)" selected>Dual-channel ou mais (2+ pentes iguais)</option>
-                            <option value="1" data-pt="Single-channel (1 pente só)" data-en="Single-channel (single stick)">Single-channel (1 pente só)</option>
-                        </select>
-                    </div>
+                    <select id="select-sys-ram" onchange="onSystemRamChange()" aria-label="Capacidade Total de RAM" class="w-full bg-zinc-900/90 border border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs text-zinc-200 font-medium focus:outline-none focus:border-emerald-500">
+                        <option value="8" data-pt="8 GB de RAM Total no PC" data-en="8 GB Total System RAM">8 GB de RAM Total no PC</option>
+                        <option value="12" data-pt="12 GB de RAM Total no PC" data-en="12 GB Total System RAM">12 GB de RAM Total no PC</option>
+                        <option value="16" data-pt="16 GB de RAM Total no PC" data-en="16 GB Total System RAM">16 GB de RAM Total no PC</option>
+                        <option value="24" data-pt="24 GB de RAM Total no PC" data-en="24 GB Total System RAM">24 GB de RAM Total no PC</option>
+                        <option value="32" data-pt="32 GB de RAM Total no PC" data-en="32 GB Total System RAM" selected>32 GB de RAM Total no PC</option>
+                        <option value="48" data-pt="48 GB de RAM Total no PC" data-en="48 GB Total System RAM">48 GB de RAM Total no PC</option>
+                        <option value="64" data-pt="64 GB de RAM Total no PC" data-en="64 GB Total System RAM">64 GB de RAM Total no PC</option>
+                    </select>
+                    <select id="select-mem-channels" onchange="onHardwareChange()" aria-label="Canais de memória" class="w-full bg-zinc-900/90 border border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs text-zinc-200 font-medium focus:outline-none focus:border-emerald-500">
+                        <option value="2" data-pt="Dual-channel ou mais (2+ pentes iguais)" data-en="Dual-channel or more (2+ matching sticks)" selected>Dual-channel ou mais (2+ pentes iguais)</option>
+                        <option value="1" data-pt="Single-channel (1 pente só)" data-en="Single-channel (single stick)">Single-channel (1 pente só)</option>
+                    </select>
                 </div>
 
-                <!-- 4. Armazenamento (Storage) -->
-                <div class="bg-gray-950/80 border border-gray-800 rounded-xl p-3.5 space-y-2">
-                    <label for="select-storage" class="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-purple-400">
-                        <span><i aria-hidden="true" class="fa-solid fa-hard-drive mr-1.5"></i><span id="i18n-lbl-storage">Armazenamento</span></span>
-                        <span id="storage-badge-io" class="font-mono text-[11px] bg-purple-500/15 px-2 py-0.5 rounded border border-purple-500/30">DynRes: ON</span>
+                <!-- 4. Armazenamento -->
+                <div class="bg-zinc-950/70 border border-zinc-800/80 rounded-xl p-3.5 space-y-2">
+                    <label for="select-storage" class="flex items-center justify-between text-[11px] font-medium text-zinc-400">
+                        <span id="i18n-lbl-storage">Armazenamento</span>
+                        <span id="storage-badge-io" class="font-mono text-[11px] text-zinc-300">DynRes: ON</span>
                     </label>
-                    <select id="select-storage" onchange="onHardwareChange()" class="w-full bg-gray-900 border border-gray-700/80 rounded-lg px-3 py-2 text-xs sm:text-sm text-white font-medium focus:outline-none focus:border-purple-500">
+                    <select id="select-storage" onchange="onHardwareChange()" class="w-full bg-zinc-900/90 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-100 font-medium focus:outline-none focus:border-emerald-500">
                         <option value="nvme" data-pt="SSD NVMe M.2 PCIe (3500+ MB/s)" data-en="NVMe M.2 PCIe SSD (3500+ MB/s)" selected>SSD NVMe M.2 PCIe (3500+ MB/s)</option>
                         <option value="sata" data-pt="SSD SATA III (500 MB/s)" data-en="SATA III SSD (500 MB/s)">SSD SATA III (500 MB/s)</option>
                         <option value="hdd" data-pt="HD Mecânico (HDD 7200/5400 RPM)" data-en="Mechanical Hard Drive (HDD 7200/5400 RPM)">HD Mecânico (HDD 7200/5400 RPM)</option>
                     </select>
-                    <p id="storage-meta-desc" class="text-[11px] text-gray-400 font-mono">I/O Ultra Rápido • Dynamic Resources: Ideal</p>
+                    <p id="storage-meta-desc" class="text-[11px] text-zinc-500 font-mono">I/O Ultra Rápido • Dynamic Resources: Ideal</p>
                 </div>
             </div>
 
-            <!-- Linha 2: Versão do Minecraft, Mod Loader e Motor GraalVM -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 border-t border-gray-800/80">
-                <!-- Versão do Jogo -->
-                <div class="bg-gray-950/70 border border-gray-800 rounded-xl p-3.5 flex items-center justify-between gap-3">
-                    <div class="w-full">
-                        <label for="select-mc-version" class="text-xs font-bold uppercase tracking-wider text-emerald-400 block mb-1.5">
-                            <i aria-hidden="true" class="fa-solid fa-gamepad mr-1.5"></i><span id="i18n-lbl-mcver">Versão do Minecraft</span>
-                        </label>
-                        <select id="select-mc-version" onchange="onVersionOrLoaderChange()" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs sm:text-sm text-white font-semibold focus:outline-none focus:border-emerald-500">
-                            <option value="1.20.1" data-pt="Minecraft 1.20.1 (LTS de Grandes Modpacks)" data-en="Minecraft 1.20.1 (Major Modpacks LTS)" selected>Minecraft 1.20.1 (LTS de Grandes Modpacks)</option>
-                            <option value="1.20.4" data-pt="Minecraft 1.20.2 / 1.20.4" data-en="Minecraft 1.20.2 / 1.20.4">Minecraft 1.20.2 / 1.20.4</option>
-                            <option value="1.20.6" data-pt="Minecraft 1.20.6 (Java 21 Nativo)" data-en="Minecraft 1.20.6 (Native Java 21)">Minecraft 1.20.6 (Java 21 Nativo)</option>
-                            <option value="1.21.1" data-pt="Minecraft 1.21.1 (LTS Atual de Mods)" data-en="Minecraft 1.21.1 (Current Modded LTS)">Minecraft 1.21.1 (LTS Atual de Mods)</option>
-                            <option value="1.21.4" data-pt="Minecraft 1.21.3 / 1.21.4+ (Mais Recente)" data-en="Minecraft 1.21.3 / 1.21.4+ (Latest)">Minecraft 1.21.3 / 1.21.4+ (Mais Recente)</option>
-                        </select>
-                    </div>
+            <!-- Linha 2: Versão do Minecraft, Mod Loader e Engine Java -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-3.5 pt-2 border-t border-zinc-800/70">
+                <div class="lg:col-span-3 bg-zinc-950/70 border border-zinc-800/80 rounded-xl p-3.5">
+                    <label for="select-mc-version" id="i18n-lbl-mcver" class="text-[11px] font-medium text-zinc-400 block mb-2">Versão do Minecraft</label>
+                    <select id="select-mc-version" onchange="onVersionOrLoaderChange()" class="w-full bg-zinc-900/90 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-100 font-medium focus:outline-none focus:border-emerald-500">
+                        <option value="1.20.1" data-pt="Minecraft 1.20.1 (LTS de Grandes Modpacks)" data-en="Minecraft 1.20.1 (Major Modpacks LTS)" selected>Minecraft 1.20.1 (LTS de Grandes Modpacks)</option>
+                        <option value="1.20.4" data-pt="Minecraft 1.20.2 / 1.20.4" data-en="Minecraft 1.20.2 / 1.20.4">Minecraft 1.20.2 / 1.20.4</option>
+                        <option value="1.20.6" data-pt="Minecraft 1.20.6 (Java 21 Nativo)" data-en="Minecraft 1.20.6 (Native Java 21)">Minecraft 1.20.6 (Java 21 Nativo)</option>
+                        <option value="1.21.1" data-pt="Minecraft 1.21.1 (LTS Atual de Mods)" data-en="Minecraft 1.21.1 (Current Modded LTS)">Minecraft 1.21.1 (LTS Atual de Mods)</option>
+                        <option value="1.21.4" data-pt="Minecraft 1.21.3 / 1.21.4+ (Mais Recente)" data-en="Minecraft 1.21.3 / 1.21.4+ (Latest)">Minecraft 1.21.3 / 1.21.4+ (Mais Recente)</option>
+                    </select>
                 </div>
 
-                <!-- Mod Loader -->
-                <div class="bg-gray-950/70 border border-gray-800 rounded-xl p-3.5 flex items-center justify-between gap-3">
-                    <div class="w-full">
-                        <label for="select-loader" class="text-xs font-bold uppercase tracking-wider text-cyan-400 block mb-1.5">
-                            <i aria-hidden="true" class="fa-solid fa-hammer mr-1.5"></i><span id="i18n-lbl-loader">Mod Loader (Carregador)</span>
-                        </label>
-                        <select id="select-loader" onchange="onVersionOrLoaderChange()" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs sm:text-sm text-white font-semibold focus:outline-none focus:border-cyan-500">
-                            <option value="forge" data-pt="Forge (Clássico 1.20.1+)" data-en="Forge (Classic 1.20.1+)" selected>Forge (Clássico 1.20.1+)</option>
-                            <option value="neoforge" data-pt="NeoForge (Sucessor Moderno 1.20.1 / 1.21+)" data-en="NeoForge (Modern Successor 1.20.1 / 1.21+)">NeoForge (Sucessor Moderno 1.20.1 / 1.21+)</option>
-                            <option value="fabric" data-pt="Fabric (Leve & Alta Performance)" data-en="Fabric (Lightweight & High Performance)">Fabric (Leve & Alta Performance)</option>
-                        </select>
-                    </div>
+                <div class="lg:col-span-3 bg-zinc-950/70 border border-zinc-800/80 rounded-xl p-3.5">
+                    <label for="select-loader" id="i18n-lbl-loader" class="text-[11px] font-medium text-zinc-400 block mb-2">Mod Loader</label>
+                    <select id="select-loader" onchange="onVersionOrLoaderChange()" class="w-full bg-zinc-900/90 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-100 font-medium focus:outline-none focus:border-emerald-500">
+                        <option value="forge" data-pt="Forge (Clássico 1.20.1+)" data-en="Forge (Classic 1.20.1+)" selected>Forge (Clássico 1.20.1+)</option>
+                        <option value="neoforge" data-pt="NeoForge (Sucessor Moderno 1.20.1 / 1.21+)" data-en="NeoForge (Modern Successor 1.20.1 / 1.21+)">NeoForge (Sucessor Moderno 1.20.1 / 1.21+)</option>
+                        <option value="fabric" data-pt="Fabric (Leve & Alta Performance)" data-en="Fabric (Lightweight & High Performance)">Fabric (Leve & Alta Performance)</option>
+                    </select>
                 </div>
 
-                <!-- Motor Java / GraalVM -->
-                <div class="bg-gray-950/70 border border-purple-500/30 rounded-xl p-3.5 flex items-center justify-between gap-3">
-                    <div class="w-full">
-                        <label for="select-jvm-engine" class="text-xs font-bold uppercase tracking-wider text-purple-300 block mb-1.5">
-                            <i aria-hidden="true" class="fa-solid fa-fire-flame-curved mr-1.5"></i><span id="i18n-lbl-jvm">Distribuição Java e GC</span>
-                        </label>
-                        <select id="select-jvm-engine" onchange="onEngineChange()" class="w-full bg-gray-900 border border-purple-500/50 rounded-lg px-3 py-2 text-xs sm:text-sm text-white font-semibold focus:outline-none focus:border-purple-400">
+                <div class="md:col-span-2 lg:col-span-6 bg-zinc-950/70 border border-zinc-800/80 rounded-xl p-3.5 space-y-2.5">
+                    <div>
+                        <label for="select-jvm-engine" id="i18n-lbl-jvm" class="text-[11px] font-medium text-zinc-400 block mb-2">Distribuição Java e GC</label>
+                        <select id="select-jvm-engine" onchange="onEngineChange()" class="w-full bg-zinc-900/90 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-100 font-medium focus:outline-none focus:border-emerald-500">
                             <option value="temurin_zgc" data-pt="OpenJDK / Adoptium Temurin (ZGC) ★" data-en="OpenJDK / Adoptium Temurin (ZGC) ★" selected>OpenJDK / Adoptium Temurin (ZGC) ★</option>
                             <option value="temurin_g1" data-pt="OpenJDK / Adoptium Temurin (G1GC Tuned — PCs modestos / Java 17)" data-en="OpenJDK / Adoptium Temurin (G1GC Tuned — modest PCs / Java 17)">OpenJDK / Adoptium Temurin (G1GC Tuned — PCs modestos / Java 17)</option>
                             <option value="graal_g1" data-pt="Oracle GraalVM (G1GC Tuned + JIT Graal)" data-en="Oracle GraalVM (G1GC Tuned + Graal JIT)">Oracle GraalVM (G1GC Tuned + JIT Graal)</option>
                         </select>
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-2.5">
-                            <div>
-                                <label for="select-java-version" id="i18n-lbl-java" class="text-[10px] font-bold uppercase tracking-wider text-gray-400 block mb-1">Versão do Java</label>
-                                <select id="select-java-version" onchange="onJavaChange()" class="w-full bg-gray-900 border border-gray-700/80 rounded-lg px-2.5 py-1.5 text-xs text-gray-200 font-medium focus:outline-none focus:border-purple-400">
-                                    <option value="17" data-pt="Java 17 (mods 1.20.1 incompatíveis com Java 21)" data-en="Java 17 (1.20.1 mods incompatible with Java 21)">Java 17 (mods 1.20.1 incompatíveis com Java 21)</option>
-                                    <option value="21" data-pt="Java 21 (recomendado) ★" data-en="Java 21 (recommended) ★" selected>Java 21 (recomendado) ★</option>
-                                    <option value="23" data-pt="Java 23 ou superior (ex.: 25 LTS)" data-en="Java 23 or newer (e.g. 25 LTS)">Java 23 ou superior (ex.: 25 LTS)</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label for="select-os" id="i18n-lbl-os" class="text-[10px] font-bold uppercase tracking-wider text-gray-400 block mb-1">Sistema operacional</label>
-                                <select id="select-os" onchange="onOsChange()" class="w-full bg-gray-900 border border-gray-700/80 rounded-lg px-2.5 py-1.5 text-xs text-gray-200 font-medium focus:outline-none focus:border-purple-400">
-                                    <option value="windows" selected>Windows</option>
-                                    <option value="linux">Linux</option>
-                                    <option value="macos" data-pt="macOS (Apple Silicon)" data-en="macOS (Apple Silicon)">macOS (Apple Silicon)</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label for="select-launcher" id="i18n-lbl-launcher" class="text-[10px] font-bold uppercase tracking-wider text-gray-400 block mb-1">Launcher</label>
-                                <select id="select-launcher" onchange="onLauncherChange()" class="w-full bg-gray-900 border border-gray-700/80 rounded-lg px-2.5 py-1.5 text-xs text-gray-200 font-medium focus:outline-none focus:border-purple-400">
-                                    <option value="prism" selected>Prism Launcher / MultiMC</option>
-                                    <option value="curseforge">CurseForge App</option>
-                                    <option value="modrinth">Modrinth App</option>
-                                    <option value="atlauncher">ATLauncher</option>
-                                    <option value="vanilla" data-pt="Launcher oficial da Mojang" data-en="Official Mojang Launcher">Launcher oficial da Mojang</option>
-                                    <option value="other" data-pt="Outro launcher" data-en="Other launcher">Outro launcher</option>
-                                </select>
-                            </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <div>
+                            <label for="select-java-version" id="i18n-lbl-java" class="text-[10px] font-medium text-zinc-500 block mb-1">Versão do Java</label>
+                            <select id="select-java-version" onchange="onJavaChange()" class="w-full bg-zinc-900/90 border border-zinc-800 rounded-lg px-2 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-emerald-500">
+                                <option value="17" data-pt="Java 17 (mods 1.20.1 incompatíveis com Java 21)" data-en="Java 17 (1.20.1 mods incompatible with Java 21)">Java 17 (mods 1.20.1 incompatíveis com Java 21)</option>
+                                <option value="21" data-pt="Java 21 (recomendado) ★" data-en="Java 21 (recommended) ★" selected>Java 21 (recomendado) ★</option>
+                                <option value="23" data-pt="Java 23 ou superior (ex.: 25 LTS)" data-en="Java 23 or newer (e.g. 25 LTS)">Java 23 ou superior (ex.: 25 LTS)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="select-os" id="i18n-lbl-os" class="text-[10px] font-medium text-zinc-500 block mb-1">Sistema operacional</label>
+                            <select id="select-os" onchange="onOsChange()" class="w-full bg-zinc-900/90 border border-zinc-800 rounded-lg px-2 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-emerald-500">
+                                <option value="windows" selected>Windows</option>
+                                <option value="linux">Linux</option>
+                                <option value="macos" data-pt="macOS (Apple Silicon)" data-en="macOS (Apple Silicon)">macOS (Apple Silicon)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="select-launcher" id="i18n-lbl-launcher" class="text-[10px] font-medium text-zinc-500 block mb-1">Launcher</label>
+                            <select id="select-launcher" onchange="onLauncherChange()" class="w-full bg-zinc-900/90 border border-zinc-800 rounded-lg px-2 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-emerald-500">
+                                <option value="prism" selected>Prism Launcher / MultiMC</option>
+                                <option value="curseforge">CurseForge App</option>
+                                <option value="modrinth">Modrinth App</option>
+                                <option value="atlauncher">ATLauncher</option>
+                                <option value="vanilla" data-pt="Launcher oficial da Mojang" data-en="Official Mojang Launcher">Launcher oficial da Mojang</option>
+                                <option value="other" data-pt="Outro launcher" data-en="Other launcher">Outro launcher</option>
+                            </select>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Painel de Diagnóstico Inteligente de Hardware & Gargalos -->
+            <!-- Painel de Diagnóstico de Hardware -->
             <div id="hardware-diagnostics" class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
                 <!-- Preenchido dinamicamente pelo JS -->
             </div>
         </section>
 
-        <!-- SEÇÃO 2: CALCULADORA DE RAM, BARRA VISUAL & GERADOR DE ARGUMENTOS GRAALVM -->
-        <section class="bg-gray-900 border border-gray-800 rounded-2xl p-5 sm:p-6 shadow-xl space-y-6">
-            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-gray-800">
+        <!-- SEÇÃO 2: ALOCAÇÃO DE RAM & ARGUMENTOS JVM -->
+        <section class="bg-[#111114] border border-zinc-800/80 rounded-2xl p-5 sm:p-7 space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-zinc-800/70">
                 <div>
-                    <h2 class="text-lg sm:text-xl font-bold text-white flex items-center gap-2.5">
-                        <i aria-hidden="true" class="fa-solid fa-terminal text-purple-400"></i>
-                        <span id="i18n-sec2-title">2. Alocação Inteligente de RAM & Argumentos JVM</span>
-                    </h2>
-                    <p id="i18n-sec2-sub" class="text-xs sm:text-sm text-gray-400 mt-0.5">O GC e o compilador da JVM usam memória nativa além do heap (Metaspace e code cache). Escolha o porte do modpack abaixo:</p>
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-xs font-mono text-emerald-400">02</span>
+                        <h2 id="i18n-sec2-title" class="text-base sm:text-lg font-semibold tracking-tight text-zinc-100">Alocação de RAM & Argumentos JVM</h2>
+                    </div>
+                    <p id="i18n-sec2-sub" class="text-xs text-zinc-400 mt-1">O GC e o compilador usam memória nativa além do heap (Metaspace e code cache). Escolha o porte do modpack:</p>
                 </div>
-                <div class="flex items-center gap-2">
-                    <span id="graal-status-pill" class="text-xs font-mono px-3 py-1.5 rounded-xl bg-purple-500/15 text-purple-300 border border-purple-500/30">
-                        <i aria-hidden="true" class="fa-solid fa-wand-magic-sparkles mr-1"></i> <span id="i18n-graal-pill">JIT padrão (C2)</span>
-                    </span>
-                </div>
+                <span id="graal-status-pill" class="text-[11px] font-mono px-2.5 py-1 rounded-md bg-zinc-900 text-zinc-300 border border-zinc-800 self-start sm:self-auto">
+                    <span id="i18n-graal-pill">JIT padrão (C2)</span>
+                </span>
             </div>
 
             <!-- 4 Perfis Rápidos de Modpack -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                <button onclick="selectModpackProfile('light')" id="profile-light" aria-pressed="false" class="profile-card text-left p-4 rounded-xl border border-gray-800 bg-gray-950/60 hover:border-gray-700 transition flex flex-col justify-between">
+                <button onclick="selectModpackProfile('light')" id="profile-light" aria-pressed="false" class="profile-card text-left p-4 rounded-xl border border-zinc-800/80 bg-zinc-950/50 hover:border-zinc-700 transition flex flex-col justify-between">
                     <div>
-                        <div class="flex items-center justify-between">
-                            <span id="i18n-prof-light-badge" class="text-xs font-bold px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-400 border border-cyan-500/30">Leve / Vanilla+</span>
-                            <span id="card-ram-light" class="text-sm font-extrabold text-white">6 GB</span>
+                        <div class="flex items-center justify-between gap-2">
+                            <span id="i18n-prof-light-badge" class="text-[11px] font-medium text-zinc-400">Leve / Vanilla+</span>
+                            <span id="card-ram-light" class="text-sm font-semibold font-mono text-zinc-100">6 GB</span>
                         </div>
-                        <h3 id="i18n-prof-light-title" class="text-sm font-bold text-gray-200 mt-2">Até 90 Mods</h3>
-                        <p id="i18n-prof-light-desc" class="text-xs text-gray-400 mt-1">Pacotes focados em FPS, aventura leve ou QoL.</p>
+                        <h3 id="i18n-prof-light-title" class="text-sm font-semibold text-zinc-200 mt-2">Até 90 Mods</h3>
+                        <p id="i18n-prof-light-desc" class="text-xs text-zinc-500 mt-1 leading-relaxed">Pacotes focados em FPS, aventura leve ou QoL.</p>
                     </div>
-                    <div class="mt-3 pt-2 border-t border-gray-800/80 flex justify-between text-[11px] font-mono text-gray-400">
+                    <div class="mt-3 pt-2 border-t border-zinc-800/70 flex justify-between text-[11px] font-mono text-zinc-500">
                         <span>SoftMax: 5G</span>
                         <span>CodeCache: 384M</span>
                     </div>
                 </button>
 
-                <button onclick="selectModpackProfile('medium')" id="profile-medium" aria-pressed="false" class="profile-card text-left p-4 rounded-xl border border-gray-800 bg-gray-950/60 hover:border-gray-700 transition flex flex-col justify-between">
+                <button onclick="selectModpackProfile('medium')" id="profile-medium" aria-pressed="false" class="profile-card text-left p-4 rounded-xl border border-zinc-800/80 bg-zinc-950/50 hover:border-zinc-700 transition flex flex-col justify-between">
                     <div>
-                        <div class="flex items-center justify-between">
-                            <span id="i18n-prof-med-badge" class="text-xs font-bold px-2 py-0.5 rounded bg-blue-500/15 text-blue-400 border border-blue-500/30">Médio / RPG ou Tech</span>
-                            <span id="card-ram-medium" class="text-sm font-extrabold text-white">10 GB</span>
+                        <div class="flex items-center justify-between gap-2">
+                            <span id="i18n-prof-med-badge" class="text-[11px] font-medium text-zinc-400">Médio / RPG ou Tech</span>
+                            <span id="card-ram-medium" class="text-sm font-semibold font-mono text-zinc-100">10 GB</span>
                         </div>
-                        <h3 id="i18n-prof-med-title" class="text-sm font-bold text-gray-200 mt-2">90 a 200 Mods</h3>
-                        <p id="i18n-prof-med-desc" class="text-xs text-gray-400 mt-1">Create, Cobblemon, RPG ou Magia com Shaders leves.</p>
+                        <h3 id="i18n-prof-med-title" class="text-sm font-semibold text-zinc-200 mt-2">90 a 200 Mods</h3>
+                        <p id="i18n-prof-med-desc" class="text-xs text-zinc-500 mt-1 leading-relaxed">Create, Cobblemon, RPG ou Magia com Shaders leves.</p>
                     </div>
-                    <div class="mt-3 pt-2 border-t border-gray-800/80 flex justify-between text-[11px] font-mono text-gray-400">
+                    <div class="mt-3 pt-2 border-t border-zinc-800/70 flex justify-between text-[11px] font-mono text-zinc-500">
                         <span>SoftMax: 8G</span>
                         <span>CodeCache: 512M</span>
                     </div>
                 </button>
 
-                <button onclick="selectModpackProfile('heavy')" id="profile-heavy" aria-pressed="true" class="profile-card text-left p-4 rounded-xl border-2 border-emerald-500 bg-emerald-950/20 transition flex flex-col justify-between">
+                <button onclick="selectModpackProfile('heavy')" id="profile-heavy" aria-pressed="true" class="profile-card text-left p-4 rounded-xl border border-emerald-500 bg-emerald-500/[0.06] transition flex flex-col justify-between">
                     <div>
-                        <div class="flex items-center justify-between">
-                            <span id="i18n-prof-heavy-badge" class="text-xs font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">Pesado ★ Recomendado</span>
-                            <span id="card-ram-heavy" class="text-sm font-extrabold text-emerald-400">12 GB</span>
+                        <div class="flex items-center justify-between gap-2">
+                            <span id="i18n-prof-heavy-badge" class="text-[11px] font-medium text-emerald-400">Pesado ★ Recomendado</span>
+                            <span id="card-ram-heavy" class="text-sm font-semibold font-mono text-emerald-400">12 GB</span>
                         </div>
-                        <h3 id="i18n-prof-heavy-title" class="text-sm font-bold text-white mt-2">200 a 350 Mods</h3>
-                        <p id="i18n-prof-heavy-desc" class="text-xs text-gray-300 mt-1">Modpacks grandes com dimensões, física, chefes e automação.</p>
+                        <h3 id="i18n-prof-heavy-title" class="text-sm font-semibold text-zinc-100 mt-2">200 a 350 Mods</h3>
+                        <p id="i18n-prof-heavy-desc" class="text-xs text-zinc-400 mt-1 leading-relaxed">Modpacks grandes com dimensões, física, chefes e automação.</p>
                     </div>
-                    <div class="mt-3 pt-2 border-t border-emerald-500/30 flex justify-between text-[11px] font-mono text-emerald-300">
+                    <div class="mt-3 pt-2 border-t border-emerald-500/20 flex justify-between text-[11px] font-mono text-emerald-400/80">
                         <span>SoftMax: 10G</span>
                         <span>CodeCache: 512M</span>
                     </div>
                 </button>
 
-                <button onclick="selectModpackProfile('extreme')" id="profile-extreme" aria-pressed="false" class="profile-card text-left p-4 rounded-xl border border-gray-800 bg-gray-950/60 hover:border-gray-700 transition flex flex-col justify-between">
+                <button onclick="selectModpackProfile('extreme')" id="profile-extreme" aria-pressed="false" class="profile-card text-left p-4 rounded-xl border border-zinc-800/80 bg-zinc-950/50 hover:border-zinc-700 transition flex flex-col justify-between">
                     <div>
-                        <div class="flex items-center justify-between">
-                            <span id="i18n-prof-ext-badge" class="text-xs font-bold px-2 py-0.5 rounded bg-orange-500/15 text-orange-400 border border-orange-500/30">Extremo / Kitchen Sink</span>
-                            <span id="card-ram-extreme" class="text-sm font-extrabold text-white">14 GB</span>
+                        <div class="flex items-center justify-between gap-2">
+                            <span id="i18n-prof-ext-badge" class="text-[11px] font-medium text-zinc-400">Extremo / Kitchen Sink</span>
+                            <span id="card-ram-extreme" class="text-sm font-semibold font-mono text-zinc-100">14 GB</span>
                         </div>
-                        <h3 id="i18n-prof-ext-title" class="text-sm font-bold text-gray-200 mt-2">350 a 500+ Mods</h3>
-                        <p id="i18n-prof-ext-desc" class="text-xs text-gray-400 mt-1">All The Mods 9/10, GregTech, Prominence II + Shaders.</p>
+                        <h3 id="i18n-prof-ext-title" class="text-sm font-semibold text-zinc-200 mt-2">350 a 500+ Mods</h3>
+                        <p id="i18n-prof-ext-desc" class="text-xs text-zinc-500 mt-1 leading-relaxed">All The Mods 9/10, GregTech, Prominence II + Shaders.</p>
                     </div>
-                    <div class="mt-3 pt-2 border-t border-gray-800/80 flex justify-between text-[11px] font-mono text-gray-400">
+                    <div class="mt-3 pt-2 border-t border-zinc-800/70 flex justify-between text-[11px] font-mono text-zinc-500">
                         <span>SoftMax: 12G</span>
                         <span>CodeCache: 768M</span>
                     </div>
                 </button>
             </div>
 
-            <!-- Slider de RAM e Mapa Visual da Memória do Sistema -->
-            <div class="bg-gray-950/90 border border-gray-800 rounded-2xl p-4 sm:p-5 space-y-4">
+            <!-- Slider de RAM e Barra Minimalista -->
+            <div class="bg-zinc-950/70 border border-zinc-800/80 rounded-xl p-4 sm:p-5 space-y-4">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div class="flex flex-wrap items-center gap-4">
                         <div>
-                            <span id="i18n-ram-slider-lbl" class="text-xs text-gray-400 block">RAM Alocada para o Minecraft (-Xms = -Xmx)</span>
+                            <span id="i18n-ram-slider-lbl" class="text-[11px] text-zinc-500 block">RAM Alocada (-Xms = -Xmx)</span>
                             <div class="flex items-baseline gap-2">
-                                <span id="ram-alloc-gb" class="text-2xl font-extrabold text-white">12 GB</span>
-                                <span id="ram-alloc-mb" class="text-sm font-mono text-emerald-400">(12288 MiB)</span>
+                                <span id="ram-alloc-gb" class="text-xl font-semibold font-mono text-zinc-100">12 GB</span>
+                                <span id="ram-alloc-mb" class="text-xs font-mono text-emerald-400">(12288 MiB)</span>
                             </div>
                         </div>
-                        <input type="range" id="ram-slider" min="4" max="30" step="1" value="12" aria-label="Memória RAM alocada ao jogo (GB)" oninput="onRamSliderInput(this.value)" class="w-40 sm:w-56 h-6 accent-emerald-500 cursor-pointer">
+                        <input type="range" id="ram-slider" min="4" max="30" step="1" value="12" aria-label="Memória RAM alocada ao jogo (GB)" oninput="onRamSliderInput(this.value)" class="w-40 sm:w-52 h-5 accent-emerald-500 cursor-pointer">
                     </div>
 
-                    <div class="flex flex-wrap items-center gap-3">
-                        <label class="flex items-center gap-2 bg-gray-900 px-3 py-2 rounded-xl border border-gray-800 cursor-pointer select-none">
+                    <div class="flex flex-wrap items-center gap-2.5">
+                        <label class="flex items-center gap-2 bg-zinc-900/90 px-3 py-1.5 rounded-lg border border-zinc-800 cursor-pointer select-none">
                             <input type="checkbox" id="chk-include-xmx" onchange="recalculateAll()" class="rounded accent-emerald-500">
-                            <span id="i18n-chk-xmx" class="text-xs text-gray-300 font-medium">Incluir <code class="text-emerald-400 font-mono">-Xms / -Xmx</code> na linha</span>
+                            <span id="i18n-chk-xmx" class="text-xs text-zinc-300">Incluir <code class="text-emerald-400 font-mono">-Xms / -Xmx</code></span>
                         </label>
-                        <label class="flex items-center gap-2 bg-gray-900 px-3 py-2 rounded-xl border border-gray-800 cursor-pointer select-none">
-                            <input type="checkbox" id="chk-large-pages" onchange="recalculateAll()" class="rounded accent-purple-500">
-                            <span id="i18n-chk-lp" class="text-xs text-gray-300 font-medium">Usar <code class="text-purple-400 font-mono">LargePages</code></span>
+                        <label class="flex items-center gap-2 bg-zinc-900/90 px-3 py-1.5 rounded-lg border border-zinc-800 cursor-pointer select-none">
+                            <input type="checkbox" id="chk-large-pages" onchange="recalculateAll()" class="rounded accent-emerald-500">
+                            <span id="i18n-chk-lp" class="text-xs text-zinc-300">Usar <code class="text-zinc-200 font-mono">LargePages</code></span>
                         </label>
                     </div>
                 </div>
 
-                <!-- Alerta caso aloque RAM demais para o PC atual -->
-                <div id="ram-warning-banner" role="alert" class="hidden p-3 rounded-xl bg-red-950/50 border border-red-500/40 text-xs text-red-200 flex items-center gap-2.5">
-                    <i aria-hidden="true" class="fa-solid fa-triangle-exclamation text-red-400 text-base"></i>
+                <!-- Alerta de RAM insuficiente -->
+                <div id="ram-warning-banner" role="alert" class="hidden p-3 rounded-lg bg-red-950/40 border border-red-500/35 text-xs text-red-200 flex items-center gap-2.5">
+                    <i aria-hidden="true" class="fa-solid fa-triangle-exclamation text-red-400"></i>
                     <span id="ram-warning-text">Atenção: Você está alocando quase toda a RAM do PC!</span>
                 </div>
 
-                <!-- Barra de Divisão da RAM Total Selecionada -->
+                <!-- Barra de Divisão da RAM -->
                 <div class="space-y-2">
-                    <div class="flex flex-col sm:flex-row sm:justify-between text-xs text-gray-400 gap-1">
-                        <span id="ram-bar-title" class="font-medium text-gray-300">Divisão dos seus 32 GB DDR4 2666 MHz:</span>
-                        <span id="ram-bar-free-label" class="font-mono text-emerald-400">19.0 GB livres para Windows/Linux, Driver GPU e Cache de Disco</span>
+                    <div class="flex flex-col sm:flex-row sm:justify-between text-xs gap-1">
+                        <span id="ram-bar-title" class="text-zinc-400">Divisão dos seus 32 GB DDR4 2666 MHz:</span>
+                        <span id="ram-bar-free-label" class="font-mono text-zinc-300">19.0 GB livres para Sistema, Driver GPU e Cache de Disco</span>
                     </div>
-                    <div class="w-full h-4 bg-gray-900 rounded-xl overflow-hidden flex border border-gray-800 p-0.5 gap-0.5">
-                        <div id="bar-seg-soft" class="bg-emerald-500 h-full rounded-l-lg transition-all duration-300" style="width: 31%"></div>
-                        <div id="bar-seg-buf" class="bg-amber-500 h-full transition-all duration-300" style="width: 6%"></div>
-                        <div id="bar-seg-graal" class="bg-purple-500 h-full transition-all duration-300" style="width: 4%"></div>
-                        <div id="bar-seg-free" class="bg-gray-800 h-full rounded-r-lg transition-all duration-300" style="width: 59%"></div>
+                    <div class="w-full h-2.5 bg-zinc-900 rounded-full overflow-hidden flex border border-zinc-800/80 gap-px">
+                        <div id="bar-seg-soft" class="bg-emerald-500 h-full transition-all duration-300" style="width: 31%"></div>
+                        <div id="bar-seg-buf" class="bg-amber-400 h-full transition-all duration-300" style="width: 6%"></div>
+                        <div id="bar-seg-graal" class="bg-zinc-500 h-full transition-all duration-300" style="width: 4%"></div>
+                        <div id="bar-seg-free" class="bg-zinc-800 h-full transition-all duration-300" style="width: 59%"></div>
                     </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-[11px]">
-                        <div class="flex items-center gap-2">
-                            <span class="w-2.5 h-2.5 rounded-sm bg-emerald-500 inline-block"></span>
-                            <span class="text-gray-300"><span id="i18n-leg-soft-lbl">Alvo SoftMax</span> (<code id="leg-soft" class="font-mono text-emerald-400">10 GB</code>)</span>
+                    <div class="flex flex-wrap gap-x-5 gap-y-1.5 pt-1 text-[11px] text-zinc-400">
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
+                            <span><span id="i18n-leg-soft-lbl">Alvo SoftMax</span> (<code id="leg-soft" class="font-mono text-zinc-200">10 GB</code>)</span>
                         </div>
-                        <div id="leg-buf-wrap" class="flex items-center gap-2">
-                            <span class="w-2.5 h-2.5 rounded-sm bg-amber-500 inline-block"></span>
-                            <span class="text-gray-300"><span id="i18n-leg-buf-lbl">Buffer Picos</span> (<code id="leg-buf" class="font-mono text-amber-400">2 GB</code>)</span>
+                        <div id="leg-buf-wrap" class="flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-amber-400 inline-block"></span>
+                            <span><span id="i18n-leg-buf-lbl">Buffer Picos</span> (<code id="leg-buf" class="font-mono text-zinc-200">2 GB</code>)</span>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <span class="w-2.5 h-2.5 rounded-sm bg-purple-500 inline-block"></span>
-                            <span class="text-gray-300"><span id="i18n-leg-graal-lbl">Metaspace + code cache</span> (<code id="leg-graal" class="font-mono text-purple-400">1.0 GB</code>)</span>
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-zinc-500 inline-block"></span>
+                            <span><span id="i18n-leg-graal-lbl">Metaspace + code cache</span> (<code id="leg-graal" class="font-mono text-zinc-200">1.0 GB</code>)</span>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <span class="w-2.5 h-2.5 rounded-sm bg-gray-700 inline-block"></span>
-                            <span class="text-gray-400"><span id="i18n-leg-free-lbl">Livre SO / VRAM</span> (<code id="leg-free" class="font-mono text-gray-300">19.0 GB</code>)</span>
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-zinc-700 inline-block"></span>
+                            <span><span id="i18n-leg-free-lbl">Livre SO / VRAM</span> (<code id="leg-free" class="font-mono text-zinc-200">19.0 GB</code>)</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Caixa de Argumentos JVM Gerados -->
-            <div class="space-y-2">
+            <!-- Argumentos JVM Gerados -->
+            <div class="space-y-2.5">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <span id="jvm-command-subtitle" class="text-xs font-mono text-emerald-400 flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span id="jvm-command-subtitle" class="text-xs font-mono text-zinc-300 flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
                         Defina Mínimo e Máximo em 12288 MiB no Launcher
                     </span>
-                    <button onclick="copyText('jvm-args-box', 'jvm')" class="flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold transition shadow-lg shadow-emerald-600/20">
-                        <i aria-hidden="true" class="fa-regular fa-copy"></i> <span id="i18n-btn-copy-jvm">Copiar Argumentos JVM Otimizados</span>
+                    <button onclick="copyText('jvm-args-box', 'jvm')" class="flex items-center justify-center gap-2 px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium transition self-start sm:self-auto shrink-0">
+                        <i aria-hidden="true" class="fa-regular fa-copy"></i> <span id="i18n-btn-copy-jvm">Copiar Argumentos JVM</span>
                     </button>
                 </div>
-                <pre id="jvm-args-box" class="bg-gray-950 border border-gray-800 rounded-xl p-4 font-mono text-xs sm:text-sm text-emerald-300 overflow-x-auto code-scroll whitespace-pre-wrap break-all leading-relaxed select-all"></pre>
+                <pre id="jvm-args-box" class="bg-[#0c0c0f] border border-zinc-800/90 rounded-xl p-4 font-mono text-xs sm:text-sm text-emerald-300 overflow-x-auto code-scroll whitespace-pre-wrap break-all leading-relaxed select-all"></pre>
             </div>
 
-            <!-- Explicação Dinâmica das Flags Geradas + Como Instalar o GraalVM -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 pt-2">
-                <div class="bg-gray-950/70 border border-gray-800 rounded-xl p-4 space-y-2.5">
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-purple-400 flex items-center gap-2">
-                        <i aria-hidden="true" class="fa-solid fa-magnifying-glass-chart"></i> <span id="i18n-exp-flags-title">Por que essas flags foram geradas para o seu PC?</span>
-                    </h3>
-                    <ul id="dynamic-flags-explanation" class="text-xs text-gray-300 space-y-2 leading-relaxed">
+            <!-- Explicação das Flags + Guia do Launcher -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-3.5">
+                <div class="bg-zinc-950/60 border border-zinc-800/80 rounded-xl p-4 space-y-2.5">
+                    <h3 id="i18n-exp-flags-title" class="text-xs font-semibold text-zinc-200">Por que essas flags foram geradas?</h3>
+                    <ul id="dynamic-flags-explanation" class="text-xs text-zinc-400 space-y-2 leading-relaxed">
                         <!-- Populado via JS -->
                     </ul>
                 </div>
 
-                <div class="bg-gray-950/70 border border-purple-500/30 rounded-xl p-4 space-y-2.5">
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-2">
-                        <i aria-hidden="true" class="fa-solid fa-download"></i> <span id="i18n-graal-guide-title">Como aplicar no seu Launcher</span>
-                    </h3>
-                    <ol id="i18n-graal-guide-steps" class="text-xs text-gray-300 space-y-2 list-decimal list-inside leading-relaxed">
-                        <!-- Populado via JS (renderLauncherGuide) -->
+                <div class="bg-zinc-950/60 border border-zinc-800/80 rounded-xl p-4 space-y-2.5">
+                    <h3 id="i18n-graal-guide-title" class="text-xs font-semibold text-zinc-200">Como aplicar no Launcher</h3>
+                    <ol id="i18n-graal-guide-steps" class="text-xs text-zinc-400 space-y-2 list-decimal list-inside leading-relaxed">
+                        <!-- Populado via JS -->
                     </ol>
                 </div>
             </div>
         </section>
 
-        <!-- SEÇÃO 3: CATÁLOGO DINÂMICO DE MODS (MUDA CONFORME FORGE / NEOFORGE / FABRIC & VERSÃO) -->
-        <section class="bg-gray-900 border border-gray-800 rounded-2xl p-5 sm:p-6 shadow-xl space-y-5">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-gray-800">
+        <!-- SEÇÃO 3: CATÁLOGO DE MODS DE OTIMIZAÇÃO -->
+        <section class="bg-[#111114] border border-zinc-800/80 rounded-2xl p-5 sm:p-7 space-y-5">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-zinc-800/70">
                 <div>
                     <div class="flex flex-wrap items-center gap-2.5">
-                        <h2 class="text-lg sm:text-xl font-bold text-white flex items-center gap-2.5">
-                            <i aria-hidden="true" class="fa-solid fa-cubes text-cyan-400"></i>
-                            <span id="i18n-sec3-title">3. Mods de Otimização Obrigatórios para</span>
-                        </h2>
-                        <span id="mods-section-badge" class="px-3 py-1 rounded-lg text-xs font-extrabold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">Forge 1.20.1</span>
+                        <span class="text-xs font-mono text-emerald-400">03</span>
+                        <h2 id="i18n-sec3-title" class="text-base sm:text-lg font-semibold tracking-tight text-zinc-100">Mods de Otimização para</h2>
+                        <span id="mods-section-badge" class="px-2 py-0.5 rounded-md text-[11px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Forge 1.20.1</span>
                     </div>
-                    <p id="i18n-sec3-sub" class="text-xs sm:text-sm text-gray-400 mt-1">Os nomes dos mods mudam automaticamente conforme você escolhe <strong>Forge</strong>, <strong>NeoForge</strong> ou <strong>Fabric</strong> e a versão do Minecraft no topo.</p>
+                    <p id="i18n-sec3-sub" class="text-xs text-zinc-400 mt-1">Catálogo adaptado automaticamente para <strong>Forge</strong>, <strong>NeoForge</strong> ou <strong>Fabric</strong> e a versão escolhida.</p>
                 </div>
 
-                <!-- Filtro de Categoria de Mods -->
-                <div class="flex flex-wrap gap-1.5 bg-gray-950 p-1.5 rounded-xl border border-gray-800">
-                    <button onclick="setModCategoryFilter('all')" id="mcat-all" aria-pressed="true" class="mcat-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-gray-800 text-white transition">Todos</button>
-                    <button onclick="setModCategoryFilter('fps')" id="mcat-fps" aria-pressed="false" class="mcat-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-emerald-400 hover:text-white transition">Render / GPU</button>
-                    <button onclick="setModCategoryFilter('ram')" id="mcat-ram" aria-pressed="false" class="mcat-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-blue-400 hover:text-white transition">RAM & Boot</button>
-                    <button onclick="setModCategoryFilter('tps')" id="mcat-tps" aria-pressed="false" class="mcat-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-orange-400 hover:text-white transition">CPU & Chunks</button>
-                    <button onclick="setModCategoryFilter('avoid')" id="mcat-avoid" aria-pressed="false" class="mcat-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-red-400 hover:text-white transition">Evitar / Conflitos</button>
+                <!-- Filtro de Categoria -->
+                <div class="flex flex-wrap gap-1 bg-zinc-950 p-1 rounded-lg border border-zinc-800/80 self-start md:self-auto">
+                    <button onclick="setModCategoryFilter('all')" id="mcat-all" aria-pressed="true" class="mcat-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-zinc-800 text-white transition">Todos</button>
+                    <button onclick="setModCategoryFilter('fps')" id="mcat-fps" aria-pressed="false" class="mcat-btn px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-400 hover:text-zinc-100 transition">Render / GPU</button>
+                    <button onclick="setModCategoryFilter('ram')" id="mcat-ram" aria-pressed="false" class="mcat-btn px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-400 hover:text-zinc-100 transition">RAM & Boot</button>
+                    <button onclick="setModCategoryFilter('tps')" id="mcat-tps" aria-pressed="false" class="mcat-btn px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-400 hover:text-zinc-100 transition">CPU & Chunks</button>
+                    <button onclick="setModCategoryFilter('avoid')" id="mcat-avoid" aria-pressed="false" class="mcat-btn px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-400 hover:text-zinc-100 transition">Evitar</button>
                 </div>
             </div>
 
-            <div id="dynamic-mods-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <!-- Populado dinamicamente pelo JS conforme Loader e Versão -->
+            <div id="dynamic-mods-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                <!-- Populado dinamicamente pelo JS -->
             </div>
         </section>
 
-        <!-- SEÇÃO 4: CENTRAL COMPLETA DE CONFIGURAÇÕES RECOMENDADAS PARA TODOS OS MODS -->
-        <section class="bg-gray-900 border border-gray-800 rounded-2xl p-5 sm:p-6 shadow-xl space-y-5">
-            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-gray-800">
+        <!-- SEÇÃO 4: CONFIGURAÇÕES DOS MODS + CARREGAMENTO AUTOMÁTICO DA PASTA /config -->
+        <section class="bg-[#111114] border border-zinc-800/80 rounded-2xl p-5 sm:p-7 space-y-5">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-4 border-b border-zinc-800/70">
                 <div>
-                    <h2 class="text-lg sm:text-xl font-bold text-white flex items-center gap-2.5">
-                        <i aria-hidden="true" class="fa-solid fa-file-code text-blue-400"></i>
-                        <span id="i18n-sec4-title">4. Configurações Recomendadas para TODOS os Mods de Otimização (Pasta <code class="text-blue-400 font-mono text-base">/config</code>)</span>
-                    </h2>
-                    <p id="i18n-sec4-sub" class="text-xs sm:text-sm text-gray-400 mt-0.5">Todos os arquivos abaixo são recalculados automaticamente para a sua <strong>CPU</strong> (threads), <strong>GPU</strong> (VRAM/driver), <strong>RAM</strong> (DDR3/4/5) e <strong>Disco</strong> (NVMe/SATA/HDD).</p>
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-xs font-mono text-emerald-400">04</span>
+                        <h2 id="i18n-sec4-title" class="text-base sm:text-lg font-semibold tracking-tight text-zinc-100">Configurações dos Mods (<code class="text-emerald-400 font-mono text-sm">/config</code>)</h2>
+                    </div>
+                    <p id="i18n-sec4-sub" class="text-xs text-zinc-400 mt-1">Arquivos gerados para seu hardware — ou carregue a pasta <code>/config</code> da sua instância para validar e ajustar automaticamente.</p>
                 </div>
             </div>
 
-            <!-- Navegação de Abas para Todos os Mods de Otimização -->
-            <div id="cfg-tablist" role="tablist" aria-label="Arquivos de configuração" class="flex flex-wrap gap-1.5 bg-gray-950 p-2 rounded-xl border border-gray-800">
-                <button role="tab" aria-controls="cfg-tabpanel" aria-selected="true" tabindex="0" onclick="selectConfigTab('modernfix')" id="ctab-modernfix" class="ctab-btn px-3 py-2 rounded-lg text-xs font-bold bg-blue-600 text-white transition flex items-center gap-1.5">
-                    <i aria-hidden="true" class="fa-solid fa-bolt"></i> 1. ModernFix
+            <!-- Carregador e Validador Automático da Pasta /config -->
+            <div class="bg-zinc-950/70 border border-zinc-800/80 rounded-xl p-4 space-y-4">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                    <div class="min-w-0">
+                        <h3 class="text-xs font-semibold text-zinc-100 flex items-center gap-2">
+                            <i aria-hidden="true" class="fa-regular fa-folder-open text-emerald-400"></i>
+                            <span id="i18n-scan-title">Ajuste Automático da Pasta /config</span>
+                        </h3>
+                        <p id="i18n-scan-sub" class="text-xs text-zinc-400 mt-1 leading-relaxed">Selecione a pasta <code>config</code> do seu Minecraft. O painel procura cada mod direto em <code>/config</code> ou em subpastas, valida as opções para a versão escolhida e aplica os ajustes preservando o restante.</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2 shrink-0">
+                        <input type="file" id="config-dir-input" webkitdirectory directory multiple aria-label="Selecionar pasta config do Minecraft" onchange="onConfigDirInputChange(this)" class="hidden">
+                        <button onclick="loadConfigDirectory()" id="btn-load-config-dir" class="px-3.5 py-2 rounded-lg bg-zinc-100 hover:bg-white text-zinc-950 text-xs font-semibold transition flex items-center gap-2">
+                            <i aria-hidden="true" class="fa-solid fa-folder-open"></i>
+                            <span id="i18n-btn-load-config-dir">Carregar pasta /config</span>
+                        </button>
+                        <div id="config-scan-actions" class="hidden flex items-center gap-2">
+                            <button onclick="applyAllConfigAdjustments()" id="btn-apply-all-cfg" class="px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium transition flex items-center gap-1.5">
+                                <i aria-hidden="true" class="fa-solid fa-wand-magic-sparkles"></i>
+                                <span id="i18n-btn-apply-all-cfg">Aplicar todos os ajustes</span>
+                            </button>
+                            <button onclick="clearConfigScan()" id="btn-clear-scan" class="px-3 py-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 text-xs font-medium transition">
+                                <span id="i18n-btn-clear-scan">Limpar</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="config-scan-results" class="hidden pt-2 border-t border-zinc-800/70">
+                    <!-- Relatório por mod preenchido pelo JS -->
+                </div>
+            </div>
+
+            <!-- Navegação de Abas (8 Mods) -->
+            <div id="cfg-tablist" role="tablist" aria-label="Arquivos de configuração" class="flex flex-wrap gap-1 bg-zinc-950 p-1.5 rounded-xl border border-zinc-800/80">
+                <button role="tab" aria-controls="cfg-tabpanel" aria-selected="true" tabindex="0" onclick="selectConfigTab('modernfix')" id="ctab-modernfix" class="ctab-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-zinc-100 text-zinc-950 transition flex items-center gap-1.5">
+                    1. ModernFix
                 </button>
-                <button role="tab" aria-controls="cfg-tabpanel" aria-selected="false" tabindex="-1" onclick="selectConfigTab('embeddium')" id="ctab-embeddium" class="ctab-btn px-3 py-2 rounded-lg text-xs font-semibold text-gray-400 hover:text-white transition flex items-center gap-1.5">
-                    <i aria-hidden="true" class="fa-solid fa-display"></i> <span id="tab-label-renderer">2. Embeddium / Sodium</span>
+                <button role="tab" aria-controls="cfg-tabpanel" aria-selected="false" tabindex="-1" onclick="selectConfigTab('embeddium')" id="ctab-embeddium" class="ctab-btn px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900 transition flex items-center gap-1.5">
+                    <span id="tab-label-renderer">2. Embeddium / Sodium</span>
                 </button>
-                <button role="tab" aria-controls="cfg-tabpanel" aria-selected="false" tabindex="-1" onclick="selectConfigTab('ferrite')" id="ctab-ferrite" class="ctab-btn px-3 py-2 rounded-lg text-xs font-semibold text-gray-400 hover:text-white transition flex items-center gap-1.5">
-                    <i aria-hidden="true" class="fa-solid fa-memory"></i> 3. FerriteCore
+                <button role="tab" aria-controls="cfg-tabpanel" aria-selected="false" tabindex="-1" onclick="selectConfigTab('ferrite')" id="ctab-ferrite" class="ctab-btn px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900 transition flex items-center gap-1.5">
+                    3. FerriteCore
                 </button>
-                <button role="tab" aria-controls="cfg-tabpanel" aria-selected="false" tabindex="-1" onclick="selectConfigTab('immediatelyfast')" id="ctab-immediatelyfast" class="ctab-btn px-3 py-2 rounded-lg text-xs font-semibold text-gray-400 hover:text-white transition flex items-center gap-1.5">
-                    <i aria-hidden="true" class="fa-solid fa-gauge-high"></i> 4. ImmediatelyFast
+                <button role="tab" aria-controls="cfg-tabpanel" aria-selected="false" tabindex="-1" onclick="selectConfigTab('immediatelyfast')" id="ctab-immediatelyfast" class="ctab-btn px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900 transition flex items-center gap-1.5">
+                    4. ImmediatelyFast
                 </button>
-                <button role="tab" aria-controls="cfg-tabpanel" aria-selected="false" tabindex="-1" onclick="selectConfigTab('entityculling')" id="ctab-entityculling" class="ctab-btn px-3 py-2 rounded-lg text-xs font-semibold text-gray-400 hover:text-white transition flex items-center gap-1.5">
-                    <i aria-hidden="true" class="fa-solid fa-eye-slash"></i> 5. EntityCulling
+                <button role="tab" aria-controls="cfg-tabpanel" aria-selected="false" tabindex="-1" onclick="selectConfigTab('entityculling')" id="ctab-entityculling" class="ctab-btn px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900 transition flex items-center gap-1.5">
+                    5. EntityCulling
                 </button>
-                <button role="tab" aria-controls="cfg-tabpanel" aria-selected="false" tabindex="-1" onclick="selectConfigTab('badopt')" id="ctab-badopt" class="ctab-btn px-3 py-2 rounded-lg text-xs font-semibold text-gray-400 hover:text-white transition flex items-center gap-1.5">
-                    <i aria-hidden="true" class="fa-solid fa-feather"></i> 6. BadOptimizations
+                <button role="tab" aria-controls="cfg-tabpanel" aria-selected="false" tabindex="-1" onclick="selectConfigTab('badopt')" id="ctab-badopt" class="ctab-btn px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900 transition flex items-center gap-1.5">
+                    6. BadOptimizations
                 </button>
-                <button role="tab" aria-controls="cfg-tabpanel" aria-selected="false" tabindex="-1" onclick="selectConfigTab('radium')" id="ctab-radium" class="ctab-btn px-3 py-2 rounded-lg text-xs font-semibold text-gray-400 hover:text-white transition flex items-center gap-1.5">
-                    <i aria-hidden="true" class="fa-solid fa-gears"></i> <span id="tab-label-lithium">7. Radium / Lithium</span>
+                <button role="tab" aria-controls="cfg-tabpanel" aria-selected="false" tabindex="-1" onclick="selectConfigTab('radium')" id="ctab-radium" class="ctab-btn px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900 transition flex items-center gap-1.5">
+                    <span id="tab-label-lithium">7. Radium / Lithium</span>
                 </button>
-                <button role="tab" aria-controls="cfg-tabpanel" aria-selected="false" tabindex="-1" onclick="selectConfigTab('loader')" id="ctab-loader" class="ctab-btn px-3 py-2 rounded-lg text-xs font-semibold text-gray-400 hover:text-white transition flex items-center gap-1.5">
-                    <i aria-hidden="true" class="fa-solid fa-sliders"></i> 8. Forge / NeoForge / C2ME
-                </button>
-                <button role="tab" aria-controls="cfg-tabpanel" aria-selected="false" tabindex="-1" onclick="selectConfigTab('driver')" id="ctab-driver" class="ctab-btn px-3 py-2 rounded-lg text-xs font-semibold text-gray-400 hover:text-white transition flex items-center gap-1.5">
-                    <i aria-hidden="true" class="fa-solid fa-screwdriver-wrench"></i> <span id="i18n-tab-driver">9. Driver GPU & Shaders</span>
+                <button role="tab" aria-controls="cfg-tabpanel" aria-selected="false" tabindex="-1" onclick="selectConfigTab('loader')" id="ctab-loader" class="ctab-btn px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900 transition flex items-center gap-1.5">
+                    8. Forge / NeoForge / C2ME
                 </button>
             </div>
 
             <!-- Painel de Conteúdo da Config Selecionada -->
-            <div id="cfg-tabpanel" role="tabpanel" aria-labelledby="ctab-modernfix" class="bg-gray-950/90 border border-gray-800 rounded-2xl p-4 sm:p-5 space-y-4">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-800">
-                    <div>
+            <div id="cfg-tabpanel" role="tabpanel" aria-labelledby="ctab-modernfix" class="bg-zinc-950/70 border border-zinc-800/80 rounded-xl p-4 sm:p-5 space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-800/70">
+                    <div class="min-w-0">
                         <div class="flex flex-wrap items-center gap-2">
-                            <span id="cfg-file-path" class="font-mono text-sm font-bold text-blue-400 break-all">config/modernfix-mixins.properties</span>
-                            <span id="cfg-hw-tag" class="max-w-full break-words text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">Ajustado para NVMe + 6GB VRAM</span>
+                            <span id="cfg-file-path" class="font-mono text-xs sm:text-sm font-semibold text-zinc-100 break-all">config/modernfix-mixins.properties</span>
+                            <span id="cfg-hw-tag" class="max-w-full break-words text-[11px] font-mono px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Otimizado para NVMe</span>
                         </div>
-                        <p id="cfg-file-desc" class="text-xs text-gray-400 mt-1">Adicione estas linhas no final do arquivo para ativar recursos dinâmicos e acelerar a renderização de itens.</p>
+                        <p id="cfg-file-desc" class="text-xs text-zinc-400 mt-1">Cole estas linhas no final do arquivo.</p>
                     </div>
 
-                    <!-- Controles Extras específicos do ModernFix -->
-                    <div id="modernfix-extra-toggles" class="flex flex-wrap items-center gap-3">
-                        <label class="flex items-center gap-1.5 text-xs text-gray-300 cursor-pointer select-none bg-gray-900 px-2.5 py-1.5 rounded-lg border border-gray-800">
-                            <input type="checkbox" id="chk-mf-dynres" checked onchange="renderActiveConfigTab()" class="rounded accent-blue-500">
-                            <span>dynamic_resources</span>
+                    <div id="modernfix-extra-toggles" class="flex flex-wrap items-center gap-2">
+                        <label class="flex items-center gap-1.5 text-xs text-zinc-300 cursor-pointer select-none bg-zinc-900 px-2.5 py-1.5 rounded-lg border border-zinc-800">
+                            <input type="checkbox" id="chk-mf-dynres" checked onchange="renderActiveConfigTab()" class="rounded accent-emerald-500">
+                            <span class="font-mono text-[11px]">dynamic_resources</span>
                         </label>
-                        <label class="flex items-center gap-1.5 text-xs text-gray-300 cursor-pointer select-none bg-gray-900 px-2.5 py-1.5 rounded-lg border border-gray-800">
-                            <input type="checkbox" id="chk-mf-spawn" checked onchange="renderActiveConfigTab()" class="rounded accent-blue-500">
-                            <span>remove_spawn_chunks</span>
+                        <label class="flex items-center gap-1.5 text-xs text-zinc-300 cursor-pointer select-none bg-zinc-900 px-2.5 py-1.5 rounded-lg border border-zinc-800">
+                            <input type="checkbox" id="chk-mf-spawn" checked onchange="renderActiveConfigTab()" class="rounded accent-emerald-500">
+                            <span class="font-mono text-[11px]">remove_spawn_chunks</span>
                         </label>
                     </div>
 
-                    <button onclick="copyText('cfg-code-output', 'cfg')" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition flex items-center gap-2 self-start sm:self-auto shrink-0">
+                    <button onclick="copyText('cfg-code-output', 'cfg')" class="px-3.5 py-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-100 border border-zinc-700/80 text-xs font-medium transition flex items-center gap-2 self-start sm:self-auto shrink-0">
                         <i aria-hidden="true" class="fa-regular fa-copy"></i> <span id="i18n-btn-copy-cfg">Copiar Configuração</span>
                     </button>
                 </div>
 
-                <pre id="cfg-code-output" class="bg-gray-900/90 border border-gray-800 rounded-xl p-4 font-mono text-xs sm:text-sm text-emerald-300 overflow-x-auto code-scroll leading-relaxed select-all"></pre>
+                <pre id="cfg-code-output" class="bg-[#0c0c0f] border border-zinc-800/90 rounded-xl p-4 font-mono text-xs sm:text-sm text-emerald-300 overflow-x-auto code-scroll leading-relaxed select-all"></pre>
 
-                <div id="cfg-tips-box" class="p-3.5 rounded-xl bg-blue-950/20 border border-blue-500/30 text-xs text-gray-300 leading-relaxed">
-                    <!-- Explicação técnica das chaves do mod atual -->
+                <div id="cfg-tips-box" class="p-3.5 rounded-xl bg-zinc-900/50 border border-zinc-800/80 text-xs text-zinc-400 leading-relaxed">
+                    <!-- Explicação técnica -->
                 </div>
             </div>
         </section>
 
-        <!-- SEÇÃO 5: CHECKLIST INTERATIVO UNIVERSAL -->
-        <section class="bg-gray-900 border border-gray-800 rounded-2xl p-5 sm:p-6 shadow-xl">
-            <div class="flex items-center justify-between pb-4 border-b border-gray-800">
+        <!-- SEÇÃO 5: DRIVER GPU & SHADERS -->
+        <section id="section-driver" class="bg-[#111114] border border-zinc-800/80 rounded-2xl p-5 sm:p-7 space-y-5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-zinc-800/70">
                 <div>
-                    <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
-                        <i aria-hidden="true" class="fa-solid fa-list-check text-emerald-400"></i>
-                        <span id="i18n-sec5-title">5. Checklist Rápido de Aplicação (Qualquer Modpack)</span>
-                    </h2>
-                    <p id="i18n-sec5-sub" class="text-xs text-gray-400 mt-0.5">Marque cada etapa concluída na sua instância.</p>
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-xs font-mono text-emerald-400">05</span>
+                        <h2 id="i18n-sec5-title" class="text-base sm:text-lg font-semibold tracking-tight text-zinc-100">Driver GPU & Shaders</h2>
+                    </div>
+                    <p id="i18n-sec5-sub" class="text-xs text-zinc-400 mt-1">Ajustes de sistema operacional, driver de vídeo para o executável Java e recomendações de Shaders.</p>
                 </div>
-                <button onclick="resetChecklist()" id="i18n-btn-reset-chk" class="text-xs text-gray-400 hover:text-red-400 transition">Resetar marcações</button>
+                <button onclick="copyText('driver-code-output', 'driver')" class="px-3.5 py-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-100 border border-zinc-700/80 text-xs font-medium transition flex items-center gap-2 self-start sm:self-auto shrink-0">
+                    <i aria-hidden="true" class="fa-regular fa-copy"></i> <span id="i18n-btn-copy-driver">Copiar Ajustes</span>
+                </button>
             </div>
-            <div id="checklist-container" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-2.5">
-                <!-- Preenchido via JS -->
+
+            <div class="bg-zinc-950/70 border border-zinc-800/80 rounded-xl p-4 sm:p-5 space-y-4">
+                <div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span id="driver-file-path" class="font-mono text-xs sm:text-sm font-semibold text-zinc-100 break-all">Painel de Controle do Driver</span>
+                        <span id="driver-hw-tag" class="max-w-full break-words text-[11px] font-mono px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">NVIDIA • Oculus / Iris Shaders</span>
+                    </div>
+                    <p id="driver-file-desc" class="text-xs text-zinc-400 mt-1">Configurações no sistema operacional e driver de vídeo para o executável Java.</p>
+                </div>
+
+                <pre id="driver-code-output" class="bg-[#0c0c0f] border border-zinc-800/90 rounded-xl p-4 font-mono text-xs sm:text-sm text-zinc-200 overflow-x-auto code-scroll leading-relaxed select-all whitespace-pre-wrap"></pre>
+
+                <div id="driver-tips-box" class="p-3.5 rounded-xl bg-zinc-900/50 border border-zinc-800/80 text-xs text-zinc-400 leading-relaxed">
+                    <!-- Dicas de Shaders e Notebook -->
+                </div>
             </div>
         </section>
 
     </main>
 
-    <!-- Rodapé com link para o GitHub -->
-    <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-6 flex justify-center">
+    <!-- Rodapé Minimalista -->
+    <footer class="max-w-6xl mx-auto px-4 sm:px-6 pt-10 pb-6 flex justify-center">
         <a href="https://github.com/anreren/minecraft-optimization-panel" target="_blank" rel="noopener noreferrer"
-           class="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-xl bg-gray-900 border border-gray-700 text-gray-200 font-semibold text-sm hover:border-emerald-500/60 hover:text-white hover:bg-gray-800 transition shadow-lg">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true" class="shrink-0"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+           class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-zinc-900/80 border border-zinc-800 text-zinc-400 text-xs font-medium hover:border-zinc-700 hover:text-zinc-100 transition">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true" class="shrink-0"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
             <span id="i18n-footer-github">Ver no GitHub</span>
         </a>
     </footer>
@@ -875,6 +875,7 @@
     <script src="js/diagnostics.js"></script>
     <script src="js/mods.js"></script>
     <script src="js/configs.js"></script>
+    <script src="js/config-scanner.js"></script>
     <script src="js/ui.js"></script>
 </body>
 </html>

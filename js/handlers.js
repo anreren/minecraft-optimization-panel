@@ -50,11 +50,11 @@ function applyOsUi() {
     const pt = state.lang === 'pt';
     if (state.os === 'linux') {
         lp.disabled = false;
-        span.innerHTML = pt ? 'Usar <code class="text-purple-400 font-mono">Transparent Huge Pages</code>' : 'Use <code class="text-purple-400 font-mono">Transparent Huge Pages</code>';
+        span.innerHTML = pt ? 'Usar <code class="text-zinc-200 font-mono">Transparent Huge Pages</code>' : 'Use <code class="text-zinc-200 font-mono">Transparent Huge Pages</code>';
     } else if (state.os === 'macos') {
         lp.checked = false;
         lp.disabled = true;
-        span.innerHTML = pt ? 'LargePages <span class="text-gray-400">(indisponível no macOS)</span>' : 'LargePages <span class="text-gray-400">(unavailable on macOS)</span>';
+        span.innerHTML = pt ? 'LargePages <span class="text-zinc-500">(indisponível no macOS)</span>' : 'LargePages <span class="text-zinc-500">(unavailable on macOS)</span>';
     } else {
         lp.disabled = false;
         span.innerHTML = i18n[state.lang].chkLp;
@@ -214,13 +214,13 @@ function selectModpackProfile(profileKey, auto = false) {
     document.getElementById('ram-slider').value = state.allocRamGB;
 
     document.querySelectorAll('.profile-card').forEach(btn => {
-        btn.className = "profile-card text-left p-4 rounded-xl border border-gray-800 bg-gray-950/60 hover:border-gray-700 transition flex flex-col justify-between";
+        btn.className = "profile-card text-left p-4 rounded-xl border border-zinc-800/80 bg-zinc-950/50 hover:border-zinc-700 transition flex flex-col justify-between";
+        btn.setAttribute('aria-pressed', 'false');
     });
-    document.querySelectorAll('.profile-card').forEach(btn => btn.setAttribute('aria-pressed', 'false'));
     const activeBtn = document.getElementById(`profile-${profileKey}`);
     if (activeBtn) {
         activeBtn.setAttribute('aria-pressed', 'true');
-        activeBtn.className = "profile-card text-left p-4 rounded-xl border-2 border-emerald-500 bg-emerald-950/20 transition flex flex-col justify-between";
+        activeBtn.className = "profile-card text-left p-4 rounded-xl border border-emerald-500 bg-emerald-500/[0.06] transition flex flex-col justify-between";
     }
 
     recalculateAll();
@@ -232,7 +232,7 @@ function onRamSliderInput(val) {
     document.getElementById('ram-slider').value = state.allocRamGB;
     document.querySelectorAll('.profile-card').forEach(btn => {
         btn.setAttribute('aria-pressed', 'false');
-        btn.className = "profile-card text-left p-4 rounded-xl border border-gray-800 bg-gray-950/60 hover:border-gray-700 transition flex flex-col justify-between";
+        btn.className = "profile-card text-left p-4 rounded-xl border border-zinc-800/80 bg-zinc-950/50 hover:border-zinc-700 transition flex flex-col justify-between";
     });
     recalculateAll();
 }

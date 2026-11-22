@@ -1,4 +1,4 @@
-// Language switch, checklist, clipboard, toast and page start-up.
+// Language switch, clipboard, toast and page start-up.
 // Classic script: loaded by index.html in order, shares the global scope with the other js/ files.
 
 // ============================================================================
@@ -10,12 +10,14 @@ function setLanguage(lang) {
 
     const btnPt = document.getElementById('lang-btn-pt');
     const btnEn = document.getElementById('lang-btn-en');
+    const activeCls = "px-2.5 py-1 rounded-md text-xs font-semibold bg-zinc-100 text-zinc-950 transition";
+    const idleCls = "px-2.5 py-1 rounded-md text-xs font-medium text-zinc-400 hover:text-zinc-100 transition";
     if (lang === 'pt') {
-        btnPt.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-700 text-white transition flex items-center gap-1.5";
-        btnEn.className = "px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-400 hover:text-white transition flex items-center gap-1.5";
+        btnPt.className = activeCls;
+        btnEn.className = idleCls;
     } else {
-        btnEn.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-700 text-white transition flex items-center gap-1.5";
-        btnPt.className = "px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-400 hover:text-white transition flex items-center gap-1.5";
+        btnEn.className = activeCls;
+        btnPt.className = idleCls;
     }
 
     btnPt.setAttribute('aria-pressed', String(lang === 'pt'));
@@ -29,7 +31,6 @@ function setLanguage(lang) {
     document.getElementById('grp-gpu-igpu').label = t.igpuGroup;
     document.getElementById('i18n-footer-github').textContent = t.footerGithub;
     document.getElementById('i18n-app-title').textContent = t.appTitle;
-    document.getElementById('i18n-checklist-top').textContent = t.checklistTop;
     document.getElementById('i18n-sec1-title').textContent = t.sec1Title;
     document.getElementById('i18n-sec1-sub').textContent = t.sec1Sub;
     document.getElementById('i18n-live-telemetry').textContent = t.liveTelemetry;
@@ -88,12 +89,16 @@ function setLanguage(lang) {
 
     document.getElementById('i18n-sec4-title').innerHTML = t.sec4Title;
     document.getElementById('i18n-sec4-sub').innerHTML = t.sec4Sub;
-    document.getElementById('i18n-tab-driver').textContent = t.tabDriver;
     document.getElementById('i18n-btn-copy-cfg').textContent = t.btnCopyCfg;
+    document.getElementById('i18n-scan-title').textContent = t.scanTitle;
+    document.getElementById('i18n-scan-sub').innerHTML = t.scanSub;
+    document.getElementById('i18n-btn-load-config-dir').textContent = t.btnLoadConfigDir;
+    document.getElementById('i18n-btn-apply-all-cfg').textContent = t.btnApplyAllCfg;
+    document.getElementById('i18n-btn-clear-scan').textContent = t.btnClearScan;
 
     document.getElementById('i18n-sec5-title').textContent = t.sec5Title;
     document.getElementById('i18n-sec5-sub').textContent = t.sec5Sub;
-    document.getElementById('i18n-btn-reset-chk').textContent = t.btnResetChk;
+    document.getElementById('i18n-btn-copy-driver').textContent = t.btnCopyDriver;
 
     // Traduzir options com atributos data-pt e data-en
     document.querySelectorAll('option[data-pt]').forEach(opt => {
@@ -102,44 +107,6 @@ function setLanguage(lang) {
 
     populateFrequencyDropdown(state.ddrType, state.ramFreq);
     recalculateAll();
-    renderChecklist();
-}
-
-function renderChecklist() {
-    const lang = state.lang;
-    const container = document.getElementById('checklist-container');
-    container.innerHTML = '';
-    let doneCount = 0;
-
-    checklistItems.forEach(item => {
-        const checked = localStorage.getItem(item.id) === 'true';
-        if (checked) doneCount++;
-
-        const label = document.createElement('label');
-        label.className = `flex items-center gap-3 p-3.5 rounded-xl border cursor-pointer transition select-none ${
-            checked ? 'bg-emerald-950/30 border-emerald-500/40 text-emerald-200' : 'bg-gray-950/60 border-gray-800 text-gray-300 hover:border-gray-700'
-        }`;
-        label.innerHTML = `
-            <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleCheck('${item.id}', this.checked)" class="w-4 h-4 rounded accent-emerald-500 shrink-0">
-            <span class="text-xs font-medium leading-snug ${checked ? 'line-through opacity-75' : ''}">${item[lang]}</span>
-        `;
-        container.appendChild(label);
-    });
-
-    const pct = Math.round((doneCount / checklistItems.length) * 100);
-    document.getElementById('progress-text').textContent = `${doneCount}/${checklistItems.length} (${pct}%)`;
-    document.getElementById('progress-bar').style.width = `${pct}%`;
-}
-
-function toggleCheck(id, val) {
-    localStorage.setItem(id, val);
-    renderChecklist();
-}
-
-function resetChecklist() {
-    checklistItems.forEach(item => localStorage.removeItem(item.id));
-    renderChecklist();
-    showToast(i18n[state.lang].toastChkReset);
 }
 
 function copyText(elementId, typeKey) {
@@ -150,7 +117,8 @@ function copyText(elementId, typeKey) {
     ta.select();
     document.execCommand('copy');
     document.body.removeChild(ta);
-    const msg = typeKey === 'jvm' ? i18n[state.lang].toastJvmCopied : i18n[state.lang].toastCfgCopied;
+    const t = i18n[state.lang];
+    const msg = typeKey === 'jvm' ? t.toastJvmCopied : (typeKey === 'driver' ? t.toastDriverCopied : t.toastCfgCopied);
     showToast(msg);
 }
 
@@ -182,7 +150,6 @@ window.onload = function() {
     applyAutoEngine(false);
     // Aplica o i18n em todo o texto estático já na abertura (o HTML só guarda um texto provisório)
     setLanguage(state.lang);
-    renderChecklist();
     state.restoring = false;
     loadSavedConfig();
 };

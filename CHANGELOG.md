@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- **Section 4 `/config` folder loader & auto-adjuster (`js/config-scanner.js`):** loads a local Minecraft `/config` directory (via File System Access API with `webkitdirectory` fallback), recursively locates each mod's config directly in `/config` or inside subfolders, validates existing options for the chosen loader and Minecraft version, surfaces per-key diffs and loader/version mismatch warnings, and safely applies adjustments in-place (or via file download) while preserving comments and untouched user settings.
+- **Expanded Section 3 optimization mod catalog (`js/mods.js`):** added version- and loader-aware recommendations for *ScalableLux* (1.21+ Fabric/NeoForge), *Starlight* (1.20.1), *Alternate Current*, *Clumps*, *ServerCore* (Fabric/NeoForge), *FastSuite* (Forge/NeoForge), *Particle Core* (Fabric), *ThreadTweak* (Fabric), and a duplicate-engine conflict warning.
 - Split mismatched CPU entries into accurate models in `data/cpus.js`: Ryzen 9 5950X (16C/32T), Ryzen 5 4500 (8MB L3), Core i5-13400F / 14400F (10C/16T), and Core i7-14700K (20C/28T).
 - Automated CI matrix coverage for Oracle GraalVM 21 and 25 (`graalvm` job), plus mobile 375 px overflow and extended JVM flag assertions in `tests/check-browser.js`.
 - Per-mod upstream schema validation in `tests/check-browser.js` covering all 9 config tabs across MC versions, loaders (`forge`, `neoforge`, `fabric`), OSes, and hardware profiles (exact keys, value types, TOML sections, and version-gated fields).
@@ -13,6 +15,8 @@ All notable changes to this project are documented here. The format follows
 - Legacy URL hash fallback mapping `#e=graal_zgc` to `temurin_zgc` in `js/persistence.js`.
 
 ### Changed
+- **Minimalist UI redesign (`index.html`, `js/*.js`):** redesigned the interface to a restrained monochrome dark zinc palette with emerald primary accents, numbered minimalist section headers (`01`–`05`), cleaner form controls, flatter cards, and sleeker code/memory visuals.
+- **Section 5 promoted to GPU Driver & Shaders:** moved former Tab 9 (*Driver GPU & Shaders*) out of Section 4 into its own dedicated Section 5 (`#section-driver`), leaving Section 4 focused exclusively on the 8 mod config tabs and `/config` auto-adjuster.
 - **GitHub Actions CI:** moved `.github/ci.yml` to `.github/workflows/ci.yml` so workflows actually execute on pushes and PRs, upgraded `actions/setup-java` to `v5`, and enabled `/sys/kernel/mm/transparent_hugepage/shmem_enabled=advise` on Linux runners so Java 25 ZGC + THP checks run cleanly.
 - **Default JVM engine:** changed default and auto-recommended engine for capable systems from `graal_zgc` to `temurin_zgc`, and auto-selected `temurin_g1` when Java 17 is chosen.
 - **JVM flags cleanup & client tuning:**
@@ -42,6 +46,7 @@ All notable changes to this project are documented here. The format follows
 - `tests/validate-jvm.py` now checks Linux THP/`shmem_enabled` support before running THP combinations and skips OpenJDK-only ZGC profiles on GraalVM <23 (where `EnableJVMCI` is enabled by default).
 
 ### Removed
+- Interactive checklist section and header progress bar (`checklistItems`, `renderChecklist`, `toggleCheck`, `resetChecklist`).
 - Contradictory `graal_zgc` engine option (ZGC disables JVMCI on Java 21).
 - Dead `-Dfml.readTimeout=180` property, unneeded `-XX:+UnlockDiagnosticVMOptions` (and `-XX:+UnlockExperimentalVMOptions` on ZGC), `-XX:+PerfDisableSharedMem`, and `-XX:MaxMetaspaceSize=2048M`.
 

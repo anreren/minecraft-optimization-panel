@@ -73,7 +73,7 @@ Mobile CPUs and laptop GPUs are flagged. With a dedicated GPU the tool warns tha
 * **Java version (17 / 21 / 23+):** `-XX:+ZGenerational` is only emitted on **Java 21**. Java 17 only has the non-generational ZGC (and defaults to G1GC instead), and on Java 23+ the generational mode is the default and the flag is deprecated/obsolete, so it is omitted. Minecraft 1.20.6+ forces Java 21 or newer.
 * **Operating system (Windows / Linux / macOS):**
   * *Windows:* `-XX:+UseLargePages` option (requires the "Lock pages in memory" policy via `secpol.msc`, not available on Windows Home), `javaw.exe` and Windows Graphics settings.
-  * *Linux:* the same option becomes `-XX:+UseTransparentHugePages` (recommends kernel THP `[madvise]`, warns against `[always]` with aggressive defrag), and the Driver tab lists launcher environment variables (Mesa: `mesa_glthread`, `vblank_mode`, `DRI_PRIME`; NVIDIA: `__GL_THREADED_OPTIMIZATIONS`, `__NV_PRIME_RENDER_OFFLOAD`).
+  * *Linux:* the same option becomes `-XX:+UseTransparentHugePages` (recommends kernel THP `[madvise]`, plus `shmem_enabled=advise` for ZGC on Java 24/25+), and Section 5 (GPU Driver & Shaders) lists launcher environment variables (Mesa: `mesa_glthread`, `vblank_mode`, `DRI_PRIME`; NVIDIA: `__GL_THREADED_OPTIMIZATIONS`, `__NV_PRIME_RENDER_OFFLOAD`).
   * *macOS (Apple Silicon, M1 to M4):* picking an Apple chip switches to macOS, locks the DDR/channel/GPU selectors (unified memory, real bandwidth shown) and recommends an ARM64 Java.
 * **Launcher (Prism/MultiMC, CurseForge, Modrinth, ATLauncher, official, other):** launchers with their own memory control get a line **without** `-Xms/-Xmx` (avoiding duplicated `-Xmx`), distinguishing Prism/ATLauncher (separate Minimum and Maximum memory fields) from CurseForge/Modrinth (single Maximum/Allocated RAM slider). A step-by-step guide shows the current menu paths for each launcher.
 
@@ -91,9 +91,9 @@ Used only by the **Oracle GraalVM + G1GC** engine. The panel keeps Oracle GraalV
 * **Apple Silicon:** M1, M2, M3 and M4 families (base and Pro/Max) with their GPU, unified memory and macOS-specific advice.
 * **Integrated Graphics Detection:** Choose *Integrated Graphics (iGPU)* in the GPU list and the iGPU is detected from the selected CPU (e.g. Ryzen 3 3200G → Radeon Vega 8, Core i5-12400 → UHD 730). CPUs without video output (F/KF models, FX, Xeon) trigger a warning, and shared-memory advice replaces the VRAM alerts.
 * **Bilingual Support (PT-BR / EN-US):** Instant interface switching between Portuguese and English.
-* **Dynamic Mod Catalog:** Adapts mod recommendations based on your chosen Mod Loader (**Forge**, **NeoForge**, or **Fabric**) and Minecraft version (**1.20.1** to **1.21.4+**).
-* **Config Code Generator:** Auto-generates configuration files for *ModernFix*, *Embeddium/Sodium*, *FerriteCore*, *EntityCulling*, *ImmediatelyFast*, *BadOptimizations*, *Radium/Lithium*, *C2ME* (Fabric), *Forge/NeoForge* (`fml.toml`, plus `forge-client.toml` on Forge) and GPU driver control panels. Only some files depend on your hardware (Embeddium/Sodium, EntityCulling, ModernFix, loader tab); the others are universal profiles.
-* **Interactive Checklist:** Tracks your setup progress across instances with `localStorage` persistence.
+* **Dynamic Mod Catalog (Section 3):** Adapts mod recommendations based on your chosen Mod Loader (**Forge**, **NeoForge**, or **Fabric**) and Minecraft version (**1.20.1** to **1.21.4+**), including *Sodium/Embeddium*, *ModernFix*, *FerriteCore*, *Lithium/Radium*, *ImmediatelyFast*, *EntityCulling*, *BadOptimizations*, *C2ME/Noisium*, *ScalableLux/Starlight*, *Alternate Current*, *Clumps*, *ServerCore*, *FastSuite*, *Particle Core*, *ThreadTweak*, *AllTheLeaks/MemoryLeakFix*, *Krypton* and *Dynamic FPS*.
+* **Config Generator & `/config` Auto-Adjuster (Section 4):** Auto-generates hardware-tailored configuration files for *ModernFix*, *Embeddium/Sodium*, *FerriteCore*, *ImmediatelyFast*, *EntityCulling*, *BadOptimizations*, *Radium/Lithium*, *C2ME* (Fabric), and *Forge/NeoForge* (`fml.toml`, plus `forge-client.toml` on Forge). You can also **load your Minecraft `/config` folder** directly in the browser: the scanner locates each mod's config file (directly in `/config` or inside subfolders), validates existing options against your selected version and loader, shows a per-key diff, and writes adjustments in-place (File System Access API) or offers adjusted file downloads while preserving comments and untouched settings.
+* **GPU Driver & Shaders Guide (Section 5):** Standalone OS- and vendor-aware driver settings (NVIDIA, AMD Adrenalin, Intel Arc, Linux Mesa/NVIDIA env vars, Apple Silicon macOS) plus Shader distance guidance.
 * **Saved & Shareable Configuration:** Your whole setup (hardware, Java, OS, launcher, RAM profile, language) is saved in `localStorage` and mirrored in the page URL hash. The **Share** button copies a link that reopens the exact same configuration, and the reset button restores the defaults. Only values that exist in the dropdowns are accepted, so a tampered link falls back to the defaults.
 * **Accessibility:** skip link, visible keyboard focus, labelled controls, ARIA tabs (arrow keys), `aria-pressed` toggles, a live region for notifications and `role="alert"` for the RAM warning, decorative icons hidden from screen readers and support for *reduced motion*.
 * **Remembered RAM Profile:** If a low-RAM machine temporarily forces the *light* profile (8 GB or less), your previous profile is restored when you go back to more RAM.
@@ -125,8 +125,9 @@ Used only by the **Oracle GraalVM + G1GC** engine. The panel keeps Oracle GraalV
 │   ├── generator.js      # RAM bar, JVM arguments, flag explanations, launcher guide
 │   ├── diagnostics.js    # Diagnostic cards
 │   ├── mods.js           # Mod catalog
-│   ├── configs.js        # Generated config files (Section 4 tabs)
-│   └── ui.js             # Language switch, checklist, clipboard, start-up
+│   ├── configs.js        # Generated mod config files (Section 4 tabs) and GPU Driver & Shaders (Section 5)
+│   ├── config-scanner.js # /config folder recursive loader, option validator & safe auto-adjuster
+│   └── ui.js             # Language switch, clipboard, toast and start-up
 ├── data/
 │   ├── cpus.js       # CPU database (threads, GC values, single-thread tier, iGPU link)
 │   └── gpus.js       # GPU database (dedicated, notebook, integrated and Apple GPUs)
